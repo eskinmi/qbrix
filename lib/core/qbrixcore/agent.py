@@ -24,14 +24,6 @@ class Agent:
     def __post_init__(self):
         if self.param_backend is None:
             self.param_backend = InMemoryParamBackend()
-        else:
-            paramstate = self.param_backend.get(experiment_id=self.experiment_id)
-            if paramstate is None:
-                paramstate = self.protocol.init_params(
-                    num_arms=len(self.pool),
-                    **self.init_params
-                )
-                self.param_backend.set(experiment_id=self.experiment_id, params=paramstate)
 
 
     def add_callback(self, clb: callback.BaseCallback):
@@ -43,13 +35,24 @@ class Agent:
     @callback.register()
     def select(self, context: Context):
         paramstate = self.param_backend.get(experiment_id=self.experiment_id)
+        if paramstate is None:
+            raise RuntimeError(
+                f"param state not found for experiment {self.experiment_id}. "
+                f"ensure params are initialized before calling select."
+            )
         choice = self.protocol.select(paramstate, context)
         return choice
 
     @callback.register()
     def train(self, context: Context, choice: int, reward: Union[int, float]):
+        paramstate = self.param_backend.get(experiment_id=self.experiment_id)
+        if paramstate is None:
+            raise RuntimeError(
+                f"param state not found for experiment {self.experiment_id}. "
+                f"ensure params are initialized before calling train."
+            )
         paramstate = self.protocol.train(
-            ps=self.param_backend.get(experiment_id=self.experiment_id),
+            ps=paramstate,
             context=context,
             choice=choice,
             reward=reward
