@@ -76,10 +76,14 @@ class AgentFactory:
         if protocol_cls is None:
             raise ValueError(f"Unknown protocol: {protocol_name}. Available: {list(PROTOCOL_MAP.keys())}")
 
-        # todo: we need to ensure parameters here anyway, just in case it's a new instance.
-
         if self._param_backend.get(experiment_id) is None:
-            await self._param_backend.update_params(experiment_id, protocol_cls)
+            params = await self._param_backend.update_params(experiment_id, protocol_cls)
+            if params is None:
+                params = protocol_cls.init_params(
+                    num_arms=len(experiment_data["pool"]["arms"]),
+                    **experiment_data.get("protocol_params", {})
+                )
+                self._param_backend.set(experiment_id, params)
 
         pool = self._build_pool(experiment_data["pool"])
 
