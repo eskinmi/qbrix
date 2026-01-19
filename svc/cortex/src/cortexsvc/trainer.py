@@ -30,12 +30,12 @@ class BatchTrainer:
         for event in events:
             events_by_experiment[event.experiment_id].append(event)
 
-        results = {}
+        ledger = {}
         for experiment_id, experiment_events in events_by_experiment.items():
             count = await self._train_experiment(experiment_id, experiment_events)
-            results[experiment_id] = count
+            ledger[experiment_id] = count
 
-        return results
+        return ledger
 
     async def _train_experiment(self, experiment_id: str, events: list[FeedbackEvent]) -> int:
         experiment_data = await self._redis.get_experiment(experiment_id)
@@ -63,6 +63,7 @@ class BatchTrainer:
                 vector=np.array(event.context_vector, dtype=np.float16),
                 metadata=event.context_metadata
             )
+
             param_state = protocol_cls.train(
                 ps=param_state,
                 context=context,

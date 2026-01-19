@@ -57,9 +57,9 @@ class CortexService:
                 message_ids = [mid for mid, _ in messages]
                 events = [event for _, event in messages]
 
-                results = await self._trainer.train_batch(events)
+                ledger = await self._trainer.train_batch(events)
 
-                for experiment_id, count in results.items():
+                for experiment_id, count in ledger.items():
                     self._stats[experiment_id]["total"] += count
                     import time
                     self._stats[experiment_id]["last_train"] = int(time.time() * 1000)
@@ -71,7 +71,7 @@ class CortexService:
                 await asyncio.sleep(1)
 
     @staticmethod
-    async def flush_batch(experiment_id: str | None = None) -> int:
+    async def flush_batch(experiment_id: str | None = None) -> int:  # noqa
         return 0
 
     def get_stats(self, experiment_id: str | None = None) -> list[dict]:
