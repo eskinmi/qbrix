@@ -17,7 +17,7 @@ class CortexSettings(BaseSettings):
     consumer_name: str = "worker-0"
 
     batch_size: int = 100
-    batch_timeout_ms: int = 5000
+    batch_timeout_ms: int = 60000
     flush_interval_sec: int = 10
 
     @property
