@@ -23,6 +23,10 @@ class LoadTestSettings(BaseSettings):
     feedback_delay_max_ms: int = 2000  # max delay before sending feedback
     reward_success_probability: float = 0.3  # probability of positive reward
 
+    # context generation
+    context_vector_dim: int = 10  # dimension of context vector
+    context_metadata_keys: list[str] = ["device", "region", "user_tier"]
+
     model_config = {"env_prefix": "LOADTEST_"}
 
     @property

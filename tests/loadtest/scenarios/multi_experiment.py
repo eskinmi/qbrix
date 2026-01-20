@@ -101,11 +101,19 @@ class MultiExperimentUser(User):
             return
 
         context_id = str(uuid.uuid4())
+        context_vector = [random.random() for _ in range(settings.context_vector_dim)]
+        context_metadata = {
+            "device": random.choice(["mobile", "desktop", "tablet"]),
+            "region": random.choice(["us-east", "us-west", "eu", "apac"]),
+            "user_tier": random.choice(["free", "premium", "enterprise"]),
+        }
 
         try:
             result: SelectResult = self.client.select(
                 experiment_id=self.assigned_experiment.experiment_id,
                 context_id=context_id,
+                context_vector=context_vector,
+                context_metadata=context_metadata,
             )
 
             events.request.fire(
@@ -166,7 +174,7 @@ class MultiExperimentUser(User):
 
     def _send_feedback(self, pending: PendingFeedback) -> None:
         """send feedback asynchronously."""
-        if not self.client:
+        if not self.client or not self.client.is_connected:
             return
 
         reward = 1.0 if random.random() < settings.reward_success_probability else 0.0

@@ -2,6 +2,7 @@ import asyncio
 from concurrent import futures
 
 import grpc
+from grpc_reflection.v1alpha import reflection
 
 from qbrixproto import common_pb2, cortex_pb2, cortex_pb2_grpc
 
@@ -53,6 +54,12 @@ async def serve(settings: CortexSettings | None = None) -> None:
 
     server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
     cortex_pb2_grpc.add_CortexServiceServicer_to_server(CortexGRPCServicer(service), server)
+
+    service_names = (
+        cortex_pb2.DESCRIPTOR.services_by_name['CortexService'].full_name,
+        reflection.SERVICE_NAME,
+    )
+    reflection.enable_server_reflection(service_names, server)
 
     listen_addr = f"{settings.grpc_host}:{settings.grpc_port}"
     server.add_insecure_port(listen_addr)

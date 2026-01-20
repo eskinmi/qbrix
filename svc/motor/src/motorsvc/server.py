@@ -1,6 +1,7 @@
 from concurrent import futures
 
 import grpc
+from grpc_reflection.v1alpha import reflection
 
 from qbrixproto import common_pb2, motor_pb2, motor_pb2_grpc
 
@@ -55,6 +56,12 @@ async def serve(settings: MotorSettings | None = None) -> None:
 
     server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
     motor_pb2_grpc.add_MotorServiceServicer_to_server(MotorGRPCServicer(service), server)
+
+    service_names = (
+        motor_pb2.DESCRIPTOR.services_by_name['MotorService'].full_name,
+        reflection.SERVICE_NAME,
+    )
+    reflection.enable_server_reflection(service_names, server)
 
     listen_addr = f"{settings.grpc_host}:{settings.grpc_port}"
     server.add_insecure_port(listen_addr)

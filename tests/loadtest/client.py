@@ -39,6 +39,10 @@ class ProxyClient:
             self._stub = None
 
     @property
+    def is_connected(self) -> bool:
+        return self._stub is not None
+
+    @property
     def stub(self) -> proxy_pb2_grpc.ProxyServiceStub:
         if self._stub is None:
             raise RuntimeError("client not connected, call connect() first")
