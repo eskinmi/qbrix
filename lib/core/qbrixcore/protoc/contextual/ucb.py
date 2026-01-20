@@ -11,6 +11,7 @@ from qbrixcore.context import Context
 
 class LinUCBParamState(BaseParamState):
     """Parameter state for Linear UCB protocol."""
+
     dim: int = Field(..., gt=0)
     alpha: float = Field(default=1.5, gt=0.0)
     d: ArrayParam | None = None  # design matrices (num_arms, dim, dim)
@@ -19,10 +20,9 @@ class LinUCBParamState(BaseParamState):
     @model_validator(mode="after")
     def set_defaults(self):
         if self.d is None:
-            self.d = np.array([
-                np.identity(self.dim, dtype=np.float64)
-                for _ in range(self.num_arms)
-            ])
+            self.d = np.array(
+                [np.identity(self.dim, dtype=np.float64) for _ in range(self.num_arms)]
+            )
         if self.r is None:
             self.r = np.zeros((self.num_arms, self.dim, 1), dtype=np.float64)
         return self
@@ -68,8 +68,7 @@ class LinUCBProtocol(BaseProtocol):
         """Arm selection using Linear UCB."""
         x = LinUCBProtocol._reshape_context_vector(context)
         upper_bounds = [
-            LinUCBProtocol._arm_upper_bound(ps, i, x)
-            for i in range(ps.num_arms)
+            LinUCBProtocol._arm_upper_bound(ps, i, x) for i in range(ps.num_arms)
         ]
         return int(np.argmax(upper_bounds))
 
@@ -79,7 +78,7 @@ class LinUCBProtocol(BaseProtocol):
         ps: LinUCBParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> LinUCBParamState:
         """Update state with observed reward."""
         x = cls._reshape_context_vector(context)
@@ -92,7 +91,9 @@ class LinUCBProtocol(BaseProtocol):
         new_d[choice] = ps.d[choice] + np.dot(x, x.T)
         new_r[choice] = ps.r[choice] + reward * x
 
-        return ps.model_copy(update={
-            "d": new_d,
-            "r": new_r,
-        })
+        return ps.model_copy(
+            update={
+                "d": new_d,
+                "r": new_r,
+            }
+        )

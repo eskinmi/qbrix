@@ -11,6 +11,7 @@ from qbrixcore.context import Context
 
 class LinTSParamState(BaseParamState):
     """Parameter state for Linear Thompson Sampling protocol."""
+
     dim: int = Field(..., gt=0)
     v: float = Field(default=1.0, gt=0.0)
     d: ArrayParam | None = None  # design matrices (num_arms, dim, dim)
@@ -19,10 +20,9 @@ class LinTSParamState(BaseParamState):
     @model_validator(mode="after")
     def set_defaults(self):
         if self.d is None:
-            self.d = np.array([
-                np.identity(self.dim, dtype=np.float64)
-                for _ in range(self.num_arms)
-            ])
+            self.d = np.array(
+                [np.identity(self.dim, dtype=np.float64) for _ in range(self.num_arms)]
+            )
         if self.r is None:
             self.r = np.zeros((self.num_arms, self.dim, 1), dtype=np.float64)
         return self
@@ -55,7 +55,7 @@ class LinTSProtocol(BaseProtocol):
         try:
             b_inv = np.linalg.inv(ps.d[arm])
             mu = np.dot(b_inv, ps.r[arm]).flatten()
-            cov = (ps.v ** 2) * b_inv
+            cov = (ps.v**2) * b_inv
             cov = (cov + cov.T) / 2
             theta_sample = np.random.multivariate_normal(mu, cov)
             return theta_sample.reshape(-1, 1)
@@ -84,7 +84,7 @@ class LinTSProtocol(BaseProtocol):
         ps: LinTSParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> LinTSParamState:
         """Update state with observed reward."""
         x = cls._reshape_context_vector(context)
@@ -97,7 +97,9 @@ class LinTSProtocol(BaseProtocol):
         new_d[choice] = ps.d[choice] + np.dot(x, x.T)
         new_r[choice] = ps.r[choice] + reward * x
 
-        return ps.model_copy(update={
-            "d": new_d,
-            "r": new_r,
-        })
+        return ps.model_copy(
+            update={
+                "d": new_d,
+                "r": new_r,
+            }
+        )

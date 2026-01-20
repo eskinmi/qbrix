@@ -24,7 +24,7 @@ class MotorClient:
         experiment_id: str,
         context_id: str,
         context_vector: List[Union[int, float]],
-        context_metadata: dict
+        context_metadata: dict,
     ) -> dict:
         if self._stub is None:
             raise RuntimeError("MotorClient not connected. Call connect() first.")
@@ -34,18 +34,18 @@ class MotorClient:
             context=common_pb2.Context(
                 id=context_id,
                 vector=context_vector,
-                metadata={k: str(v) for k, v in context_metadata.items()}
-            )
+                metadata={k: str(v) for k, v in context_metadata.items()},
+            ),
         )
         response = await self._stub.Select(request)
         return {
             "arm": {
                 "id": response.arm.id,
                 "name": response.arm.name,
-                "index": response.arm.index
+                "index": response.arm.index,
             },
             "request_id": response.request_id,
-            "score": response.score
+            "score": response.score,
         }
 
     async def health(self) -> bool:

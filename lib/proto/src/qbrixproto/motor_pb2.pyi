@@ -34,7 +34,9 @@ class SelectRequest(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["context", b"context"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["context", b"context", "experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "context", b"context", "experiment_id", b"experiment_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___SelectRequest: _TypeAlias = SelectRequest  # noqa: Y015
@@ -61,7 +63,9 @@ class SelectResponse(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm", "request_id", b"request_id", "score", b"score"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "arm", b"arm", "request_id", b"request_id", "score", b"score"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___SelectResponse: _TypeAlias = SelectResponse  # noqa: Y015

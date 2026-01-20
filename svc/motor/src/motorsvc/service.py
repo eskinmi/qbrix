@@ -23,7 +23,7 @@ class MotorService:
             host=self._settings.redis_host,
             port=self._settings.redis_port,
             password=self._settings.redis_password,
-            db=self._settings.redis_db
+            db=self._settings.redis_db,
         )
         self._redis = RedisClient(redis_settings)
         await self._redis.connect()
@@ -39,7 +39,7 @@ class MotorService:
         experiment_id: str,
         context_id: str,
         context_vector: list[float],
-        context_metadata: dict
+        context_metadata: dict,
     ) -> dict:
         experiment_data = await self._redis.get_experiment(experiment_id)
         if experiment_data is None:
@@ -48,22 +48,16 @@ class MotorService:
         agent = await self._agent_factory.get_or_create(experiment_data)
 
         context = Context(
-            id=context_id,
-            vector=context_vector or [],
-            metadata=context_metadata or {}
+            id=context_id, vector=context_vector or [], metadata=context_metadata or {}
         )
 
         choice_index = agent.select(context)
         arm = agent.pool.arms[choice_index]
 
         return {
-            "arm": {
-                "id": arm.id,
-                "name": arm.name,
-                "index": choice_index
-            },
+            "arm": {"id": arm.id, "name": arm.name, "index": choice_index},
             "request_id": uuid.uuid4().hex,
-            "score": 0.0
+            "score": 0.0,
         }
 
     async def health(self) -> bool:

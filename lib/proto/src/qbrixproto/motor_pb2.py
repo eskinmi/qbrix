@@ -9,13 +9,9 @@ from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
+
 _runtime_version.ValidateProtobufRuntimeVersion(
-    _runtime_version.Domain.PUBLIC,
-    6,
-    33,
-    4,
-    '',
-    'motor.proto'
+    _runtime_version.Domain.PUBLIC, 6, 33, 4, "", "motor.proto"
 )
 # @@protoc_insertion_point(imports)
 
@@ -25,18 +21,22 @@ _sym_db = _symbol_database.Default()
 from qbrixproto import common_pb2 as common__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bmotor.proto\x12\x0bqbrix.motor\x1a\x0c\x63ommon.proto\"e\n\rSelectRequest\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId\x12/\n\x07\x63ontext\x18\x02 \x01(\x0b\x32\x15.qbrix.common.ContextR\x07\x63ontext\"j\n\x0eSelectResponse\x12#\n\x03\x61rm\x18\x01 \x01(\x0b\x32\x11.qbrix.common.ArmR\x03\x61rm\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x14\n\x05score\x18\x03 \x01(\x01R\x05score2\xa0\x01\n\x0cMotorService\x12\x41\n\x06Select\x12\x1a.qbrix.motor.SelectRequest\x1a\x1b.qbrix.motor.SelectResponse\x12M\n\x06Health\x12 .qbrix.common.HealthCheckRequest\x1a!.qbrix.common.HealthCheckResponseBj\n\x0f\x63om.qbrix.motorB\nMotorProtoP\x01\xa2\x02\x03QMX\xaa\x02\x0bQbrix.Motor\xca\x02\x0bQbrix\\Motor\xe2\x02\x17Qbrix\\Motor\\GPBMetadata\xea\x02\x0cQbrix::Motorb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
+    b'\n\x0bmotor.proto\x12\x0bqbrix.motor\x1a\x0c\x63ommon.proto"e\n\rSelectRequest\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId\x12/\n\x07\x63ontext\x18\x02 \x01(\x0b\x32\x15.qbrix.common.ContextR\x07\x63ontext"j\n\x0eSelectResponse\x12#\n\x03\x61rm\x18\x01 \x01(\x0b\x32\x11.qbrix.common.ArmR\x03\x61rm\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x14\n\x05score\x18\x03 \x01(\x01R\x05score2\xa0\x01\n\x0cMotorService\x12\x41\n\x06Select\x12\x1a.qbrix.motor.SelectRequest\x1a\x1b.qbrix.motor.SelectResponse\x12M\n\x06Health\x12 .qbrix.common.HealthCheckRequest\x1a!.qbrix.common.HealthCheckResponseBj\n\x0f\x63om.qbrix.motorB\nMotorProtoP\x01\xa2\x02\x03QMX\xaa\x02\x0bQbrix.Motor\xca\x02\x0bQbrix\\Motor\xe2\x02\x17Qbrix\\Motor\\GPBMetadata\xea\x02\x0cQbrix::Motorb\x06proto3'
+)
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'motor_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "motor_pb2", _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
-  _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'\n\017com.qbrix.motorB\nMotorProtoP\001\242\002\003QMX\252\002\013Qbrix.Motor\312\002\013Qbrix\\Motor\342\002\027Qbrix\\Motor\\GPBMetadata\352\002\014Qbrix::Motor'
-  _globals['_SELECTREQUEST']._serialized_start=42
-  _globals['_SELECTREQUEST']._serialized_end=143
-  _globals['_SELECTRESPONSE']._serialized_start=145
-  _globals['_SELECTRESPONSE']._serialized_end=251
-  _globals['_MOTORSERVICE']._serialized_start=254
-  _globals['_MOTORSERVICE']._serialized_end=414
+    _globals["DESCRIPTOR"]._loaded_options = None
+    _globals["DESCRIPTOR"]._serialized_options = (
+        b"\n\017com.qbrix.motorB\nMotorProtoP\001\242\002\003QMX\252\002\013Qbrix.Motor\312\002\013Qbrix\\Motor\342\002\027Qbrix\\Motor\\GPBMetadata\352\002\014Qbrix::Motor"
+    )
+    _globals["_SELECTREQUEST"]._serialized_start = 42
+    _globals["_SELECTREQUEST"]._serialized_end = 143
+    _globals["_SELECTRESPONSE"]._serialized_start = 145
+    _globals["_SELECTRESPONSE"]._serialized_end = 251
+    _globals["_MOTORSERVICE"]._serialized_start = 254
+    _globals["_MOTORSERVICE"]._serialized_end = 414
 # @@protoc_insertion_point(module_scope)

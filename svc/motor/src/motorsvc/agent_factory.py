@@ -8,11 +8,13 @@ from motorsvc.param_backend import RedisBackedInMemoryParamBackend
 
 def _build_protocol_map() -> dict[str, type[BaseProtocol]]:
     registry = {}
+
     def collect(cls):
         for subclass in cls.__subclasses__():
             if hasattr(subclass, "name") and subclass.name:
                 registry[subclass.name] = subclass
             collect(subclass)
+
     collect(BaseProtocol)
     return registry
 
@@ -21,7 +23,9 @@ PROTOCOL_MAP = _build_protocol_map()
 
 
 class AgentFactory:
-    def __init__(self, cache: MotorCache, param_backend: RedisBackedInMemoryParamBackend):
+    def __init__(
+        self, cache: MotorCache, param_backend: RedisBackedInMemoryParamBackend
+    ):
         self._cache = cache
         self._param_backend = param_backend
 
@@ -32,7 +36,7 @@ class AgentFactory:
             arm = Arm(
                 name=arm_data["name"],
                 id=arm_data["id"],
-                is_active=arm_data.get("is_active", True)
+                is_active=arm_data.get("is_active", True),
             )
             pool.add_arm(arm)
         return pool
@@ -51,13 +55,11 @@ class AgentFactory:
         if agent is not None:
             if (params := self._param_backend.get(experiment_id)) is None:
                 params = await self._param_backend.update_params(
-                    experiment_id,
-                    agent.protocol
+                    experiment_id, agent.protocol
                 )
             if params is None:
                 params = agent.protocol.init_params(
-                    num_arms=len(agent.pool),
-                    **agent.init_params
+                    num_arms=len(agent.pool), **agent.init_params
                 )
                 self._param_backend.set(experiment_id, params)
             return agent
@@ -74,14 +76,18 @@ class AgentFactory:
         protocol_name = experiment_data["protocol"]
         protocol_cls = PROTOCOL_MAP.get(protocol_name)
         if protocol_cls is None:
-            raise ValueError(f"Unknown protocol: {protocol_name}. Available: {list(PROTOCOL_MAP.keys())}")
+            raise ValueError(
+                f"Unknown protocol: {protocol_name}. Available: {list(PROTOCOL_MAP.keys())}"
+            )
 
         if self._param_backend.get(experiment_id) is None:
-            params = await self._param_backend.update_params(experiment_id, protocol_cls)
+            params = await self._param_backend.update_params(
+                experiment_id, protocol_cls
+            )
             if params is None:
                 params = protocol_cls.init_params(
                     num_arms=len(experiment_data["pool"]["arms"]),
-                    **experiment_data.get("protocol_params", {})
+                    **experiment_data.get("protocol_params", {}),
                 )
                 self._param_backend.set(experiment_id, params)
 
@@ -92,7 +98,7 @@ class AgentFactory:
             pool=pool,
             protocol=protocol_cls,
             init_params=experiment_data.get("protocol_params", {}),
-            param_backend=self._param_backend
+            param_backend=self._param_backend,
         )
 
         self._cache.set_agent(experiment_id, agent)

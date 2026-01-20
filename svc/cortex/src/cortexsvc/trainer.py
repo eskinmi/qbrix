@@ -9,11 +9,13 @@ from qbrixstore.redis.streams import FeedbackEvent
 
 def _build_protocol_map() -> dict[str, type[BaseProtocol]]:
     registry = {}
+
     def collect(cls):
         for subclass in cls.__subclasses__():
             if hasattr(subclass, "name") and subclass.name:
                 registry[subclass.name] = subclass
             collect(subclass)
+
     collect(BaseProtocol)
     return registry
 
@@ -37,7 +39,9 @@ class BatchTrainer:
 
         return ledger
 
-    async def _train_experiment(self, experiment_id: str, events: list[FeedbackEvent]) -> int:
+    async def _train_experiment(
+        self, experiment_id: str, events: list[FeedbackEvent]
+    ) -> int:
         experiment_data = await self._redis.get_experiment(experiment_id)
         if experiment_data is None:
             return 0
@@ -51,8 +55,7 @@ class BatchTrainer:
         if params is None:
             num_arms = len(experiment_data["pool"]["arms"])
             param_state = protocol_cls.init_params(
-                num_arms=num_arms,
-                **experiment_data.get("protocol_params", {})
+                num_arms=num_arms, **experiment_data.get("protocol_params", {})
             )
         else:
             param_state = protocol_cls.param_state_cls.model_validate(params)
@@ -61,14 +64,14 @@ class BatchTrainer:
             context = Context(
                 id=event.context_id,
                 vector=np.array(event.context_vector, dtype=np.float16),
-                metadata=event.context_metadata
+                metadata=event.context_metadata,
             )
 
             param_state = protocol_cls.train(
                 ps=param_state,
                 context=context,
                 choice=event.arm_index,
-                reward=event.reward
+                reward=event.reward,
             )
 
         await self._redis.set_params(experiment_id, param_state.model_dump())

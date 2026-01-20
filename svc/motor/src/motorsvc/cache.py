@@ -9,12 +9,10 @@ class MotorCache:
     def __init__(self, settings: MotorSettings):
         self._settings = settings
         self._params: TTLCache = TTLCache(
-            maxsize=settings.param_cache_maxsize,
-            ttl=settings.param_cache_ttl
+            maxsize=settings.param_cache_maxsize, ttl=settings.param_cache_ttl
         )
         self._agents: TTLCache = TTLCache(
-            maxsize=settings.agent_cache_maxsize,
-            ttl=settings.agent_cache_ttl
+            maxsize=settings.agent_cache_maxsize, ttl=settings.agent_cache_ttl
         )
 
     def get_params(self, experiment_id: str) -> BaseParamState | None:

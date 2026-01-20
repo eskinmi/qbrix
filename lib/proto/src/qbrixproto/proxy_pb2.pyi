@@ -36,7 +36,9 @@ class CreatePoolRequest(_message.Message):
         name: _builtins.str = ...,
         arms: _abc.Iterable[_common_pb2.Arm] | None = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["arms", b"arms", "name", b"name"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "arms", b"arms", "name", b"name"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___CreatePoolRequest: _TypeAlias = CreatePoolRequest  # noqa: Y015
@@ -71,7 +73,9 @@ class GetPoolRequest(_message.Message):
         *,
         pool_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["pool_id", b"pool_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "pool_id", b"pool_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___GetPoolRequest: _TypeAlias = GetPoolRequest  # noqa: Y015
@@ -106,7 +110,9 @@ class DeletePoolRequest(_message.Message):
         *,
         pool_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["pool_id", b"pool_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "pool_id", b"pool_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___DeletePoolRequest: _TypeAlias = DeletePoolRequest  # noqa: Y015
@@ -122,7 +128,9 @@ class DeletePoolResponse(_message.Message):
         *,
         deleted: _builtins.bool = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["deleted", b"deleted"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "deleted", b"deleted"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___DeletePoolResponse: _TypeAlias = DeletePoolResponse  # noqa: Y015
@@ -147,7 +155,9 @@ class CreateExperimentRequest(_message.Message):
             key: _builtins.str = ...,
             value: _builtins.str = ...,
         ) -> None: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
+        _ClearFieldArgType: _TypeAlias = _typing.Literal[
+            "key", b"key", "value", b"value"
+        ]  # noqa: Y015
         def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
     NAME_FIELD_NUMBER: _builtins.int
@@ -161,7 +171,9 @@ class CreateExperimentRequest(_message.Message):
     protocol: _builtins.str
     enabled: _builtins.bool
     @_builtins.property
-    def protocol_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
+    def protocol_params(
+        self,
+    ) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
     @_builtins.property
     def feature_gate(self) -> Global___FeatureGateConfig:
         """Feature gate config"""
@@ -176,9 +188,24 @@ class CreateExperimentRequest(_message.Message):
         enabled: _builtins.bool = ...,
         feature_gate: Global___FeatureGateConfig | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["feature_gate", b"feature_gate"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal[
+        "feature_gate", b"feature_gate"
+    ]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "feature_gate", b"feature_gate", "name", b"name", "pool_id", b"pool_id", "protocol", b"protocol", "protocol_params", b"protocol_params"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "enabled",
+        b"enabled",
+        "feature_gate",
+        b"feature_gate",
+        "name",
+        b"name",
+        "pool_id",
+        b"pool_id",
+        "protocol",
+        b"protocol",
+        "protocol_params",
+        b"protocol_params",
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___CreateExperimentRequest: _TypeAlias = CreateExperimentRequest  # noqa: Y015
@@ -206,7 +233,9 @@ class FeatureGateConfig(_message.Message):
     @_builtins.property
     def active_hours(self) -> Global___ActiveHoursConfig: ...
     @_builtins.property
-    def rules(self) -> _containers.RepeatedCompositeFieldContainer[Global___RuleConfig]: ...
+    def rules(
+        self,
+    ) -> _containers.RepeatedCompositeFieldContainer[Global___RuleConfig]: ...
     def __init__(
         self,
         *,
@@ -218,9 +247,26 @@ class FeatureGateConfig(_message.Message):
         timezone: _builtins.str = ...,
         rules: _abc.Iterable[Global___RuleConfig] | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["active_hours", b"active_hours", "schedule", b"schedule"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal[
+        "active_hours", b"active_hours", "schedule", b"schedule"
+    ]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["active_hours", b"active_hours", "default_arm_id", b"default_arm_id", "enabled", b"enabled", "rollout_percentage", b"rollout_percentage", "rules", b"rules", "schedule", b"schedule", "timezone", b"timezone"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "active_hours",
+        b"active_hours",
+        "default_arm_id",
+        b"default_arm_id",
+        "enabled",
+        b"enabled",
+        "rollout_percentage",
+        b"rollout_percentage",
+        "rules",
+        b"rules",
+        "schedule",
+        b"schedule",
+        "timezone",
+        b"timezone",
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___FeatureGateConfig: _TypeAlias = FeatureGateConfig  # noqa: Y015
@@ -239,18 +285,48 @@ class ScheduleConfig(_message.Message):
         start_timestamp_ms: _builtins.int | None = ...,
         end_timestamp_ms: _builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["_end_timestamp_ms", b"_end_timestamp_ms", "_start_timestamp_ms", b"_start_timestamp_ms", "end_timestamp_ms", b"end_timestamp_ms", "start_timestamp_ms", b"start_timestamp_ms"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal[
+        "_end_timestamp_ms",
+        b"_end_timestamp_ms",
+        "_start_timestamp_ms",
+        b"_start_timestamp_ms",
+        "end_timestamp_ms",
+        b"end_timestamp_ms",
+        "start_timestamp_ms",
+        b"start_timestamp_ms",
+    ]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["_end_timestamp_ms", b"_end_timestamp_ms", "_start_timestamp_ms", b"_start_timestamp_ms", "end_timestamp_ms", b"end_timestamp_ms", "start_timestamp_ms", b"start_timestamp_ms"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "_end_timestamp_ms",
+        b"_end_timestamp_ms",
+        "_start_timestamp_ms",
+        b"_start_timestamp_ms",
+        "end_timestamp_ms",
+        b"end_timestamp_ms",
+        "start_timestamp_ms",
+        b"start_timestamp_ms",
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType__end_timestamp_ms: _TypeAlias = _typing.Literal["end_timestamp_ms"]  # noqa: Y015
-    _WhichOneofArgType__end_timestamp_ms: _TypeAlias = _typing.Literal["_end_timestamp_ms", b"_end_timestamp_ms"]  # noqa: Y015
-    _WhichOneofReturnType__start_timestamp_ms: _TypeAlias = _typing.Literal["start_timestamp_ms"]  # noqa: Y015
-    _WhichOneofArgType__start_timestamp_ms: _TypeAlias = _typing.Literal["_start_timestamp_ms", b"_start_timestamp_ms"]  # noqa: Y015
+    _WhichOneofReturnType__end_timestamp_ms: _TypeAlias = _typing.Literal[
+        "end_timestamp_ms"
+    ]  # noqa: Y015
+    _WhichOneofArgType__end_timestamp_ms: _TypeAlias = _typing.Literal[
+        "_end_timestamp_ms", b"_end_timestamp_ms"
+    ]  # noqa: Y015
+    _WhichOneofReturnType__start_timestamp_ms: _TypeAlias = _typing.Literal[
+        "start_timestamp_ms"
+    ]  # noqa: Y015
+    _WhichOneofArgType__start_timestamp_ms: _TypeAlias = _typing.Literal[
+        "_start_timestamp_ms", b"_start_timestamp_ms"
+    ]  # noqa: Y015
     @_typing.overload
-    def WhichOneof(self, oneof_group: _WhichOneofArgType__end_timestamp_ms) -> _WhichOneofReturnType__end_timestamp_ms | None: ...
+    def WhichOneof(
+        self, oneof_group: _WhichOneofArgType__end_timestamp_ms
+    ) -> _WhichOneofReturnType__end_timestamp_ms | None: ...
     @_typing.overload
-    def WhichOneof(self, oneof_group: _WhichOneofArgType__start_timestamp_ms) -> _WhichOneofReturnType__start_timestamp_ms | None: ...
+    def WhichOneof(
+        self, oneof_group: _WhichOneofArgType__start_timestamp_ms
+    ) -> _WhichOneofReturnType__start_timestamp_ms | None: ...
 
 Global___ScheduleConfig: _TypeAlias = ScheduleConfig  # noqa: Y015
 
@@ -270,18 +346,28 @@ class ActiveHoursConfig(_message.Message):
         start: _builtins.str | None = ...,
         end: _builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["_end", b"_end", "_start", b"_start", "end", b"end", "start", b"start"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal[
+        "_end", b"_end", "_start", b"_start", "end", b"end", "start", b"start"
+    ]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["_end", b"_end", "_start", b"_start", "end", b"end", "start", b"start"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "_end", b"_end", "_start", b"_start", "end", b"end", "start", b"start"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
     _WhichOneofReturnType__end: _TypeAlias = _typing.Literal["end"]  # noqa: Y015
     _WhichOneofArgType__end: _TypeAlias = _typing.Literal["_end", b"_end"]  # noqa: Y015
     _WhichOneofReturnType__start: _TypeAlias = _typing.Literal["start"]  # noqa: Y015
-    _WhichOneofArgType__start: _TypeAlias = _typing.Literal["_start", b"_start"]  # noqa: Y015
+    _WhichOneofArgType__start: _TypeAlias = _typing.Literal[
+        "_start", b"_start"
+    ]  # noqa: Y015
     @_typing.overload
-    def WhichOneof(self, oneof_group: _WhichOneofArgType__end) -> _WhichOneofReturnType__end | None: ...
+    def WhichOneof(
+        self, oneof_group: _WhichOneofArgType__end
+    ) -> _WhichOneofReturnType__end | None: ...
     @_typing.overload
-    def WhichOneof(self, oneof_group: _WhichOneofArgType__start) -> _WhichOneofReturnType__start | None: ...
+    def WhichOneof(
+        self, oneof_group: _WhichOneofArgType__start
+    ) -> _WhichOneofReturnType__start | None: ...
 
 Global___ActiveHoursConfig: _TypeAlias = ActiveHoursConfig  # noqa: Y015
 
@@ -309,7 +395,9 @@ class RuleConfig(_message.Message):
         value: _builtins.str = ...,
         arm_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm_id", b"arm_id", "key", b"key", "operator", b"operator", "value", b"value"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "arm_id", b"arm_id", "key", b"key", "operator", b"operator", "value", b"value"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___RuleConfig: _TypeAlias = RuleConfig  # noqa: Y015
@@ -326,9 +414,13 @@ class CreateExperimentResponse(_message.Message):
         *,
         experiment: _common_pb2.Experiment | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["experiment", b"experiment"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment", b"experiment"
+    ]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment", b"experiment"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment", b"experiment"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___CreateExperimentResponse: _TypeAlias = CreateExperimentResponse  # noqa: Y015
@@ -344,7 +436,9 @@ class GetExperimentRequest(_message.Message):
         *,
         experiment_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment_id", b"experiment_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___GetExperimentRequest: _TypeAlias = GetExperimentRequest  # noqa: Y015
@@ -365,9 +459,13 @@ class GetExperimentResponse(_message.Message):
         experiment: _common_pb2.Experiment | None = ...,
         feature_gate: Global___FeatureGateConfig | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["experiment", b"experiment", "feature_gate", b"feature_gate"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment", b"experiment", "feature_gate", b"feature_gate"
+    ]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment", b"experiment", "feature_gate", b"feature_gate"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment", b"experiment", "feature_gate", b"feature_gate"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___GetExperimentResponse: _TypeAlias = GetExperimentResponse  # noqa: Y015
@@ -390,7 +488,9 @@ class UpdateExperimentRequest(_message.Message):
             key: _builtins.str = ...,
             value: _builtins.str = ...,
         ) -> None: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
+        _ClearFieldArgType: _TypeAlias = _typing.Literal[
+            "key", b"key", "value", b"value"
+        ]  # noqa: Y015
         def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
     EXPERIMENT_ID_FIELD_NUMBER: _builtins.int
@@ -400,7 +500,9 @@ class UpdateExperimentRequest(_message.Message):
     experiment_id: _builtins.str
     enabled: _builtins.bool
     @_builtins.property
-    def protocol_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
+    def protocol_params(
+        self,
+    ) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
     @_builtins.property
     def feature_gate(self) -> Global___FeatureGateConfig: ...
     def __init__(
@@ -411,18 +513,52 @@ class UpdateExperimentRequest(_message.Message):
         protocol_params: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
         feature_gate: Global___FeatureGateConfig | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["_enabled", b"_enabled", "_feature_gate", b"_feature_gate", "enabled", b"enabled", "feature_gate", b"feature_gate"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal[
+        "_enabled",
+        b"_enabled",
+        "_feature_gate",
+        b"_feature_gate",
+        "enabled",
+        b"enabled",
+        "feature_gate",
+        b"feature_gate",
+    ]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["_enabled", b"_enabled", "_feature_gate", b"_feature_gate", "enabled", b"enabled", "experiment_id", b"experiment_id", "feature_gate", b"feature_gate", "protocol_params", b"protocol_params"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "_enabled",
+        b"_enabled",
+        "_feature_gate",
+        b"_feature_gate",
+        "enabled",
+        b"enabled",
+        "experiment_id",
+        b"experiment_id",
+        "feature_gate",
+        b"feature_gate",
+        "protocol_params",
+        b"protocol_params",
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType__enabled: _TypeAlias = _typing.Literal["enabled"]  # noqa: Y015
-    _WhichOneofArgType__enabled: _TypeAlias = _typing.Literal["_enabled", b"_enabled"]  # noqa: Y015
-    _WhichOneofReturnType__feature_gate: _TypeAlias = _typing.Literal["feature_gate"]  # noqa: Y015
-    _WhichOneofArgType__feature_gate: _TypeAlias = _typing.Literal["_feature_gate", b"_feature_gate"]  # noqa: Y015
+    _WhichOneofReturnType__enabled: _TypeAlias = _typing.Literal[
+        "enabled"
+    ]  # noqa: Y015
+    _WhichOneofArgType__enabled: _TypeAlias = _typing.Literal[
+        "_enabled", b"_enabled"
+    ]  # noqa: Y015
+    _WhichOneofReturnType__feature_gate: _TypeAlias = _typing.Literal[
+        "feature_gate"
+    ]  # noqa: Y015
+    _WhichOneofArgType__feature_gate: _TypeAlias = _typing.Literal[
+        "_feature_gate", b"_feature_gate"
+    ]  # noqa: Y015
     @_typing.overload
-    def WhichOneof(self, oneof_group: _WhichOneofArgType__enabled) -> _WhichOneofReturnType__enabled | None: ...
+    def WhichOneof(
+        self, oneof_group: _WhichOneofArgType__enabled
+    ) -> _WhichOneofReturnType__enabled | None: ...
     @_typing.overload
-    def WhichOneof(self, oneof_group: _WhichOneofArgType__feature_gate) -> _WhichOneofReturnType__feature_gate | None: ...
+    def WhichOneof(
+        self, oneof_group: _WhichOneofArgType__feature_gate
+    ) -> _WhichOneofReturnType__feature_gate | None: ...
 
 Global___UpdateExperimentRequest: _TypeAlias = UpdateExperimentRequest  # noqa: Y015
 
@@ -438,9 +574,13 @@ class UpdateExperimentResponse(_message.Message):
         *,
         experiment: _common_pb2.Experiment | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["experiment", b"experiment"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment", b"experiment"
+    ]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment", b"experiment"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment", b"experiment"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___UpdateExperimentResponse: _TypeAlias = UpdateExperimentResponse  # noqa: Y015
@@ -456,7 +596,9 @@ class DeleteExperimentRequest(_message.Message):
         *,
         experiment_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment_id", b"experiment_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___DeleteExperimentRequest: _TypeAlias = DeleteExperimentRequest  # noqa: Y015
@@ -472,7 +614,9 @@ class DeleteExperimentResponse(_message.Message):
         *,
         deleted: _builtins.bool = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["deleted", b"deleted"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "deleted", b"deleted"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___DeleteExperimentResponse: _TypeAlias = DeleteExperimentResponse  # noqa: Y015
@@ -496,7 +640,9 @@ class CreateGateConfigRequest(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["config", b"config"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["config", b"config", "experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "config", b"config", "experiment_id", b"experiment_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___CreateGateConfigRequest: _TypeAlias = CreateGateConfigRequest  # noqa: Y015
@@ -531,7 +677,9 @@ class GetGateConfigRequest(_message.Message):
         *,
         experiment_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment_id", b"experiment_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___GetGateConfigRequest: _TypeAlias = GetGateConfigRequest  # noqa: Y015
@@ -572,7 +720,9 @@ class UpdateGateConfigRequest(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["config", b"config"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["config", b"config", "experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "config", b"config", "experiment_id", b"experiment_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___UpdateGateConfigRequest: _TypeAlias = UpdateGateConfigRequest  # noqa: Y015
@@ -607,7 +757,9 @@ class DeleteGateConfigRequest(_message.Message):
         *,
         experiment_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "experiment_id", b"experiment_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___DeleteGateConfigRequest: _TypeAlias = DeleteGateConfigRequest  # noqa: Y015
@@ -623,7 +775,9 @@ class DeleteGateConfigResponse(_message.Message):
         *,
         deleted: _builtins.bool = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["deleted", b"deleted"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "deleted", b"deleted"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___DeleteGateConfigResponse: _TypeAlias = DeleteGateConfigResponse  # noqa: Y015
@@ -647,7 +801,9 @@ class SelectRequest(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["context", b"context"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["context", b"context", "experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "context", b"context", "experiment_id", b"experiment_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___SelectRequest: _TypeAlias = SelectRequest  # noqa: Y015
@@ -673,7 +829,9 @@ class SelectResponse(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm", "is_default", b"is_default", "request_id", b"request_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "arm", b"arm", "is_default", b"is_default", "request_id", b"request_id"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___SelectResponse: _TypeAlias = SelectResponse  # noqa: Y015
@@ -695,7 +853,9 @@ class FeedbackRequest(_message.Message):
         request_id: _builtins.str = ...,
         reward: _builtins.float = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["request_id", b"request_id", "reward", b"reward"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "request_id", b"request_id", "reward", b"reward"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___FeedbackRequest: _TypeAlias = FeedbackRequest  # noqa: Y015
@@ -711,7 +871,9 @@ class FeedbackResponse(_message.Message):
         *,
         accepted: _builtins.bool = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["accepted", b"accepted"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "accepted", b"accepted"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___FeedbackResponse: _TypeAlias = FeedbackResponse  # noqa: Y015

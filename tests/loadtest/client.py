@@ -54,10 +54,7 @@ class ProxyClient:
         return response.status == common_pb2.HealthCheckResponse.SERVING
 
     def create_pool(self, name: str, num_arms: int) -> str:
-        arms = [
-            common_pb2.Arm(name=f"arm-{i}", index=i)
-            for i in range(num_arms)
-        ]
+        arms = [common_pb2.Arm(name=f"arm-{i}", index=i) for i in range(num_arms)]
         request = proxy_pb2.CreatePoolRequest(name=name, arms=arms)
         response = self.stub.CreatePool(request)
         return response.pool.id

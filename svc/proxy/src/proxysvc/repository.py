@@ -28,9 +28,7 @@ class PoolRepository:
         pool = Pool(name=name)
         for i, arm_data in enumerate(arms):
             arm = Arm(
-                name=arm_data["name"],
-                index=i,
-                metadata_=arm_data.get("metadata", {})
+                name=arm_data["name"], index=i, metadata_=arm_data.get("metadata", {})
             )
             pool.arms.append(arm)
         self._session.add(pool)
@@ -67,14 +65,14 @@ class ExperimentRepository:
         protocol: str,
         protocol_params: dict,
         enabled: bool,
-        feature_gate_config: dict | None = None
+        feature_gate_config: dict | None = None,
     ) -> Experiment:
         experiment = Experiment(
             name=name,
             pool_id=pool_id,
             protocol=protocol,
             protocol_params=protocol_params,
-            enabled=enabled
+            enabled=enabled,
         )
 
         if feature_gate_config:
@@ -88,7 +86,7 @@ class ExperimentRepository:
                 active_hours_end=feature_gate_config.get("active_hours_end"),
                 timezone=feature_gate_config.get("timezone", "UTC"),
                 rules=feature_gate_config.get("rules", []),
-                version=1
+                version=1,
             )
             experiment.feature_gate = feature_gate
 
@@ -101,7 +99,7 @@ class ExperimentRepository:
             select(Experiment)
             .options(
                 selectinload(Experiment.pool).selectinload(Pool.arms),
-                selectinload(Experiment.feature_gate)
+                selectinload(Experiment.feature_gate),
             )
             .where(Experiment.id == experiment_id)
         )
@@ -113,7 +111,7 @@ class ExperimentRepository:
             select(Experiment)
             .options(
                 selectinload(Experiment.pool).selectinload(Pool.arms),
-                selectinload(Experiment.feature_gate)
+                selectinload(Experiment.feature_gate),
             )
             .where(Experiment.name == name)
         )
@@ -170,7 +168,7 @@ class FeatureGateRepository:
             active_hours_end=config.get("active_hours_end"),
             timezone=config.get("timezone", "UTC"),
             rules=config.get("rules", []),
-            version=1
+            version=1,
         )
         self._session.add(gate)
         await self._session.flush()
@@ -209,7 +207,7 @@ class FeatureGateRepository:
             committed_arm = BaseArmModel(
                 id=gate.default_arm.id,
                 name=gate.default_arm.name,
-                index=gate.default_arm.index
+                index=gate.default_arm.index,
             )
 
         experiment = ExperimentConfig(
@@ -221,16 +219,14 @@ class FeatureGateRepository:
                 hour=ActiveHoursConfig(
                     start=gate.active_hours_start,
                     end=gate.active_hours_end,
-                    timezone=tz
+                    timezone=tz,
                 ),
                 period=ActivePeriodConfig(
-                    start=gate.schedule_start,
-                    end=gate.schedule_end,
-                    timezone=tz
-                )
+                    start=gate.schedule_start, end=gate.schedule_end, timezone=tz
+                ),
             ),
             updated_at=gate.updated_at,
-            version=gate.version
+            version=gate.version,
         )
 
         rules = [Rule.model_validate(r) for r in (gate.rules or [])]
@@ -239,5 +235,5 @@ class FeatureGateRepository:
             experiment=experiment,
             rules=rules,
             updated_at=gate.updated_at,
-            version=gate.version
+            version=gate.version,
         )

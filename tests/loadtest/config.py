@@ -19,7 +19,7 @@ class LoadTestSettings(BaseSettings):
 
     # behavior tuning
     feedback_probability: float = 0.7  # probability of sending feedback after select
-    feedback_delay_min_ms: int = 100   # min delay before sending feedback
+    feedback_delay_min_ms: int = 100  # min delay before sending feedback
     feedback_delay_max_ms: int = 2000  # max delay before sending feedback
     reward_success_probability: float = 0.3  # probability of positive reward
 

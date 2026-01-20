@@ -11,6 +11,7 @@ from qbrixcore.context import Context
 
 class BetaTSParamState(BaseParamState):
     """Parameter state for Beta-Bernoulli Thompson Sampling protocol."""
+
     alpha_prior: float = Field(default=1.0, gt=0.0)
     beta_prior: float = Field(default=1.0, gt=0.0)
     alpha: ArrayParam | None = None
@@ -52,7 +53,7 @@ class BetaTSProtocol(BaseProtocol):
         ps: BetaTSParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> BetaTSParamState:
         """
         Update state with observed reward using Beta-Bernoulli conjugacy.
@@ -75,15 +76,18 @@ class BetaTSProtocol(BaseProtocol):
         else:
             new_beta[choice] += 1
 
-        return ps.model_copy(update={
-            "alpha": new_alpha,
-            "beta": new_beta,
-            "T": new_T,
-        })
+        return ps.model_copy(
+            update={
+                "alpha": new_alpha,
+                "beta": new_beta,
+                "T": new_T,
+            }
+        )
 
 
 class GaussianTSParamState(BaseParamState):
     """Parameter state for Gaussian Thompson Sampling protocol."""
+
     prior_mean: float = Field(default=0.0)
     prior_precision: float = Field(default=1.0, gt=0.0)
     noise_precision: float = Field(default=1.0, gt=0.0)
@@ -94,9 +98,13 @@ class GaussianTSParamState(BaseParamState):
     @model_validator(mode="after")
     def set_defaults(self):
         if self.posterior_mean is None:
-            self.posterior_mean = np.full(self.num_arms, self.prior_mean, dtype=np.float64)
+            self.posterior_mean = np.full(
+                self.num_arms, self.prior_mean, dtype=np.float64
+            )
         if self.posterior_precision is None:
-            self.posterior_precision = np.full(self.num_arms, self.prior_precision, dtype=np.float64)
+            self.posterior_precision = np.full(
+                self.num_arms, self.prior_precision, dtype=np.float64
+            )
         if self.T is None:
             self.T = np.zeros(self.num_arms, dtype=np.int64)
         return self
@@ -118,8 +126,7 @@ class GaussianTSProtocol(BaseProtocol):
         """Arm selection using Gaussian Thompson Sampling."""
         samples = [
             np.random.normal(
-                ps.posterior_mean[i],
-                1.0 / np.sqrt(ps.posterior_precision[i])
+                ps.posterior_mean[i], 1.0 / np.sqrt(ps.posterior_precision[i])
             )
             for i in range(ps.num_arms)
         ]
@@ -131,7 +138,7 @@ class GaussianTSProtocol(BaseProtocol):
         ps: GaussianTSParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> GaussianTSParamState:
         """Update state with observed reward using Gaussian-Gaussian conjugacy."""
         new_posterior_mean = ps.posterior_mean.copy()
@@ -148,8 +155,10 @@ class GaussianTSProtocol(BaseProtocol):
             prev_precision * prev_mean + ps.noise_precision * reward
         ) / new_posterior_precision[choice]
 
-        return ps.model_copy(update={
-            "posterior_mean": new_posterior_mean,
-            "posterior_precision": new_posterior_precision,
-            "T": new_T,
-        })
+        return ps.model_copy(
+            update={
+                "posterior_mean": new_posterior_mean,
+                "posterior_precision": new_posterior_precision,
+                "T": new_T,
+            }
+        )

@@ -131,15 +131,22 @@ def run(
     else:
         if not run_time:
             click.echo("error: --run-time is required for headless mode", err=True)
-            click.echo("use --web for interactive mode or specify -t/--run-time", err=True)
+            click.echo(
+                "use --web for interactive mode or specify -t/--run-time", err=True
+            )
             sys.exit(1)
 
-        locust_args.extend([
-            "--headless",
-            "-u", str(users),
-            "-r", str(spawn_rate),
-            "-t", run_time,
-        ])
+        locust_args.extend(
+            [
+                "--headless",
+                "-u",
+                str(users),
+                "-r",
+                str(spawn_rate),
+                "-t",
+                run_time,
+            ]
+        )
         click.echo(f"running headless load test")
         click.echo(f"scenario: {scenario}")
         click.echo(f"target: {host}:{port}")
@@ -148,6 +155,7 @@ def run(
     # replace current process with locust
     sys.argv = locust_args
     from locust.main import main as locust_main
+
     locust_main()
 
 

@@ -31,7 +31,7 @@ class CortexGRPCServicer(cortex_pb2_grpc.CortexServiceServicer):
                     experiment_id=s["experiment_id"],
                     total_events=s.get("total", 0),
                     pending_events=s.get("pending", 0),
-                    last_train_timestamp_ms=s.get("last_train", 0)
+                    last_train_timestamp_ms=s.get("last_train", 0),
                 )
                 for s in stats_list
             ]
@@ -40,8 +40,11 @@ class CortexGRPCServicer(cortex_pb2_grpc.CortexServiceServicer):
     async def Health(self, request, context):
         healthy = await self._service.health()
         return common_pb2.HealthCheckResponse(
-            status=common_pb2.HealthCheckResponse.SERVING if healthy
-            else common_pb2.HealthCheckResponse.NOT_SERVING
+            status=(
+                common_pb2.HealthCheckResponse.SERVING
+                if healthy
+                else common_pb2.HealthCheckResponse.NOT_SERVING
+            )
         )
 
 
@@ -53,10 +56,12 @@ async def serve(settings: CortexSettings | None = None) -> None:
     await service.start()
 
     server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
-    cortex_pb2_grpc.add_CortexServiceServicer_to_server(CortexGRPCServicer(service), server)
+    cortex_pb2_grpc.add_CortexServiceServicer_to_server(
+        CortexGRPCServicer(service), server
+    )
 
     service_names = (
-        cortex_pb2.DESCRIPTOR.services_by_name['CortexService'].full_name,
+        cortex_pb2.DESCRIPTOR.services_by_name["CortexService"].full_name,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(service_names, server)

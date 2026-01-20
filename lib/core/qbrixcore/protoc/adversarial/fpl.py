@@ -11,6 +11,7 @@ from qbrixcore.context import Context
 
 class FPLParamState(BaseParamState):
     """Parameter state for FPL (Follow the Perturbed Leader) protocol."""
+
     eta: float = Field(default=5.0, gt=0.0)
     r: ArrayParam | None = None
 
@@ -50,7 +51,7 @@ class FPLProtocol(BaseProtocol):
         ps: FPLParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> FPLParamState:
         """Update cumulative rewards (no noise in updates)."""
         new_r = ps.r.copy()

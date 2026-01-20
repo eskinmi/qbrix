@@ -7,7 +7,11 @@ from qbrixstore.redis.streams import RedisStreamPublisher, FeedbackEvent
 from qbrixstore.config import PostgresSettings, RedisSettings
 
 from proxysvc.config import ProxySettings
-from proxysvc.repository import PoolRepository, ExperimentRepository, FeatureGateRepository
+from proxysvc.repository import (
+    PoolRepository,
+    ExperimentRepository,
+    FeatureGateRepository,
+)
 from proxysvc.motor_client import MotorClient
 from proxysvc.token import SelectionToken
 from proxysvc.gate import GateService
@@ -27,7 +31,7 @@ class ProxyService:
             port=self._settings.postgres_port,
             user=self._settings.postgres_user,
             password=self._settings.postgres_password,
-            database=self._settings.postgres_database
+            database=self._settings.postgres_database,
         )
         init_db(pg_settings)
         await create_tables()
@@ -37,7 +41,7 @@ class ProxyService:
             port=self._settings.redis_port,
             password=self._settings.redis_password,
             db=self._settings.redis_db,
-            stream_name=self._settings.stream_name
+            stream_name=self._settings.stream_name,
         )
         self._redis = RedisClient(redis_settings)
         await self._redis.connect()
@@ -71,7 +75,7 @@ class ProxyService:
             if pool is None:
                 return None
             return self._pool_to_dict(pool)
-    
+
     @staticmethod
     async def delete_pool(pool_id: str) -> bool:
         async with get_session() as session:
@@ -85,7 +89,7 @@ class ProxyService:
         protocol: str,
         protocol_params: dict,
         enabled: bool,
-        feature_gate_config: dict | None = None
+        feature_gate_config: dict | None = None,
     ) -> dict:
         async with get_session() as session:
             repo = ExperimentRepository(session)
@@ -95,7 +99,7 @@ class ProxyService:
                 protocol=protocol,
                 protocol_params=protocol_params,
                 enabled=enabled,
-                feature_gate_config=feature_gate_config
+                feature_gate_config=feature_gate_config,
             )
             exp_dict = self._experiment_to_dict(experiment)
             experiment_id = experiment.id
@@ -185,13 +189,13 @@ class ProxyService:
         experiment_id: str,
         context_id: str,
         context_vector: list[float],
-        context_metadata: dict
+        context_metadata: dict,
     ) -> dict:
         # evaluate feature gate first
         committed_arm = await self._gate_service.evaluate(
             experiment_id=experiment_id,
             context_id=context_id,
-            context_metadata=context_metadata
+            context_metadata=context_metadata,
         )
 
         if committed_arm is not None and committed_arm.index is not None:
@@ -208,10 +212,10 @@ class ProxyService:
                 "arm": {
                     "id": committed_arm.id,
                     "name": committed_arm.name,
-                    "index": committed_arm.index
+                    "index": committed_arm.index,
                 },
                 "request_id": token,
-                "is_default": True
+                "is_default": True,
             }
 
         # bandit selection via motorsvc
@@ -219,7 +223,7 @@ class ProxyService:
             experiment_id=experiment_id,
             context_id=context_id,
             context_vector=context_vector,
-            context_metadata=context_metadata
+            context_metadata=context_metadata,
         )
 
         token = SelectionToken.encode(
@@ -262,7 +266,7 @@ class ProxyService:
             context_id=selection.context_id,
             context_vector=selection.context_vector,
             context_metadata=selection.context_metadata,
-            timestamp_ms=int(time.time() * 1000)
+            timestamp_ms=int(time.time() * 1000),
         )
         await self._publisher.publish(event)
         return True
@@ -282,7 +286,7 @@ class ProxyService:
                 "pool": self._pool_to_dict(pool),
                 "protocol": experiment.protocol,
                 "protocol_params": experiment.protocol_params,
-                "enabled": experiment.enabled
+                "enabled": experiment.enabled,
             }
             await self._redis.set_experiment(experiment_id, redis_data)
 
@@ -299,9 +303,14 @@ class ProxyService:
             "id": pool.id,
             "name": pool.name,
             "arms": [
-                {"id": arm.id, "name": arm.name, "index": arm.index, "is_active": arm.is_active}
+                {
+                    "id": arm.id,
+                    "name": arm.name,
+                    "index": arm.index,
+                    "is_active": arm.is_active,
+                }
                 for arm in sorted(pool.arms, key=lambda a: a.index)
-            ]
+            ],
         }
 
     @staticmethod
@@ -312,5 +321,5 @@ class ProxyService:
             "pool_id": experiment.pool_id,
             "protocol": experiment.protocol,
             "protocol_params": experiment.protocol_params,
-            "enabled": experiment.enabled
+            "enabled": experiment.enabled,
         }

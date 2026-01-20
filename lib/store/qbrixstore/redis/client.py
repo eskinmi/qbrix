@@ -47,7 +47,9 @@ class RedisClient:
             return None
         return json.loads(data)
 
-    async def set_params(self, experiment_id: str, params: dict, ttl: int | None = None) -> None:
+    async def set_params(
+        self, experiment_id: str, params: dict, ttl: int | None = None
+    ) -> None:
         key = self._param_key(experiment_id)
         await self.client.set(key, json.dumps(params), ex=ttl)
 
@@ -57,14 +59,15 @@ class RedisClient:
             return None
         return json.loads(data)
 
-    async def set_experiment(self, experiment_id: str, experiment: dict, ttl: int | None = None) -> None:
+    async def set_experiment(
+        self, experiment_id: str, experiment: dict, ttl: int | None = None
+    ) -> None:
         key = self._experiment_key(experiment_id)
         await self.client.set(key, json.dumps(experiment), ex=ttl)
 
     async def delete_experiment(self, experiment_id: str) -> None:
         await self.client.delete(
-            self._experiment_key(experiment_id),
-            self._param_key(experiment_id)
+            self._experiment_key(experiment_id), self._param_key(experiment_id)
         )
 
     async def get_gate_config(self, experiment_id: str) -> dict | None:
@@ -73,7 +76,9 @@ class RedisClient:
             return None
         return json.loads(data)
 
-    async def set_gate_config(self, experiment_id: str, config: dict, ttl: int | None = None) -> None:
+    async def set_gate_config(
+        self, experiment_id: str, config: dict, ttl: int | None = None
+    ) -> None:
         key = self._gate_key(experiment_id)
         await self.client.set(key, json.dumps(config), ex=ttl)
 
@@ -83,5 +88,3 @@ class RedisClient:
     async def publish_gate_invalidation(self, channel: str, experiment_id: str) -> None:
         """publish gate config invalidation event for cache listeners."""
         await self.client.publish(channel, experiment_id)
-
-

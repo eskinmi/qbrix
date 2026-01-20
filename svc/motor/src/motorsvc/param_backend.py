@@ -18,9 +18,7 @@ class RedisBackedInMemoryParamBackend(BaseParamBackend):
         self._cache.set_params(experiment_id, params)
 
     async def update_params(
-        self,
-        experiment_id: str,
-        protocol: type[BaseProtocol]
+        self, experiment_id: str, protocol: type[BaseProtocol]
     ) -> BaseParamState | None:
         params_dict = await self._redis.get_params(experiment_id)
         if params_dict is not None:

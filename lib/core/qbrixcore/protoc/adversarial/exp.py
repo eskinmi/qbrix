@@ -11,6 +11,7 @@ from qbrixcore.context import Context
 
 class EXP3ParamState(BaseParamState):
     """Parameter state for EXP3 (Exponential-weight) protocol."""
+
     gamma: float = Field(default=0.1, ge=0.0, le=1.0)
     w: ArrayParam | None = None
 
@@ -51,7 +52,7 @@ class EXP3Protocol(BaseProtocol):
         ps: EXP3ParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> EXP3ParamState:
         """Update weights with importance-weighted reward estimate."""
         proba = cls._proba(ps)

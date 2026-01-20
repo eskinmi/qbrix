@@ -12,6 +12,7 @@ class Context:
     (LinUCB, LinTS) will convert lists to arrays internally when needed.
     Stochastic protocols ignore the vector entirely.
     """
+
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     vector: np.ndarray | list[float] = field(default_factory=list)
     metadata: dict = field(default_factory=dict)

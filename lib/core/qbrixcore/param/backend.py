@@ -8,6 +8,7 @@ class BaseParamBackend(ABC):
     @abstractmethod
     def get(self, experiment_id: str):
         pass
+
     @abstractmethod
     def set(self, experiment_id: str, params: BaseParamState):
         pass

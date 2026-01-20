@@ -61,12 +61,16 @@ class RedisStreamPublisher:
     async def publish(self, event: FeedbackEvent) -> str:
         if self._client is None:
             raise RuntimeError("Publisher not connected. Call connect() first.")
-        message_id = await self._client.xadd(self._settings.stream_name, event.to_dict())
+        message_id = await self._client.xadd(
+            self._settings.stream_name, event.to_dict()
+        )
         return message_id
 
 
 class RedisStreamConsumer:
-    def __init__(self, settings: RedisSettings | None = None, consumer_name: str = "worker-0"):
+    def __init__(
+        self, settings: RedisSettings | None = None, consumer_name: str = "worker-0"
+    ):
         if settings is None:
             settings = RedisSettings()
         self._settings = settings
@@ -80,7 +84,7 @@ class RedisStreamConsumer:
                 self._settings.stream_name,
                 self._settings.consumer_group,
                 id="0",
-                mkstream=True
+                mkstream=True,
             )
         except redis.ResponseError as e:
             if "BUSYGROUP" not in str(e):
@@ -91,9 +95,7 @@ class RedisStreamConsumer:
             await self._client.close()
 
     async def consume(
-        self,
-        batch_size: int = 100,
-        block_ms: int = 5000
+        self, batch_size: int = 100, block_ms: int = 5000
     ) -> list[tuple[str, FeedbackEvent]]:
         if self._client is None:
             raise RuntimeError("Consumer not connected. Call connect() first.")
@@ -103,7 +105,7 @@ class RedisStreamConsumer:
             consumername=self._consumer_name,
             streams={self._settings.stream_name: ">"},
             count=batch_size,
-            block=block_ms
+            block=block_ms,
         )
 
         events = []
@@ -119,16 +121,14 @@ class RedisStreamConsumer:
             raise RuntimeError("Consumer not connected. Call connect() first.")
         if message_ids:
             await self._client.xack(
-                self._settings.stream_name,
-                self._settings.consumer_group,
-                *message_ids
+                self._settings.stream_name, self._settings.consumer_group, *message_ids
             )
 
     async def run(
         self,
         handler: Callable[[list[FeedbackEvent]], Awaitable[None]],
         batch_size: int = 100,
-        block_ms: int = 5000
+        block_ms: int = 5000,
     ) -> None:
         while True:
             messages = await self.consume(batch_size=batch_size, block_ms=block_ms)

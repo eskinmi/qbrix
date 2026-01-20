@@ -12,6 +12,7 @@ from qbrixcore.context import Context
 
 class MOSSParamState(BaseParamState):
     """Parameter state for MOSS (Minimax Optimal Strategy in the Stochastic case) protocol."""
+
     horizon: int = Field(..., gt=0)
     mu: ArrayParam | None = None
     T: ArrayParam | None = None
@@ -76,11 +77,11 @@ class MOSSProtocol(BaseProtocol):
 
     @classmethod
     def train(
-            cls,
-            ps: MOSSParamState,
-            context: Context,
-            choice: int,
-            reward: Union[int, float, np.float64]
+        cls,
+        ps: MOSSParamState,
+        context: Context,
+        choice: int,
+        reward: Union[int, float, np.float64],
     ) -> MOSSParamState:
         """
         Update state with observed reward.
@@ -93,15 +94,18 @@ class MOSSProtocol(BaseProtocol):
         new_T[choice] += 1
         new_mu[choice] += (reward - ps.mu[choice]) / new_T[choice]
 
-        return ps.model_copy(update={
-            "T": new_T,
-            "mu": new_mu,
-            "round": ps.round + 1,
-        })
+        return ps.model_copy(
+            update={
+                "T": new_T,
+                "mu": new_mu,
+                "round": ps.round + 1,
+            }
+        )
 
 
 class MOSSAnyTimeParamState(BaseParamState):
     """Parameter state for Anytime MOSS protocol (no horizon required)."""
+
     mu: ArrayParam | None = None
     T: ArrayParam | None = None
     round: int = Field(default=0, ge=0)
@@ -153,8 +157,7 @@ class MOSSAnyTimeProtocol(BaseProtocol):
     def select(ps: MOSSAnyTimeParamState, context: Context) -> int:
         """Arm selection using anytime MOSS index."""
         moss_indices = [
-            MOSSAnyTimeProtocol._moss_anytime_index(ps, i)
-            for i in range(ps.num_arms)
+            MOSSAnyTimeProtocol._moss_anytime_index(ps, i) for i in range(ps.num_arms)
         ]
         return int(np.argmax(moss_indices))
 
@@ -164,7 +167,7 @@ class MOSSAnyTimeProtocol(BaseProtocol):
         ps: MOSSAnyTimeParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> MOSSAnyTimeParamState:
         """Update state with observed reward."""
         new_T = ps.T.copy()
@@ -173,8 +176,10 @@ class MOSSAnyTimeProtocol(BaseProtocol):
         new_T[choice] += 1
         new_mu[choice] += (reward - ps.mu[choice]) / new_T[choice]
 
-        return ps.model_copy(update={
-            "T": new_T,
-            "mu": new_mu,
-            "round": ps.round + 1,
-        })
+        return ps.model_copy(
+            update={
+                "T": new_T,
+                "mu": new_mu,
+                "round": ps.round + 1,
+            }
+        )

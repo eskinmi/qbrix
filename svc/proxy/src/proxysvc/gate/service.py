@@ -26,10 +26,7 @@ class GateService:
         self._settings = settings
 
     async def evaluate(
-        self,
-        experiment_id: str,
-        context_id: str,
-        context_metadata: dict
+        self, experiment_id: str, context_id: str, context_metadata: dict
     ) -> BaseArmModel | None:
         """evaluate feature gate for a select request.
 

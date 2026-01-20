@@ -15,7 +15,9 @@ class CortexService:
         self._redis: RedisClient | None = None
         self._consumer: RedisStreamConsumer | None = None
         self._trainer: BatchTrainer | None = None
-        self._stats: dict[str, dict] = defaultdict(lambda: {"total": 0, "pending": 0, "last_train": 0})
+        self._stats: dict[str, dict] = defaultdict(
+            lambda: {"total": 0, "pending": 0, "last_train": 0}
+        )
         self._running = False
 
     async def start(self) -> None:
@@ -25,12 +27,14 @@ class CortexService:
             password=self._settings.redis_password,
             db=self._settings.redis_db,
             stream_name=self._settings.stream_name,
-            consumer_group=self._settings.consumer_group
+            consumer_group=self._settings.consumer_group,
         )
         self._redis = RedisClient(redis_settings)
         await self._redis.connect()
 
-        self._consumer = RedisStreamConsumer(redis_settings, self._settings.consumer_name)
+        self._consumer = RedisStreamConsumer(
+            redis_settings, self._settings.consumer_name
+        )
         await self._consumer.connect()
 
         self._trainer = BatchTrainer(self._redis)
@@ -48,7 +52,7 @@ class CortexService:
             try:
                 messages = await self._consumer.consume(
                     batch_size=self._settings.batch_size,
-                    block_ms=self._settings.batch_timeout_ms
+                    block_ms=self._settings.batch_timeout_ms,
                 )
 
                 if not messages:
@@ -62,6 +66,7 @@ class CortexService:
                 for experiment_id, count in ledger.items():
                     self._stats[experiment_id]["total"] += count
                     import time
+
                     self._stats[experiment_id]["last_train"] = int(time.time() * 1000)
 
                 await self._consumer.ack(message_ids)

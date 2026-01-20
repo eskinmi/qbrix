@@ -231,7 +231,9 @@ def on_test_start(environment, **kwargs):
                 ExperimentInfo(experiment_id=experiment_id, pool_id=pool_id)
             )
 
-            print(f"created experiment {i + 1}/{settings.num_experiments}: {experiment_id}")
+            print(
+                f"created experiment {i + 1}/{settings.num_experiments}: {experiment_id}"
+            )
 
         MultiExperimentUser._setup_done = True
 

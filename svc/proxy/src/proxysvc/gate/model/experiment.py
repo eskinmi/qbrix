@@ -10,8 +10,7 @@ from .base import ArmConfig
 
 class RolloutConfig(BaseModel):
     percentage: float = Field(
-        default=100.0,
-        description="Percentage of users to be included in the rollout"
+        default=100.0, description="Percentage of users to be included in the rollout"
     )
 
     def is_in_rollout(self, identifier: str) -> bool:
@@ -20,16 +19,14 @@ class RolloutConfig(BaseModel):
 
 class ActiveHoursConfig(BaseModel):
     start: Optional[time] = Field(
-        default=None,
-        description="Start time of the active hours"
+        default=None, description="Start time of the active hours"
     )
     end: Optional[time] = Field(
-        default=None,
-        description="End time of the active hours"
+        default=None, description="End time of the active hours"
     )
     timezone: ZoneInfo = Field(
         default_factory=lambda: ZoneInfo("UTC"),
-        description="Timezone for the active hours"
+        description="Timezone for the active hours",
     )
 
     def is_in_active_hours(self):
@@ -46,16 +43,14 @@ class ActiveHoursConfig(BaseModel):
 
 class ActivePeriodConfig(BaseModel):
     start: Optional[datetime] = Field(
-        default=None,
-        description="Start datetime of the active period"
+        default=None, description="Start datetime of the active period"
     )
     end: Optional[datetime] = Field(
-        default=None,
-        description="End datetime of the active period"
+        default=None, description="End datetime of the active period"
     )
     timezone: ZoneInfo = Field(
         default_factory=lambda: ZoneInfo("UTC"),
-        description="Timezone for the active period"
+        description="Timezone for the active period",
     )
 
     def is_in_active_period(self):
@@ -77,7 +72,9 @@ class ScheduleConfig(BaseModel):
 
 class ExperimentConfig(BaseConfig):
     experiment_id: str = Field(..., description="Unique identifier for the experiment")
-    enabled: bool = Field(default=True, description="Flag to enable or disable the experiment")
+    enabled: bool = Field(
+        default=True, description="Flag to enable or disable the experiment"
+    )
     arm: ArmConfig = ArmConfig()
     rollout: RolloutConfig = RolloutConfig()
     schedule: ScheduleConfig = ScheduleConfig()

@@ -4,16 +4,28 @@ from pydantic import BaseModel, Field
 from .base import ArmConfig
 
 OperatorType = Literal[
-    "equals", "==", "eq",
-    "not_equals", "!=", "ne",
-    "greater_than", ">", "gt",
-    "less_than", "<", "lt",
-    "greater_or_equal", ">=", "gte",
-    "less_or_equal", "<=", "lte",
+    "equals",
+    "==",
+    "eq",
+    "not_equals",
+    "!=",
+    "ne",
+    "greater_than",
+    ">",
+    "gt",
+    "less_than",
+    "<",
+    "lt",
+    "greater_or_equal",
+    ">=",
+    "gte",
+    "less_or_equal",
+    "<=",
+    "lte",
     "contains",
     "not_contains",
     "in",
-    "not_in"
+    "not_in",
 ]
 
 
@@ -31,12 +43,12 @@ class Rule(BaseModel):
     arm : ArmConfig
         Arm to commit if the rule matches
     """
+
     key: str = Field(..., description="Key in the data dictionary to evaluate")
     operator: OperatorType = Field(..., description="Comparison operator")
     value: Any = Field(..., description="Value to compare against")
     arm: ArmConfig = Field(
-        default=None,
-        description="Arm to commit if the rule matches"
+        default=None, description="Arm to commit if the rule matches"
     )
 
     def eval(self, metadata: dict) -> bool:

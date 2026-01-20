@@ -9,9 +9,7 @@ class BaseParamState(BaseModel):
     _id: UUID = PrivateAttr(default_factory=uuid4)
 
     model_config = ConfigDict(
-        extra="allow",
-        arbitrary_types_allowed=True,
-        validate_assignment = True
+        extra="allow", arbitrary_types_allowed=True, validate_assignment=True
     )
 
     num_arms: int = Field(..., gt=0)

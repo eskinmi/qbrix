@@ -16,11 +16,15 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
 
     async def CreatePool(self, request, context):
         try:
-            arms = [{"name": arm.name, "metadata": dict(arm.metadata) if hasattr(arm, 'metadata') else {}} for arm in request.arms]
+            arms = [
+                {
+                    "name": arm.name,
+                    "metadata": dict(arm.metadata) if hasattr(arm, "metadata") else {},
+                }
+                for arm in request.arms
+            ]
             response = await self._service.create_pool(request.name, arms)
-            return proxy_pb2.CreatePoolResponse(
-                pool=self._dict_to_pool(response)
-            )
+            return proxy_pb2.CreatePoolResponse(pool=self._dict_to_pool(response))
         except Exception as e:
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
@@ -32,9 +36,7 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details(f"Pool not found: {request.pool_id}")
             return proxy_pb2.GetPoolResponse()
-        return proxy_pb2.GetPoolResponse(
-            pool=self._dict_to_pool(response)
-        )
+        return proxy_pb2.GetPoolResponse(pool=self._dict_to_pool(response))
 
     async def DeletePool(self, request, context):
         deleted = await self._service.delete_pool(request.pool_id)
@@ -54,7 +56,7 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
                 protocol=request.protocol,
                 protocol_params=dict(request.protocol_params),
                 enabled=request.enabled,
-                feature_gate_config=feature_gate
+                feature_gate_config=feature_gate,
             )
             return proxy_pb2.CreateExperimentResponse(
                 experiment=self._dict_to_experiment(response)
@@ -82,8 +84,12 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             if request.protocol_params:
                 kwargs["protocol_params"] = dict(request.protocol_params)
             if request.HasField("feature_gate"):
-                kwargs["feature_gate_config"] = self._proto_to_gate_config(request.feature_gate)
-            response = await self._service.update_experiment(request.experiment_id, **kwargs)
+                kwargs["feature_gate_config"] = self._proto_to_gate_config(
+                    request.feature_gate
+                )
+            response = await self._service.update_experiment(
+                request.experiment_id, **kwargs
+            )
             if response is None:
                 context.set_code(grpc.StatusCode.NOT_FOUND)
                 context.set_details(f"Experiment not found: {request.experiment_id}")
@@ -106,7 +112,9 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
     async def CreateGateConfig(self, request, context):
         try:
             config = self._proto_to_gate_config(request.config)
-            response = await self._service.create_gate_config(request.experiment_id, config)
+            response = await self._service.create_gate_config(
+                request.experiment_id, config
+            )
             if response is None:
                 context.set_code(grpc.StatusCode.NOT_FOUND)
                 context.set_details(f"Experiment not found: {request.experiment_id}")
@@ -123,7 +131,9 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
         response = await self._service.get_gate_config(request.experiment_id)
         if response is None:
             context.set_code(grpc.StatusCode.NOT_FOUND)
-            context.set_details(f"Gate config not found for experiment: {request.experiment_id}")
+            context.set_details(
+                f"Gate config not found for experiment: {request.experiment_id}"
+            )
             return proxy_pb2.GetGateConfigResponse()
         return proxy_pb2.GetGateConfigResponse(
             config=self._dict_to_gate_config(response)
@@ -132,10 +142,14 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
     async def UpdateGateConfig(self, request, context):
         try:
             config = self._proto_to_gate_config(request.config)
-            response = await self._service.update_gate_config(request.experiment_id, config)
+            response = await self._service.update_gate_config(
+                request.experiment_id, config
+            )
             if response is None:
                 context.set_code(grpc.StatusCode.NOT_FOUND)
-                context.set_details(f"Gate config not found for experiment: {request.experiment_id}")
+                context.set_details(
+                    f"Gate config not found for experiment: {request.experiment_id}"
+                )
                 return proxy_pb2.UpdateGateConfigResponse()
             return proxy_pb2.UpdateGateConfigResponse(
                 config=self._dict_to_gate_config(response)
@@ -149,7 +163,9 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
         deleted = await self._service.delete_gate_config(request.experiment_id)
         if not deleted:
             context.set_code(grpc.StatusCode.NOT_FOUND)
-            context.set_details(f"Gate config not found for experiment: {request.experiment_id}")
+            context.set_details(
+                f"Gate config not found for experiment: {request.experiment_id}"
+            )
         return proxy_pb2.DeleteGateConfigResponse(deleted=deleted)
 
     async def Select(self, request, context):
@@ -158,16 +174,16 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
                 experiment_id=request.experiment_id,
                 context_id=request.context.id,
                 context_vector=list(request.context.vector),
-                context_metadata=dict(request.context.metadata)
+                context_metadata=dict(request.context.metadata),
             )
             return proxy_pb2.SelectResponse(
                 arm=common_pb2.Arm(
                     id=response["arm"]["id"],
                     name=response["arm"]["name"],
-                    index=response["arm"]["index"]
+                    index=response["arm"]["index"],
                 ),
                 request_id=response["request_id"],
-                is_default=response.get("is_default", False)
+                is_default=response.get("is_default", False),
             )
         except ValueError as e:
             context.set_code(grpc.StatusCode.NOT_FOUND)
@@ -210,8 +226,11 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
     async def Health(self, request, context):
         healthy = await self._service.health()
         return common_pb2.HealthCheckResponse(
-            status=common_pb2.HealthCheckResponse.SERVING if healthy
-            else common_pb2.HealthCheckResponse.NOT_SERVING
+            status=(
+                common_pb2.HealthCheckResponse.SERVING
+                if healthy
+                else common_pb2.HealthCheckResponse.NOT_SERVING
+            )
         )
 
     @staticmethod
@@ -222,7 +241,7 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             arms=[
                 common_pb2.Arm(id=arm["id"], name=arm["name"], index=arm["index"])
                 for arm in d.get("arms", [])
-            ]
+            ],
         )
 
     @staticmethod
@@ -232,8 +251,10 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             name=d["name"],
             pool_id=d["pool_id"],
             protocol=d["protocol"],
-            protocol_params={k: str(v) for k, v in d.get("protocol_params", {}).items()},
-            enabled=d.get("enabled", False)
+            protocol_params={
+                k: str(v) for k, v in d.get("protocol_params", {}).items()
+            },
+            enabled=d.get("enabled", False),
         )
 
     @staticmethod
@@ -246,7 +267,7 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             "rollout_percentage": proto.rollout_percentage,
             "default_arm_id": proto.default_arm_id or None,
             "timezone": proto.timezone or "UTC",
-            "rules": []
+            "rules": [],
         }
 
         # parse schedule
@@ -271,17 +292,20 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
 
         # parse rules
         import json
+
         for rule in proto.rules:
             try:
                 value = json.loads(rule.value)
             except (json.JSONDecodeError, TypeError):
                 value = rule.value
-            config["rules"].append({
-                "key": rule.key,
-                "operator": rule.operator,
-                "value": value,
-                "arm": {"committed": {"id": rule.arm_id}}
-            })
+            config["rules"].append(
+                {
+                    "key": rule.key,
+                    "operator": rule.operator,
+                    "value": value,
+                    "arm": {"committed": {"id": rule.arm_id}},
+                }
+            )
 
         return config
 
@@ -299,8 +323,9 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
         proto_config = proxy_pb2.FeatureGateConfig(
             enabled=experiment.get("enabled", True),
             rollout_percentage=rollout.get("percentage", 100.0),
-            default_arm_id=experiment.get("arm", {}).get("committed", {}).get("id") or "",
-            timezone=hour.get("timezone") or period.get("timezone") or "UTC"
+            default_arm_id=experiment.get("arm", {}).get("committed", {}).get("id")
+            or "",
+            timezone=hour.get("timezone") or period.get("timezone") or "UTC",
         )
 
         # set schedule
@@ -308,12 +333,14 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             start_dt = period["start"]
             if isinstance(start_dt, str):
                 from datetime import datetime
+
                 start_dt = datetime.fromisoformat(start_dt)
             proto_config.schedule.start_timestamp_ms = int(start_dt.timestamp() * 1000)
         if period.get("end"):
             end_dt = period["end"]
             if isinstance(end_dt, str):
                 from datetime import datetime
+
                 end_dt = datetime.fromisoformat(end_dt)
             proto_config.schedule.end_timestamp_ms = int(end_dt.timestamp() * 1000)
 
@@ -333,12 +360,18 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
 
         # set rules
         for rule in d.get("rules", []):
-            proto_config.rules.append(proxy_pb2.RuleConfig(
-                key=rule.get("key", ""),
-                operator=rule.get("operator", ""),
-                value=json.dumps(rule.get("value")) if not isinstance(rule.get("value"), str) else rule.get("value", ""),
-                arm_id=rule.get("arm", {}).get("committed", {}).get("id") or ""
-            ))
+            proto_config.rules.append(
+                proxy_pb2.RuleConfig(
+                    key=rule.get("key", ""),
+                    operator=rule.get("operator", ""),
+                    value=(
+                        json.dumps(rule.get("value"))
+                        if not isinstance(rule.get("value"), str)
+                        else rule.get("value", "")
+                    ),
+                    arm_id=rule.get("arm", {}).get("committed", {}).get("id") or "",
+                )
+            )
 
         return proto_config
 
@@ -351,10 +384,12 @@ async def serve(settings: ProxySettings | None = None) -> None:
     await service.start()
 
     server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
-    proxy_pb2_grpc.add_ProxyServiceServicer_to_server(ProxyGRPCServicer(service), server)
+    proxy_pb2_grpc.add_ProxyServiceServicer_to_server(
+        ProxyGRPCServicer(service), server
+    )
 
     service_names = (
-        proxy_pb2.DESCRIPTOR.services_by_name['ProxyService'].full_name,
+        proxy_pb2.DESCRIPTOR.services_by_name["ProxyService"].full_name,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(service_names, server)

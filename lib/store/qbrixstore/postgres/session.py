@@ -11,7 +11,9 @@ _engine = None
 _session_factory = None
 
 
-def init_db(settings: PostgresSettings | None = None) -> async_sessionmaker[AsyncSession]:
+def init_db(
+    settings: PostgresSettings | None = None,
+) -> async_sessionmaker[AsyncSession]:
     global _engine, _session_factory
 
     if settings is None:

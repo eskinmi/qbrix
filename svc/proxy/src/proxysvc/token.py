@@ -16,22 +16,26 @@ from dataclasses import dataclass
 
 class TokenError(Exception):
     """raised when token validation fails."""
+
     pass
 
 
 class TokenExpiredError(TokenError):
     """raised when token has expired."""
+
     pass
 
 
 class TokenInvalidError(TokenError):
     """raised when token signature is invalid."""
+
     pass
 
 
 @dataclass
 class SelectionEntry:
     """decoded selection data from token."""
+
     experiment_id: str
     arm_index: int
     context_id: str

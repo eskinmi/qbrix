@@ -16,90 +16,95 @@ class CortexServiceStub(object):
             channel: A grpc.Channel.
         """
         self.FlushBatch = channel.unary_unary(
-                '/qbrix.cortex.CortexService/FlushBatch',
-                request_serializer=cortex__pb2.FlushBatchRequest.SerializeToString,
-                response_deserializer=cortex__pb2.FlushBatchResponse.FromString,
-                _registered_method=True)
+            "/qbrix.cortex.CortexService/FlushBatch",
+            request_serializer=cortex__pb2.FlushBatchRequest.SerializeToString,
+            response_deserializer=cortex__pb2.FlushBatchResponse.FromString,
+            _registered_method=True,
+        )
         self.GetStats = channel.unary_unary(
-                '/qbrix.cortex.CortexService/GetStats',
-                request_serializer=cortex__pb2.GetStatsRequest.SerializeToString,
-                response_deserializer=cortex__pb2.GetStatsResponse.FromString,
-                _registered_method=True)
+            "/qbrix.cortex.CortexService/GetStats",
+            request_serializer=cortex__pb2.GetStatsRequest.SerializeToString,
+            response_deserializer=cortex__pb2.GetStatsResponse.FromString,
+            _registered_method=True,
+        )
         self.Health = channel.unary_unary(
-                '/qbrix.cortex.CortexService/Health',
-                request_serializer=common__pb2.HealthCheckRequest.SerializeToString,
-                response_deserializer=common__pb2.HealthCheckResponse.FromString,
-                _registered_method=True)
+            "/qbrix.cortex.CortexService/Health",
+            request_serializer=common__pb2.HealthCheckRequest.SerializeToString,
+            response_deserializer=common__pb2.HealthCheckResponse.FromString,
+            _registered_method=True,
+        )
 
 
 class CortexServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def FlushBatch(self, request, context):
-        """Force flush pending training batch
-        """
+        """Force flush pending training batch"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def GetStats(self, request, context):
-        """Get training stats
-        """
+        """Get training stats"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
     def Health(self, request, context):
-        """Health check
-        """
+        """Health check"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
 
 
 def add_CortexServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'FlushBatch': grpc.unary_unary_rpc_method_handler(
-                    servicer.FlushBatch,
-                    request_deserializer=cortex__pb2.FlushBatchRequest.FromString,
-                    response_serializer=cortex__pb2.FlushBatchResponse.SerializeToString,
-            ),
-            'GetStats': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetStats,
-                    request_deserializer=cortex__pb2.GetStatsRequest.FromString,
-                    response_serializer=cortex__pb2.GetStatsResponse.SerializeToString,
-            ),
-            'Health': grpc.unary_unary_rpc_method_handler(
-                    servicer.Health,
-                    request_deserializer=common__pb2.HealthCheckRequest.FromString,
-                    response_serializer=common__pb2.HealthCheckResponse.SerializeToString,
-            ),
+        "FlushBatch": grpc.unary_unary_rpc_method_handler(
+            servicer.FlushBatch,
+            request_deserializer=cortex__pb2.FlushBatchRequest.FromString,
+            response_serializer=cortex__pb2.FlushBatchResponse.SerializeToString,
+        ),
+        "GetStats": grpc.unary_unary_rpc_method_handler(
+            servicer.GetStats,
+            request_deserializer=cortex__pb2.GetStatsRequest.FromString,
+            response_serializer=cortex__pb2.GetStatsResponse.SerializeToString,
+        ),
+        "Health": grpc.unary_unary_rpc_method_handler(
+            servicer.Health,
+            request_deserializer=common__pb2.HealthCheckRequest.FromString,
+            response_serializer=common__pb2.HealthCheckResponse.SerializeToString,
+        ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'qbrix.cortex.CortexService', rpc_method_handlers)
+        "qbrix.cortex.CortexService", rpc_method_handlers
+    )
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('qbrix.cortex.CortexService', rpc_method_handlers)
+    server.add_registered_method_handlers(
+        "qbrix.cortex.CortexService", rpc_method_handlers
+    )
 
 
- # This class is part of an EXPERIMENTAL API.
+# This class is part of an EXPERIMENTAL API.
 class CortexService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def FlushBatch(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
+    def FlushBatch(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/qbrix.cortex.CortexService/FlushBatch',
+            "/qbrix.cortex.CortexService/FlushBatch",
             cortex__pb2.FlushBatchRequest.SerializeToString,
             cortex__pb2.FlushBatchResponse.FromString,
             options,
@@ -110,23 +115,26 @@ class CortexService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True)
+            _registered_method=True,
+        )
 
     @staticmethod
-    def GetStats(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
+    def GetStats(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/qbrix.cortex.CortexService/GetStats',
+            "/qbrix.cortex.CortexService/GetStats",
             cortex__pb2.GetStatsRequest.SerializeToString,
             cortex__pb2.GetStatsResponse.FromString,
             options,
@@ -137,23 +145,26 @@ class CortexService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True)
+            _registered_method=True,
+        )
 
     @staticmethod
-    def Health(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
+    def Health(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/qbrix.cortex.CortexService/Health',
+            "/qbrix.cortex.CortexService/Health",
             common__pb2.HealthCheckRequest.SerializeToString,
             common__pb2.HealthCheckResponse.FromString,
             options,
@@ -164,4 +175,5 @@ class CortexService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True)
+            _registered_method=True,
+        )

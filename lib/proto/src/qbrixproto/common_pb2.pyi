@@ -37,7 +37,9 @@ class Context(_message.Message):
             key: _builtins.str = ...,
             value: _builtins.str = ...,
         ) -> None: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
+        _ClearFieldArgType: _TypeAlias = _typing.Literal[
+            "key", b"key", "value", b"value"
+        ]  # noqa: Y015
         def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
     ID_FIELD_NUMBER: _builtins.int
@@ -55,7 +57,9 @@ class Context(_message.Message):
         vector: _abc.Iterable[_builtins.float] | None = ...,
         metadata: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["id", b"id", "metadata", b"metadata", "vector", b"vector"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "id", b"id", "metadata", b"metadata", "vector", b"vector"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___Context: _TypeAlias = Context  # noqa: Y015
@@ -79,7 +83,9 @@ class Arm(_message.Message):
         name: _builtins.str = ...,
         index: _builtins.int = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["id", b"id", "index", b"index", "name", b"name"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "id", b"id", "index", b"index", "name", b"name"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___Arm: _TypeAlias = Arm  # noqa: Y015
@@ -104,7 +110,9 @@ class Pool(_message.Message):
         name: _builtins.str = ...,
         arms: _abc.Iterable[Global___Arm] | None = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["arms", b"arms", "id", b"id", "name", b"name"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "arms", b"arms", "id", b"id", "name", b"name"
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___Pool: _TypeAlias = Pool  # noqa: Y015
@@ -129,7 +137,9 @@ class Experiment(_message.Message):
             key: _builtins.str = ...,
             value: _builtins.str = ...,
         ) -> None: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
+        _ClearFieldArgType: _TypeAlias = _typing.Literal[
+            "key", b"key", "value", b"value"
+        ]  # noqa: Y015
         def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
     ID_FIELD_NUMBER: _builtins.int
@@ -145,7 +155,9 @@ class Experiment(_message.Message):
     """e.g., "thompson_sampling", "ucb", "epsilon_greedy" """
     enabled: _builtins.bool
     @_builtins.property
-    def protocol_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
+    def protocol_params(
+        self,
+    ) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
     def __init__(
         self,
         *,
@@ -156,7 +168,20 @@ class Experiment(_message.Message):
         protocol_params: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
         enabled: _builtins.bool = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "id", b"id", "name", b"name", "pool_id", b"pool_id", "protocol", b"protocol", "protocol_params", b"protocol_params"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal[
+        "enabled",
+        b"enabled",
+        "id",
+        b"id",
+        "name",
+        b"name",
+        "pool_id",
+        b"pool_id",
+        "protocol",
+        b"protocol",
+        "protocol_params",
+        b"protocol_params",
+    ]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___Experiment: _TypeAlias = Experiment  # noqa: Y015
@@ -181,7 +206,12 @@ class HealthCheckResponse(_message.Message):
         ValueType = _typing.NewType("ValueType", _builtins.int)
         V: _TypeAlias = ValueType  # noqa: Y015
 
-    class _ServingStatusEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[HealthCheckResponse._ServingStatus.ValueType], _builtins.type):
+    class _ServingStatusEnumTypeWrapper(
+        _enum_type_wrapper._EnumTypeWrapper[
+            HealthCheckResponse._ServingStatus.ValueType
+        ],
+        _builtins.type,
+    ):
         DESCRIPTOR: _descriptor.EnumDescriptor
         UNKNOWN: HealthCheckResponse._ServingStatus.ValueType  # 0
         SERVING: HealthCheckResponse._ServingStatus.ValueType  # 1

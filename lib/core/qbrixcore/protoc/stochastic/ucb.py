@@ -12,6 +12,7 @@ from qbrixcore.context import Context
 
 class UCB1TunedParamState(BaseParamState):
     """Parameter state for UCB1-Tuned protocol."""
+
     alpha: float = Field(default=2.0, gt=0.0)
     mu: ArrayParam | None = None
     T: ArrayParam | None = None
@@ -73,7 +74,7 @@ class UCB1TunedProtocol(BaseProtocol):
         ps: UCB1TunedParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> UCB1TunedParamState:
         """Update state with observed reward."""
         new_T = ps.T.copy()
@@ -81,20 +82,23 @@ class UCB1TunedProtocol(BaseProtocol):
         new_rsq = ps.rsq.copy()
 
         new_T[choice] += 1
-        new_rsq[choice] += reward ** 2
+        new_rsq[choice] += reward**2
         prev_mu = ps.mu[choice]
         new_mu[choice] += (reward - prev_mu) / new_T[choice]
 
-        return ps.model_copy(update={
-            "T": new_T,
-            "mu": new_mu,
-            "rsq": new_rsq,
-            "round": ps.round + 1,
-        })
+        return ps.model_copy(
+            update={
+                "T": new_T,
+                "mu": new_mu,
+                "rsq": new_rsq,
+                "round": ps.round + 1,
+            }
+        )
 
 
 class KLUCBParamState(BaseParamState):
     """Parameter state for KL-UCB protocol."""
+
     c: float = Field(default=0.0, ge=0.0)
     S: ArrayParam | None = None
     N: ArrayParam | None = None
@@ -199,7 +203,7 @@ class KLUCBProtocol(BaseProtocol):
         ps: KLUCBParamState,
         context: Context,
         choice: int,
-        reward: Union[int, float, np.float64]
+        reward: Union[int, float, np.float64],
     ) -> KLUCBParamState:
         """Update state with observed reward."""
         new_N = ps.N.copy()
@@ -209,11 +213,13 @@ class KLUCBProtocol(BaseProtocol):
         new_N[choice] += 1
         new_S[choice] += reward
 
-        return ps.model_copy(update={
-            "N": new_N,
-            "S": new_S,
-            "round": ps.round + 1,
-        })
+        return ps.model_copy(
+            update={
+                "N": new_N,
+                "S": new_S,
+                "round": ps.round + 1,
+            }
+        )
 
 
 class KLUCBPlusProtocol(KLUCBProtocol):

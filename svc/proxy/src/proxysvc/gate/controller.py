@@ -5,6 +5,7 @@ from .config import FeatureGateConfig, Rule, BaseArmModel
 
 class ExperimentFlagState(Flag):
     """flags representing the state of an experiment."""
+
     ENABLED = auto()
     ACTIVE = auto()
     BLACKOUT = auto()
@@ -16,13 +17,15 @@ class ExperimentFlagState(Flag):
 class FeatureGate:
     """feature gate controller for experiment-based decision-making."""
 
-    negset = ExperimentFlagState.DISABLED | ExperimentFlagState.BLACKOUT | ExperimentFlagState.RNEG
+    negset = (
+        ExperimentFlagState.DISABLED
+        | ExperimentFlagState.BLACKOUT
+        | ExperimentFlagState.RNEG
+    )
 
     @classmethod
     def render_feature_flags(
-        cls,
-        config: FeatureGateConfig,
-        context_id: str
+        cls, config: FeatureGateConfig, context_id: str
     ) -> ExperimentFlagState:
         """render experiment state flags based on configuration and context."""
         experiment = config.experiment
@@ -59,10 +62,7 @@ class FeatureGate:
 
     @classmethod
     def control(
-        cls,
-        config: FeatureGateConfig,
-        context_id: str,
-        metadata: dict
+        cls, config: FeatureGateConfig, context_id: str, metadata: dict
     ) -> BaseArmModel | None:
         """determine which arm to return based on experiment state and rules.
 

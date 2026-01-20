@@ -25,8 +25,6 @@ class EpsilonParamState(BaseParamState):
         return self
 
 
-
-
 class EpsilonProtocol(BaseProtocol):
 
     name: ClassVar[str] = "EpsilonProtocol"
@@ -45,9 +43,8 @@ class EpsilonProtocol(BaseProtocol):
         - gamma=0.1: Medium decay (10% reduction per step)
         - gamma=0.5: Fast decay (50% reduction per step)
         """
-        ps.eps *= (1 - ps.gamma)
+        ps.eps *= 1 - ps.gamma
         return ps
-
 
     @staticmethod
     def select(ps: EpsilonParamState, context: Context):
@@ -58,11 +55,11 @@ class EpsilonProtocol(BaseProtocol):
 
     @classmethod
     def train(
-            cls,
-            ps: EpsilonParamState,
-            context: Context,
-            choice: int,
-            reward: Union[int, float, np.float64]
+        cls,
+        ps: EpsilonParamState,
+        context: Context,
+        choice: int,
+        reward: Union[int, float, np.float64],
     ) -> EpsilonParamState:
 
         new_T = ps.T.copy()
@@ -72,8 +69,10 @@ class EpsilonProtocol(BaseProtocol):
         new_mu[choice] += (reward - ps.mu[choice]) / new_T[choice]
         new_eps = ps.eps * (1 - ps.gamma)
 
-        return ps.model_copy(update={
-            "T": new_T,
-            "mu": new_mu,
-            "eps": new_eps,
-        })
+        return ps.model_copy(
+            update={
+                "T": new_T,
+                "mu": new_mu,
+                "eps": new_eps,
+            }
+        )

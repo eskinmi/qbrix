@@ -9,9 +9,13 @@ from cortexsvc.server import serve
 @click.command()
 @click.option("--host", default="0.0.0.0", help="gRPC server host")
 @click.option("--port", default=50052, type=int, help="gRPC server port")
-@click.option("--consumer-name", default="worker-0", help="Consumer name for Redis Streams")
+@click.option(
+    "--consumer-name", default="worker-0", help="Consumer name for Redis Streams"
+)
 def run(host: str, port: int, consumer_name: str) -> None:
-    settings = CortexSettings(grpc_host=host, grpc_port=port, consumer_name=consumer_name)
+    settings = CortexSettings(
+        grpc_host=host, grpc_port=port, consumer_name=consumer_name
+    )
     asyncio.run(serve(settings))
 
 

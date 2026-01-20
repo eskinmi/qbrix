@@ -19,16 +19,16 @@ class MotorGRPCServicer(motor_pb2_grpc.MotorServiceServicer):
                 experiment_id=request.experiment_id,
                 context_id=request.context.id,
                 context_vector=list(request.context.vector),
-                context_metadata=dict(request.context.metadata)
+                context_metadata=dict(request.context.metadata),
             )
             return motor_pb2.SelectResponse(
                 arm=common_pb2.Arm(
                     id=result["arm"]["id"],
                     name=result["arm"]["name"],
-                    index=result["arm"]["index"]
+                    index=result["arm"]["index"],
                 ),
                 request_id=result["request_id"],
-                score=result.get("score", 0.0)
+                score=result.get("score", 0.0),
             )
         except ValueError as e:
             context.set_code(grpc.StatusCode.NOT_FOUND)
@@ -42,8 +42,11 @@ class MotorGRPCServicer(motor_pb2_grpc.MotorServiceServicer):
     async def Health(self, request, context):
         healthy = await self._service.health()
         return common_pb2.HealthCheckResponse(
-            status=common_pb2.HealthCheckResponse.SERVING if healthy
-            else common_pb2.HealthCheckResponse.NOT_SERVING
+            status=(
+                common_pb2.HealthCheckResponse.SERVING
+                if healthy
+                else common_pb2.HealthCheckResponse.NOT_SERVING
+            )
         )
 
 
@@ -55,10 +58,12 @@ async def serve(settings: MotorSettings | None = None) -> None:
     await service.start()
 
     server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
-    motor_pb2_grpc.add_MotorServiceServicer_to_server(MotorGRPCServicer(service), server)
+    motor_pb2_grpc.add_MotorServiceServicer_to_server(
+        MotorGRPCServicer(service), server
+    )
 
     service_names = (
-        motor_pb2.DESCRIPTOR.services_by_name['MotorService'].full_name,
+        motor_pb2.DESCRIPTOR.services_by_name["MotorService"].full_name,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(service_names, server)

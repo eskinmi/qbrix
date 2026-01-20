@@ -19,8 +19,7 @@ class GateConfigCache:
         self._redis = redis
         self._settings = settings
         self._cache: TTLCache = TTLCache(
-            maxsize=settings.gate_cache_maxsize,
-            ttl=settings.gate_cache_ttl
+            maxsize=settings.gate_cache_maxsize, ttl=settings.gate_cache_ttl
         )
 
     async def get(self, experiment_id: str) -> FeatureGateConfig | None:
@@ -41,7 +40,7 @@ class GateConfigCache:
         await self._redis.set_gate_config(
             experiment_id=experiment_id,
             config=config.model_dump(mode="json"),
-            ttl=self._settings.gate_redis_ttl
+            ttl=self._settings.gate_redis_ttl,
         )
         self._cache[experiment_id] = config
 
