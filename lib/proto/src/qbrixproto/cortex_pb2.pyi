@@ -51,20 +51,7 @@ class FeedbackEvent(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["context", b"context"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal[
-        "arm_index",
-        b"arm_index",
-        "context",
-        b"context",
-        "experiment_id",
-        b"experiment_id",
-        "request_id",
-        b"request_id",
-        "reward",
-        b"reward",
-        "timestamp_ms",
-        b"timestamp_ms",
-    ]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm_index", b"arm_index", "context", b"context", "experiment_id", b"experiment_id", "request_id", b"request_id", "reward", b"reward", "timestamp_ms", b"timestamp_ms"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___FeedbackEvent: _TypeAlias = FeedbackEvent  # noqa: Y015
@@ -81,9 +68,7 @@ class FlushBatchRequest(_message.Message):
         *,
         experiment_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal[
-        "experiment_id", b"experiment_id"
-    ]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment_id", b"experiment_id"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___FlushBatchRequest: _TypeAlias = FlushBatchRequest  # noqa: Y015
@@ -99,9 +84,7 @@ class FlushBatchResponse(_message.Message):
         *,
         events_processed: _builtins.int = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal[
-        "events_processed", b"events_processed"
-    ]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["events_processed", b"events_processed"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___FlushBatchResponse: _TypeAlias = FlushBatchResponse  # noqa: Y015
@@ -118,9 +101,7 @@ class GetStatsRequest(_message.Message):
         *,
         experiment_id: _builtins.str = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal[
-        "experiment_id", b"experiment_id"
-    ]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment_id", b"experiment_id"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___GetStatsRequest: _TypeAlias = GetStatsRequest  # noqa: Y015
@@ -145,16 +126,7 @@ class ExperimentStats(_message.Message):
         pending_events: _builtins.int = ...,
         last_train_timestamp_ms: _builtins.int = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal[
-        "experiment_id",
-        b"experiment_id",
-        "last_train_timestamp_ms",
-        b"last_train_timestamp_ms",
-        "pending_events",
-        b"pending_events",
-        "total_events",
-        b"total_events",
-    ]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["experiment_id", b"experiment_id", "last_train_timestamp_ms", b"last_train_timestamp_ms", "pending_events", b"pending_events", "total_events", b"total_events"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___ExperimentStats: _TypeAlias = ExperimentStats  # noqa: Y015
@@ -165,9 +137,7 @@ class GetStatsResponse(_message.Message):
 
     STATS_FIELD_NUMBER: _builtins.int
     @_builtins.property
-    def stats(
-        self,
-    ) -> _containers.RepeatedCompositeFieldContainer[Global___ExperimentStats]: ...
+    def stats(self) -> _containers.RepeatedCompositeFieldContainer[Global___ExperimentStats]: ...
     def __init__(
         self,
         *,

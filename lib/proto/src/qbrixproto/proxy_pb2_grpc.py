@@ -16,89 +16,75 @@ class ProxyServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreatePool = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/CreatePool",
-            request_serializer=proxy__pb2.CreatePoolRequest.SerializeToString,
-            response_deserializer=proxy__pb2.CreatePoolResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/CreatePool',
+                request_serializer=proxy__pb2.CreatePoolRequest.SerializeToString,
+                response_deserializer=proxy__pb2.CreatePoolResponse.FromString,
+                _registered_method=True)
         self.GetPool = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/GetPool",
-            request_serializer=proxy__pb2.GetPoolRequest.SerializeToString,
-            response_deserializer=proxy__pb2.GetPoolResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/GetPool',
+                request_serializer=proxy__pb2.GetPoolRequest.SerializeToString,
+                response_deserializer=proxy__pb2.GetPoolResponse.FromString,
+                _registered_method=True)
         self.DeletePool = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/DeletePool",
-            request_serializer=proxy__pb2.DeletePoolRequest.SerializeToString,
-            response_deserializer=proxy__pb2.DeletePoolResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/DeletePool',
+                request_serializer=proxy__pb2.DeletePoolRequest.SerializeToString,
+                response_deserializer=proxy__pb2.DeletePoolResponse.FromString,
+                _registered_method=True)
         self.CreateExperiment = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/CreateExperiment",
-            request_serializer=proxy__pb2.CreateExperimentRequest.SerializeToString,
-            response_deserializer=proxy__pb2.CreateExperimentResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/CreateExperiment',
+                request_serializer=proxy__pb2.CreateExperimentRequest.SerializeToString,
+                response_deserializer=proxy__pb2.CreateExperimentResponse.FromString,
+                _registered_method=True)
         self.GetExperiment = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/GetExperiment",
-            request_serializer=proxy__pb2.GetExperimentRequest.SerializeToString,
-            response_deserializer=proxy__pb2.GetExperimentResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/GetExperiment',
+                request_serializer=proxy__pb2.GetExperimentRequest.SerializeToString,
+                response_deserializer=proxy__pb2.GetExperimentResponse.FromString,
+                _registered_method=True)
         self.UpdateExperiment = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/UpdateExperiment",
-            request_serializer=proxy__pb2.UpdateExperimentRequest.SerializeToString,
-            response_deserializer=proxy__pb2.UpdateExperimentResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/UpdateExperiment',
+                request_serializer=proxy__pb2.UpdateExperimentRequest.SerializeToString,
+                response_deserializer=proxy__pb2.UpdateExperimentResponse.FromString,
+                _registered_method=True)
         self.DeleteExperiment = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/DeleteExperiment",
-            request_serializer=proxy__pb2.DeleteExperimentRequest.SerializeToString,
-            response_deserializer=proxy__pb2.DeleteExperimentResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/DeleteExperiment',
+                request_serializer=proxy__pb2.DeleteExperimentRequest.SerializeToString,
+                response_deserializer=proxy__pb2.DeleteExperimentResponse.FromString,
+                _registered_method=True)
         self.CreateGateConfig = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/CreateGateConfig",
-            request_serializer=proxy__pb2.CreateGateConfigRequest.SerializeToString,
-            response_deserializer=proxy__pb2.CreateGateConfigResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/CreateGateConfig',
+                request_serializer=proxy__pb2.CreateGateConfigRequest.SerializeToString,
+                response_deserializer=proxy__pb2.CreateGateConfigResponse.FromString,
+                _registered_method=True)
         self.GetGateConfig = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/GetGateConfig",
-            request_serializer=proxy__pb2.GetGateConfigRequest.SerializeToString,
-            response_deserializer=proxy__pb2.GetGateConfigResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/GetGateConfig',
+                request_serializer=proxy__pb2.GetGateConfigRequest.SerializeToString,
+                response_deserializer=proxy__pb2.GetGateConfigResponse.FromString,
+                _registered_method=True)
         self.UpdateGateConfig = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/UpdateGateConfig",
-            request_serializer=proxy__pb2.UpdateGateConfigRequest.SerializeToString,
-            response_deserializer=proxy__pb2.UpdateGateConfigResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/UpdateGateConfig',
+                request_serializer=proxy__pb2.UpdateGateConfigRequest.SerializeToString,
+                response_deserializer=proxy__pb2.UpdateGateConfigResponse.FromString,
+                _registered_method=True)
         self.DeleteGateConfig = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/DeleteGateConfig",
-            request_serializer=proxy__pb2.DeleteGateConfigRequest.SerializeToString,
-            response_deserializer=proxy__pb2.DeleteGateConfigResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/DeleteGateConfig',
+                request_serializer=proxy__pb2.DeleteGateConfigRequest.SerializeToString,
+                response_deserializer=proxy__pb2.DeleteGateConfigResponse.FromString,
+                _registered_method=True)
         self.Select = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/Select",
-            request_serializer=proxy__pb2.SelectRequest.SerializeToString,
-            response_deserializer=proxy__pb2.SelectResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/Select',
+                request_serializer=proxy__pb2.SelectRequest.SerializeToString,
+                response_deserializer=proxy__pb2.SelectResponse.FromString,
+                _registered_method=True)
         self.Feedback = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/Feedback",
-            request_serializer=proxy__pb2.FeedbackRequest.SerializeToString,
-            response_deserializer=proxy__pb2.FeedbackResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/Feedback',
+                request_serializer=proxy__pb2.FeedbackRequest.SerializeToString,
+                response_deserializer=proxy__pb2.FeedbackResponse.FromString,
+                _registered_method=True)
         self.Health = channel.unary_unary(
-            "/qbrix.proxy.ProxyService/Health",
-            request_serializer=common__pb2.HealthCheckRequest.SerializeToString,
-            response_deserializer=common__pb2.HealthCheckResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.proxy.ProxyService/Health',
+                request_serializer=common__pb2.HealthCheckRequest.SerializeToString,
+                response_deserializer=common__pb2.HealthCheckResponse.FromString,
+                _registered_method=True)
 
 
 class ProxyServiceServicer(object):
@@ -107,191 +93,186 @@ class ProxyServiceServicer(object):
     def CreatePool(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def GetPool(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def DeletePool(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def CreateExperiment(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def GetExperiment(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def UpdateExperiment(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def DeleteExperiment(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def CreateGateConfig(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def GetGateConfig(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def UpdateGateConfig(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def DeleteGateConfig(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def Select(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def Feedback(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def Health(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
 
 def add_ProxyServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "CreatePool": grpc.unary_unary_rpc_method_handler(
-            servicer.CreatePool,
-            request_deserializer=proxy__pb2.CreatePoolRequest.FromString,
-            response_serializer=proxy__pb2.CreatePoolResponse.SerializeToString,
-        ),
-        "GetPool": grpc.unary_unary_rpc_method_handler(
-            servicer.GetPool,
-            request_deserializer=proxy__pb2.GetPoolRequest.FromString,
-            response_serializer=proxy__pb2.GetPoolResponse.SerializeToString,
-        ),
-        "DeletePool": grpc.unary_unary_rpc_method_handler(
-            servicer.DeletePool,
-            request_deserializer=proxy__pb2.DeletePoolRequest.FromString,
-            response_serializer=proxy__pb2.DeletePoolResponse.SerializeToString,
-        ),
-        "CreateExperiment": grpc.unary_unary_rpc_method_handler(
-            servicer.CreateExperiment,
-            request_deserializer=proxy__pb2.CreateExperimentRequest.FromString,
-            response_serializer=proxy__pb2.CreateExperimentResponse.SerializeToString,
-        ),
-        "GetExperiment": grpc.unary_unary_rpc_method_handler(
-            servicer.GetExperiment,
-            request_deserializer=proxy__pb2.GetExperimentRequest.FromString,
-            response_serializer=proxy__pb2.GetExperimentResponse.SerializeToString,
-        ),
-        "UpdateExperiment": grpc.unary_unary_rpc_method_handler(
-            servicer.UpdateExperiment,
-            request_deserializer=proxy__pb2.UpdateExperimentRequest.FromString,
-            response_serializer=proxy__pb2.UpdateExperimentResponse.SerializeToString,
-        ),
-        "DeleteExperiment": grpc.unary_unary_rpc_method_handler(
-            servicer.DeleteExperiment,
-            request_deserializer=proxy__pb2.DeleteExperimentRequest.FromString,
-            response_serializer=proxy__pb2.DeleteExperimentResponse.SerializeToString,
-        ),
-        "CreateGateConfig": grpc.unary_unary_rpc_method_handler(
-            servicer.CreateGateConfig,
-            request_deserializer=proxy__pb2.CreateGateConfigRequest.FromString,
-            response_serializer=proxy__pb2.CreateGateConfigResponse.SerializeToString,
-        ),
-        "GetGateConfig": grpc.unary_unary_rpc_method_handler(
-            servicer.GetGateConfig,
-            request_deserializer=proxy__pb2.GetGateConfigRequest.FromString,
-            response_serializer=proxy__pb2.GetGateConfigResponse.SerializeToString,
-        ),
-        "UpdateGateConfig": grpc.unary_unary_rpc_method_handler(
-            servicer.UpdateGateConfig,
-            request_deserializer=proxy__pb2.UpdateGateConfigRequest.FromString,
-            response_serializer=proxy__pb2.UpdateGateConfigResponse.SerializeToString,
-        ),
-        "DeleteGateConfig": grpc.unary_unary_rpc_method_handler(
-            servicer.DeleteGateConfig,
-            request_deserializer=proxy__pb2.DeleteGateConfigRequest.FromString,
-            response_serializer=proxy__pb2.DeleteGateConfigResponse.SerializeToString,
-        ),
-        "Select": grpc.unary_unary_rpc_method_handler(
-            servicer.Select,
-            request_deserializer=proxy__pb2.SelectRequest.FromString,
-            response_serializer=proxy__pb2.SelectResponse.SerializeToString,
-        ),
-        "Feedback": grpc.unary_unary_rpc_method_handler(
-            servicer.Feedback,
-            request_deserializer=proxy__pb2.FeedbackRequest.FromString,
-            response_serializer=proxy__pb2.FeedbackResponse.SerializeToString,
-        ),
-        "Health": grpc.unary_unary_rpc_method_handler(
-            servicer.Health,
-            request_deserializer=common__pb2.HealthCheckRequest.FromString,
-            response_serializer=common__pb2.HealthCheckResponse.SerializeToString,
-        ),
+            'CreatePool': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreatePool,
+                    request_deserializer=proxy__pb2.CreatePoolRequest.FromString,
+                    response_serializer=proxy__pb2.CreatePoolResponse.SerializeToString,
+            ),
+            'GetPool': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPool,
+                    request_deserializer=proxy__pb2.GetPoolRequest.FromString,
+                    response_serializer=proxy__pb2.GetPoolResponse.SerializeToString,
+            ),
+            'DeletePool': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeletePool,
+                    request_deserializer=proxy__pb2.DeletePoolRequest.FromString,
+                    response_serializer=proxy__pb2.DeletePoolResponse.SerializeToString,
+            ),
+            'CreateExperiment': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateExperiment,
+                    request_deserializer=proxy__pb2.CreateExperimentRequest.FromString,
+                    response_serializer=proxy__pb2.CreateExperimentResponse.SerializeToString,
+            ),
+            'GetExperiment': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetExperiment,
+                    request_deserializer=proxy__pb2.GetExperimentRequest.FromString,
+                    response_serializer=proxy__pb2.GetExperimentResponse.SerializeToString,
+            ),
+            'UpdateExperiment': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateExperiment,
+                    request_deserializer=proxy__pb2.UpdateExperimentRequest.FromString,
+                    response_serializer=proxy__pb2.UpdateExperimentResponse.SerializeToString,
+            ),
+            'DeleteExperiment': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteExperiment,
+                    request_deserializer=proxy__pb2.DeleteExperimentRequest.FromString,
+                    response_serializer=proxy__pb2.DeleteExperimentResponse.SerializeToString,
+            ),
+            'CreateGateConfig': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateGateConfig,
+                    request_deserializer=proxy__pb2.CreateGateConfigRequest.FromString,
+                    response_serializer=proxy__pb2.CreateGateConfigResponse.SerializeToString,
+            ),
+            'GetGateConfig': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetGateConfig,
+                    request_deserializer=proxy__pb2.GetGateConfigRequest.FromString,
+                    response_serializer=proxy__pb2.GetGateConfigResponse.SerializeToString,
+            ),
+            'UpdateGateConfig': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateGateConfig,
+                    request_deserializer=proxy__pb2.UpdateGateConfigRequest.FromString,
+                    response_serializer=proxy__pb2.UpdateGateConfigResponse.SerializeToString,
+            ),
+            'DeleteGateConfig': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteGateConfig,
+                    request_deserializer=proxy__pb2.DeleteGateConfigRequest.FromString,
+                    response_serializer=proxy__pb2.DeleteGateConfigResponse.SerializeToString,
+            ),
+            'Select': grpc.unary_unary_rpc_method_handler(
+                    servicer.Select,
+                    request_deserializer=proxy__pb2.SelectRequest.FromString,
+                    response_serializer=proxy__pb2.SelectResponse.SerializeToString,
+            ),
+            'Feedback': grpc.unary_unary_rpc_method_handler(
+                    servicer.Feedback,
+                    request_deserializer=proxy__pb2.FeedbackRequest.FromString,
+                    response_serializer=proxy__pb2.FeedbackResponse.SerializeToString,
+            ),
+            'Health': grpc.unary_unary_rpc_method_handler(
+                    servicer.Health,
+                    request_deserializer=common__pb2.HealthCheckRequest.FromString,
+                    response_serializer=common__pb2.HealthCheckResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        "qbrix.proxy.ProxyService", rpc_method_handlers
-    )
+            'qbrix.proxy.ProxyService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers(
-        "qbrix.proxy.ProxyService", rpc_method_handlers
-    )
+    server.add_registered_method_handlers('qbrix.proxy.ProxyService', rpc_method_handlers)
 
 
-# This class is part of an EXPERIMENTAL API.
+ # This class is part of an EXPERIMENTAL API.
 class ProxyService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def CreatePool(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def CreatePool(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/CreatePool",
+            '/qbrix.proxy.ProxyService/CreatePool',
             proxy__pb2.CreatePoolRequest.SerializeToString,
             proxy__pb2.CreatePoolResponse.FromString,
             options,
@@ -302,26 +283,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def GetPool(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def GetPool(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/GetPool",
+            '/qbrix.proxy.ProxyService/GetPool',
             proxy__pb2.GetPoolRequest.SerializeToString,
             proxy__pb2.GetPoolResponse.FromString,
             options,
@@ -332,26 +310,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def DeletePool(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def DeletePool(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/DeletePool",
+            '/qbrix.proxy.ProxyService/DeletePool',
             proxy__pb2.DeletePoolRequest.SerializeToString,
             proxy__pb2.DeletePoolResponse.FromString,
             options,
@@ -362,26 +337,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def CreateExperiment(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def CreateExperiment(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/CreateExperiment",
+            '/qbrix.proxy.ProxyService/CreateExperiment',
             proxy__pb2.CreateExperimentRequest.SerializeToString,
             proxy__pb2.CreateExperimentResponse.FromString,
             options,
@@ -392,26 +364,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def GetExperiment(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def GetExperiment(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/GetExperiment",
+            '/qbrix.proxy.ProxyService/GetExperiment',
             proxy__pb2.GetExperimentRequest.SerializeToString,
             proxy__pb2.GetExperimentResponse.FromString,
             options,
@@ -422,26 +391,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def UpdateExperiment(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def UpdateExperiment(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/UpdateExperiment",
+            '/qbrix.proxy.ProxyService/UpdateExperiment',
             proxy__pb2.UpdateExperimentRequest.SerializeToString,
             proxy__pb2.UpdateExperimentResponse.FromString,
             options,
@@ -452,26 +418,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def DeleteExperiment(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def DeleteExperiment(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/DeleteExperiment",
+            '/qbrix.proxy.ProxyService/DeleteExperiment',
             proxy__pb2.DeleteExperimentRequest.SerializeToString,
             proxy__pb2.DeleteExperimentResponse.FromString,
             options,
@@ -482,26 +445,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def CreateGateConfig(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def CreateGateConfig(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/CreateGateConfig",
+            '/qbrix.proxy.ProxyService/CreateGateConfig',
             proxy__pb2.CreateGateConfigRequest.SerializeToString,
             proxy__pb2.CreateGateConfigResponse.FromString,
             options,
@@ -512,26 +472,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def GetGateConfig(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def GetGateConfig(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/GetGateConfig",
+            '/qbrix.proxy.ProxyService/GetGateConfig',
             proxy__pb2.GetGateConfigRequest.SerializeToString,
             proxy__pb2.GetGateConfigResponse.FromString,
             options,
@@ -542,26 +499,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def UpdateGateConfig(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def UpdateGateConfig(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/UpdateGateConfig",
+            '/qbrix.proxy.ProxyService/UpdateGateConfig',
             proxy__pb2.UpdateGateConfigRequest.SerializeToString,
             proxy__pb2.UpdateGateConfigResponse.FromString,
             options,
@@ -572,26 +526,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def DeleteGateConfig(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def DeleteGateConfig(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/DeleteGateConfig",
+            '/qbrix.proxy.ProxyService/DeleteGateConfig',
             proxy__pb2.DeleteGateConfigRequest.SerializeToString,
             proxy__pb2.DeleteGateConfigResponse.FromString,
             options,
@@ -602,26 +553,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def Select(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def Select(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/Select",
+            '/qbrix.proxy.ProxyService/Select',
             proxy__pb2.SelectRequest.SerializeToString,
             proxy__pb2.SelectResponse.FromString,
             options,
@@ -632,26 +580,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def Feedback(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def Feedback(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/Feedback",
+            '/qbrix.proxy.ProxyService/Feedback',
             proxy__pb2.FeedbackRequest.SerializeToString,
             proxy__pb2.FeedbackResponse.FromString,
             options,
@@ -662,26 +607,23 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def Health(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def Health(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.proxy.ProxyService/Health",
+            '/qbrix.proxy.ProxyService/Health',
             common__pb2.HealthCheckRequest.SerializeToString,
             common__pb2.HealthCheckResponse.FromString,
             options,
@@ -692,5 +634,4 @@ class ProxyService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)

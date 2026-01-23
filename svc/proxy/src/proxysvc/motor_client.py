@@ -51,7 +51,6 @@ class MotorClient:
                 "index": response.arm.index,
             },
             "request_id": response.request_id,
-            "score": response.score,
         }
 
     async def health(self) -> bool:

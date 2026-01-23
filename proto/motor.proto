@@ -19,6 +19,5 @@ message SelectRequest {
 
 message SelectResponse {
   qbrix.common.Arm arm = 1;
-  string request_id = 2;  // For tracking/correlation
-  double score = 3;       // Optional: selection score/probability
+  string request_id = 2;  // for tracking/correlation
 }

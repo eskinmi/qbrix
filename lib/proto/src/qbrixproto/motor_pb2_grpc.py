@@ -16,78 +16,73 @@ class MotorServiceStub(object):
             channel: A grpc.Channel.
         """
         self.Select = channel.unary_unary(
-            "/qbrix.motor.MotorService/Select",
-            request_serializer=motor__pb2.SelectRequest.SerializeToString,
-            response_deserializer=motor__pb2.SelectResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.motor.MotorService/Select',
+                request_serializer=motor__pb2.SelectRequest.SerializeToString,
+                response_deserializer=motor__pb2.SelectResponse.FromString,
+                _registered_method=True)
         self.Health = channel.unary_unary(
-            "/qbrix.motor.MotorService/Health",
-            request_serializer=common__pb2.HealthCheckRequest.SerializeToString,
-            response_deserializer=common__pb2.HealthCheckResponse.FromString,
-            _registered_method=True,
-        )
+                '/qbrix.motor.MotorService/Health',
+                request_serializer=common__pb2.HealthCheckRequest.SerializeToString,
+                response_deserializer=common__pb2.HealthCheckResponse.FromString,
+                _registered_method=True)
 
 
 class MotorServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def Select(self, request, context):
-        """Select an arm for the given experiment and context"""
+        """Select an arm for the given experiment and context
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def Health(self, request, context):
-        """Health check"""
+        """Health check
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
 
 def add_MotorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "Select": grpc.unary_unary_rpc_method_handler(
-            servicer.Select,
-            request_deserializer=motor__pb2.SelectRequest.FromString,
-            response_serializer=motor__pb2.SelectResponse.SerializeToString,
-        ),
-        "Health": grpc.unary_unary_rpc_method_handler(
-            servicer.Health,
-            request_deserializer=common__pb2.HealthCheckRequest.FromString,
-            response_serializer=common__pb2.HealthCheckResponse.SerializeToString,
-        ),
+            'Select': grpc.unary_unary_rpc_method_handler(
+                    servicer.Select,
+                    request_deserializer=motor__pb2.SelectRequest.FromString,
+                    response_serializer=motor__pb2.SelectResponse.SerializeToString,
+            ),
+            'Health': grpc.unary_unary_rpc_method_handler(
+                    servicer.Health,
+                    request_deserializer=common__pb2.HealthCheckRequest.FromString,
+                    response_serializer=common__pb2.HealthCheckResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        "qbrix.motor.MotorService", rpc_method_handlers
-    )
+            'qbrix.motor.MotorService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers(
-        "qbrix.motor.MotorService", rpc_method_handlers
-    )
+    server.add_registered_method_handlers('qbrix.motor.MotorService', rpc_method_handlers)
 
 
-# This class is part of an EXPERIMENTAL API.
+ # This class is part of an EXPERIMENTAL API.
 class MotorService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Select(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def Select(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.motor.MotorService/Select",
+            '/qbrix.motor.MotorService/Select',
             motor__pb2.SelectRequest.SerializeToString,
             motor__pb2.SelectResponse.FromString,
             options,
@@ -98,26 +93,23 @@ class MotorService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)
 
     @staticmethod
-    def Health(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
+    def Health(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/qbrix.motor.MotorService/Health",
+            '/qbrix.motor.MotorService/Health',
             common__pb2.HealthCheckRequest.SerializeToString,
             common__pb2.HealthCheckResponse.FromString,
             options,
@@ -128,5 +120,4 @@ class MotorService(object):
             wait_for_ready,
             timeout,
             metadata,
-            _registered_method=True,
-        )
+            _registered_method=True)

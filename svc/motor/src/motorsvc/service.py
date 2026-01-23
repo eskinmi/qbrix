@@ -57,7 +57,6 @@ class MotorService:
         return {
             "arm": {"id": arm.id, "name": arm.name, "index": choice_index},
             "request_id": uuid.uuid4().hex,
-            "score": 0.0,
         }
 
     async def health(self) -> bool:

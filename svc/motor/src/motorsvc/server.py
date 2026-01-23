@@ -28,7 +28,6 @@ class MotorGRPCServicer(motor_pb2_grpc.MotorServiceServicer):
                     index=result["arm"]["index"],
                 ),
                 request_id=result["request_id"],
-                score=result.get("score", 0.0),
             )
         except ValueError as e:
             context.set_code(grpc.StatusCode.NOT_FOUND)

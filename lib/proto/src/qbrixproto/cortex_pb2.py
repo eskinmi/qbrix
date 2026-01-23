@@ -9,9 +9,13 @@ from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
-
 _runtime_version.ValidateProtobufRuntimeVersion(
-    _runtime_version.Domain.PUBLIC, 6, 33, 4, "", "cortex.proto"
+    _runtime_version.Domain.PUBLIC,
+    6,
+    33,
+    4,
+    '',
+    'cortex.proto'
 )
 # @@protoc_insertion_point(imports)
 
@@ -21,30 +25,26 @@ _sym_db = _symbol_database.Default()
 from qbrixproto import common_pb2 as common__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\x0c\x63ortex.proto\x12\x0cqbrix.cortex\x1a\x0c\x63ommon.proto"\xdc\x01\n\rFeedbackEvent\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x1b\n\tarm_index\x18\x03 \x01(\x05R\x08\x61rmIndex\x12\x16\n\x06reward\x18\x04 \x01(\x01R\x06reward\x12/\n\x07\x63ontext\x18\x05 \x01(\x0b\x32\x15.qbrix.common.ContextR\x07\x63ontext\x12!\n\x0ctimestamp_ms\x18\x06 \x01(\x03R\x0btimestampMs"8\n\x11\x46lushBatchRequest\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId"?\n\x12\x46lushBatchResponse\x12)\n\x10\x65vents_processed\x18\x01 \x01(\x05R\x0f\x65ventsProcessed"6\n\x0fGetStatsRequest\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId"\xb7\x01\n\x0f\x45xperimentStats\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId\x12!\n\x0ctotal_events\x18\x02 \x01(\x03R\x0btotalEvents\x12%\n\x0epending_events\x18\x03 \x01(\x03R\rpendingEvents\x12\x35\n\x17last_train_timestamp_ms\x18\x04 \x01(\x03R\x14lastTrainTimestampMs"G\n\x10GetStatsResponse\x12\x33\n\x05stats\x18\x01 \x03(\x0b\x32\x1d.qbrix.cortex.ExperimentStatsR\x05stats2\xfa\x01\n\rCortexService\x12O\n\nFlushBatch\x12\x1f.qbrix.cortex.FlushBatchRequest\x1a .qbrix.cortex.FlushBatchResponse\x12I\n\x08GetStats\x12\x1d.qbrix.cortex.GetStatsRequest\x1a\x1e.qbrix.cortex.GetStatsResponse\x12M\n\x06Health\x12 .qbrix.common.HealthCheckRequest\x1a!.qbrix.common.HealthCheckResponseBp\n\x10\x63om.qbrix.cortexB\x0b\x43ortexProtoP\x01\xa2\x02\x03QCX\xaa\x02\x0cQbrix.Cortex\xca\x02\x0cQbrix\\Cortex\xe2\x02\x18Qbrix\\Cortex\\GPBMetadata\xea\x02\rQbrix::Cortexb\x06proto3'
-)
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ortex.proto\x12\x0cqbrix.cortex\x1a\x0c\x63ommon.proto\"\xdc\x01\n\rFeedbackEvent\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x1b\n\tarm_index\x18\x03 \x01(\x05R\x08\x61rmIndex\x12\x16\n\x06reward\x18\x04 \x01(\x01R\x06reward\x12/\n\x07\x63ontext\x18\x05 \x01(\x0b\x32\x15.qbrix.common.ContextR\x07\x63ontext\x12!\n\x0ctimestamp_ms\x18\x06 \x01(\x03R\x0btimestampMs\"8\n\x11\x46lushBatchRequest\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId\"?\n\x12\x46lushBatchResponse\x12)\n\x10\x65vents_processed\x18\x01 \x01(\x05R\x0f\x65ventsProcessed\"6\n\x0fGetStatsRequest\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId\"\xb7\x01\n\x0f\x45xperimentStats\x12#\n\rexperiment_id\x18\x01 \x01(\tR\x0c\x65xperimentId\x12!\n\x0ctotal_events\x18\x02 \x01(\x03R\x0btotalEvents\x12%\n\x0epending_events\x18\x03 \x01(\x03R\rpendingEvents\x12\x35\n\x17last_train_timestamp_ms\x18\x04 \x01(\x03R\x14lastTrainTimestampMs\"G\n\x10GetStatsResponse\x12\x33\n\x05stats\x18\x01 \x03(\x0b\x32\x1d.qbrix.cortex.ExperimentStatsR\x05stats2\xfa\x01\n\rCortexService\x12O\n\nFlushBatch\x12\x1f.qbrix.cortex.FlushBatchRequest\x1a .qbrix.cortex.FlushBatchResponse\x12I\n\x08GetStats\x12\x1d.qbrix.cortex.GetStatsRequest\x1a\x1e.qbrix.cortex.GetStatsResponse\x12M\n\x06Health\x12 .qbrix.common.HealthCheckRequest\x1a!.qbrix.common.HealthCheckResponseBp\n\x10\x63om.qbrix.cortexB\x0b\x43ortexProtoP\x01\xa2\x02\x03QCX\xaa\x02\x0cQbrix.Cortex\xca\x02\x0cQbrix\\Cortex\xe2\x02\x18Qbrix\\Cortex\\GPBMetadata\xea\x02\rQbrix::Cortexb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "cortex_pb2", _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'cortex_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
-    _globals["DESCRIPTOR"]._loaded_options = None
-    _globals["DESCRIPTOR"]._serialized_options = (
-        b"\n\020com.qbrix.cortexB\013CortexProtoP\001\242\002\003QCX\252\002\014Qbrix.Cortex\312\002\014Qbrix\\Cortex\342\002\030Qbrix\\Cortex\\GPBMetadata\352\002\rQbrix::Cortex"
-    )
-    _globals["_FEEDBACKEVENT"]._serialized_start = 45
-    _globals["_FEEDBACKEVENT"]._serialized_end = 265
-    _globals["_FLUSHBATCHREQUEST"]._serialized_start = 267
-    _globals["_FLUSHBATCHREQUEST"]._serialized_end = 323
-    _globals["_FLUSHBATCHRESPONSE"]._serialized_start = 325
-    _globals["_FLUSHBATCHRESPONSE"]._serialized_end = 388
-    _globals["_GETSTATSREQUEST"]._serialized_start = 390
-    _globals["_GETSTATSREQUEST"]._serialized_end = 444
-    _globals["_EXPERIMENTSTATS"]._serialized_start = 447
-    _globals["_EXPERIMENTSTATS"]._serialized_end = 630
-    _globals["_GETSTATSRESPONSE"]._serialized_start = 632
-    _globals["_GETSTATSRESPONSE"]._serialized_end = 703
-    _globals["_CORTEXSERVICE"]._serialized_start = 706
-    _globals["_CORTEXSERVICE"]._serialized_end = 956
+  _globals['DESCRIPTOR']._loaded_options = None
+  _globals['DESCRIPTOR']._serialized_options = b'\n\020com.qbrix.cortexB\013CortexProtoP\001\242\002\003QCX\252\002\014Qbrix.Cortex\312\002\014Qbrix\\Cortex\342\002\030Qbrix\\Cortex\\GPBMetadata\352\002\rQbrix::Cortex'
+  _globals['_FEEDBACKEVENT']._serialized_start=45
+  _globals['_FEEDBACKEVENT']._serialized_end=265
+  _globals['_FLUSHBATCHREQUEST']._serialized_start=267
+  _globals['_FLUSHBATCHREQUEST']._serialized_end=323
+  _globals['_FLUSHBATCHRESPONSE']._serialized_start=325
+  _globals['_FLUSHBATCHRESPONSE']._serialized_end=388
+  _globals['_GETSTATSREQUEST']._serialized_start=390
+  _globals['_GETSTATSREQUEST']._serialized_end=444
+  _globals['_EXPERIMENTSTATS']._serialized_start=447
+  _globals['_EXPERIMENTSTATS']._serialized_end=630
+  _globals['_GETSTATSRESPONSE']._serialized_start=632
+  _globals['_GETSTATSRESPONSE']._serialized_end=703
+  _globals['_CORTEXSERVICE']._serialized_start=706
+  _globals['_CORTEXSERVICE']._serialized_end=956
 # @@protoc_insertion_point(module_scope)

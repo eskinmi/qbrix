@@ -34,9 +34,7 @@ class SelectRequest(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["context", b"context"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal[
-        "context", b"context", "experiment_id", b"experiment_id"
-    ]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["context", b"context", "experiment_id", b"experiment_id"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___SelectRequest: _TypeAlias = SelectRequest  # noqa: Y015
@@ -47,11 +45,8 @@ class SelectResponse(_message.Message):
 
     ARM_FIELD_NUMBER: _builtins.int
     REQUEST_ID_FIELD_NUMBER: _builtins.int
-    SCORE_FIELD_NUMBER: _builtins.int
     request_id: _builtins.str
-    """For tracking/correlation"""
-    score: _builtins.float
-    """Optional: selection score/probability"""
+    """for tracking/correlation"""
     @_builtins.property
     def arm(self) -> _common_pb2.Arm: ...
     def __init__(
@@ -59,13 +54,10 @@ class SelectResponse(_message.Message):
         *,
         arm: _common_pb2.Arm | None = ...,
         request_id: _builtins.str = ...,
-        score: _builtins.float = ...,
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal[
-        "arm", b"arm", "request_id", b"request_id", "score", b"score"
-    ]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm", "request_id", b"request_id"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___SelectResponse: _TypeAlias = SelectResponse  # noqa: Y015
