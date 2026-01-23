@@ -57,7 +57,7 @@ services:
       PROXY_JWT_ALGORITHM: "HS256"
       PROXY_JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "30"
       PROXY_JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
-      PROXY_LOG_LEVEL: "INFO"
+      PROXY_LOG_LEVEL: "WARNING"
       LOG_FORMAT: "json"
     depends_on:
       postgres:
@@ -96,7 +96,8 @@ services:
       CORTEX_REDIS_HOST: redis
       CORTEX_REDIS_PORT: "6379"
       CORTEX_CONSUMER_NAME: "worker-0"
-      CORTEX_LOG_LEVEL: "INFO"
+      CORTEX_LOG_LEVEL: "WARNING"
+      CORTEX_BATCH_SIZE: 256
       LOG_FORMAT: "json"
     depends_on:
       redis:

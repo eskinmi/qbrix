@@ -16,7 +16,7 @@ class CortexSettings(BaseSettings):
     consumer_group: str = "cortex"
     consumer_name: str = "worker-0"
 
-    batch_size: int = 100
+    batch_size: int = 256
     batch_timeout_ms: int = 100
     flush_interval_sec: int = 10
 
