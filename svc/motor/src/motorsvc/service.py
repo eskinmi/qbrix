@@ -1,5 +1,3 @@
-import uuid
-
 from qbrixlog import get_logger
 from qbrixcore.context import Context
 from qbrixstore.redis.client import RedisClient
@@ -14,6 +12,7 @@ logger = get_logger(__name__)
 
 
 class MotorService:
+
     def __init__(self, settings: MotorSettings):
         self._settings = settings
         self._cache = MotorCache(settings)
@@ -47,27 +46,25 @@ class MotorService:
         context_vector: list[float],
         context_metadata: dict,
     ) -> dict:
-        experiment_data = await self._redis.get_experiment(experiment_id)
-        if experiment_data is None:
+        experiment_record = await self._redis.get_experiment(experiment_id)
+        if experiment_record is None:
             raise ValueError(f"experiment not found: {experiment_id}")
 
-        agent = await self._agent_factory.get_or_create(experiment_data)
-
+        agent = await self._agent_factory.get_or_create(experiment_record)
         context = Context(
-            id=context_id, vector=context_vector or [], metadata=context_metadata or {}
+            id=context_id,
+            vector=context_vector or [],
+            metadata=context_metadata or {}
         )
 
         choice_index = agent.select(context)
         arm = agent.pool.arms[choice_index]
 
-        return {
-            "arm": {"id": arm.id, "name": arm.name, "index": choice_index},
-            "request_id": uuid.uuid4().hex,
-        }
+        return {"arm": {"id": arm.id, "name": arm.name, "index": choice_index}}
 
     async def health(self) -> bool:
         try:
             await self._redis.client.ping()
             return True
-        except Exception:
+        except Exception:  # noqa
             return False

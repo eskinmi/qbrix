@@ -60,9 +60,8 @@ async def agent_select(
     _user=Depends(require_scopes(["agent:read"])),
 ):
     try:
-        service = get_proxy_service()
-
-        response = await service.select(
+        svc = get_proxy_service()
+        response = await svc.select(
             experiment_id=body.experiment_id,
             context_id=body.context.id,
             context_vector=body.context.vector,
@@ -89,8 +88,8 @@ async def agent_feedback(
     _user=Depends(require_scopes(["agent:write"])),
 ):
     try:
-        service = get_proxy_service()
-        accepted = await service.feed(
+        svc = get_proxy_service()
+        accepted = await svc.feed(
             request_id=body.request_id,
             reward=body.reward,
         )

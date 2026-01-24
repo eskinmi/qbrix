@@ -19,5 +19,4 @@ message SelectRequest {
 
 message SelectResponse {
   qbrix.common.Arm arm = 1;
-  string request_id = 2;  // for tracking/correlation
 }

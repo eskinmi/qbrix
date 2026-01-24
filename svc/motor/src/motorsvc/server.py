@@ -31,7 +31,6 @@ class MotorGRPCServicer(motor_pb2_grpc.MotorServiceServicer):
                     name=result["arm"]["name"],
                     index=result["arm"]["index"],
                 ),
-                request_id=result["request_id"],
             )
         except ValueError as e:
             logger.warning("experiment not found: %s", request.experiment_id)
