@@ -94,15 +94,11 @@ class CortexService:
         """process a batch of messages: train and ack."""
         message_ids = [mid for mid, _ in messages]
         events = [event for _, event in messages]
-
-        ledger = await self._trainer.train_batch(events)
-
+        ledger = await self._trainer.train(events)
         for experiment_id, count in ledger.items():
             self._stats[experiment_id]["total"] += count
             self._stats[experiment_id]["last_train"] = int(time.time() * 1000)
-
         await self._consumer.ack(message_ids)
-
         logger.info(
             "trained batch: %d events across %d experiments",
             len(events),
@@ -115,7 +111,6 @@ class CortexService:
         await self._recover_pending()
 
         last_flush = time.time()
-
         while self._running:
             try:
                 remaining_capacity = self._settings.batch_size - len(self._pending)
