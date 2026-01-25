@@ -25,18 +25,12 @@ class BatchTrainer:
     def __init__(self, redis_client: RedisClient):
         self._redis = redis_client
 
-    async def train(self, events: list[FeedbackEvent]) -> dict[str, int]:
-        events_per_experiment = defaultdict(list)
+    @staticmethod
+    def _group_per_experiment(events: list[FeedbackEvent]):
+        grouped = defaultdict(list)
         for event in events:
-            events_per_experiment[event.experiment_id].append(event)
-        ledger = dict()
-        for experiment_id, experiment_events in events_per_experiment.items():
-            count = await self._train_experiment(
-                experiment_id,
-                experiment_events
-            )
-            ledger[experiment_id] = count
-        return ledger
+            grouped[event.experiment_id].append(event)
+        return grouped
 
     async def _train_experiment(
         self, experiment_id: str, events: list[FeedbackEvent]
@@ -75,3 +69,14 @@ class BatchTrainer:
 
         await self._redis.set_params(experiment_id, param_state.model_dump())
         return len(events)
+
+    async def train(self, events: list[FeedbackEvent]) -> dict[str, int]:
+        ledger = dict()
+        events_per_experiment = self._group_per_experiment(events)
+        for experiment_id, experiment_events in events_per_experiment.items():
+            count = await self._train_experiment(
+                experiment_id,
+                experiment_events
+            )
+            ledger[experiment_id] = count
+        return ledger

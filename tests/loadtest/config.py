@@ -32,7 +32,7 @@ class LoadTestSettings(BaseSettings):
 
     @property
     def proxy_address(self) -> str:
-        return f"http://{self.proxy_host}:{self.proxy_port}"
+        return f"http://{self.proxy_host}:{self.proxy_port}"  # noqa
 
 
 settings = LoadTestSettings()

@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class CortexSettings(BaseSettings):
+
     model_config = SettingsConfigDict(env_prefix="CORTEX_")
 
     grpc_host: str = "0.0.0.0"

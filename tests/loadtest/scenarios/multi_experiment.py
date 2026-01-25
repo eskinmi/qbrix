@@ -202,7 +202,7 @@ class MultiExperimentUser(User):
 
 
 @events.test_start.add_listener
-def on_test_start(environment, **kwargs):
+def on_test_start(environment, **kwargs):  # noqa
     """setup multiple experiments before test starts."""
     if MultiExperimentUser._setup_done:  # noqa
         return
@@ -240,9 +240,9 @@ def on_test_start(environment, **kwargs):
 
 
 @events.test_stop.add_listener
-def on_test_stop(environment, **kwargs):
+def on_test_stop(environment, **kwargs):  # noqa
     """cleanup all experiments after test ends."""
-    if not MultiExperimentUser._setup_done:
+    if not MultiExperimentUser._setup_done:  # noqa
         return
 
     client = ProxyClient()

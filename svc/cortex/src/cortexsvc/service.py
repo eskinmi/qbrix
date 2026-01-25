@@ -17,6 +17,7 @@ logger = get_logger(__name__)
 
 
 class CortexService:
+
     def __init__(self, settings: CortexSettings):
         self._settings = settings
         self._redis: RedisClient | None = None

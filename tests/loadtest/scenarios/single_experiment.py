@@ -169,9 +169,9 @@ class SingleExperimentUser(User):
 
 
 @events.test_start.add_listener
-def on_test_start(environment, **kwargs):
+def on_test_start(environment, **kwargs):  # noqa
     """setup shared experiment before test starts."""
-    if SingleExperimentUser._setup_done:
+    if SingleExperimentUser._setup_done:  # noqa
         return
 
     client = ProxyClient()
@@ -202,9 +202,9 @@ def on_test_start(environment, **kwargs):
 
 
 @events.test_stop.add_listener
-def on_test_stop(environment, **kwargs):
+def on_test_stop(environment, **kwargs):  # noqa
     """cleanup experiment after test ends."""
-    if not SingleExperimentUser._setup_done:
+    if not SingleExperimentUser._setup_done:  # noqa
         return
 
     client = ProxyClient()

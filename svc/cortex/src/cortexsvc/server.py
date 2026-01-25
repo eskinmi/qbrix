@@ -15,6 +15,7 @@ logger = get_logger(__name__)
 
 
 class CortexGRPCServicer(cortex_pb2_grpc.CortexServiceServicer):
+
     def __init__(self, service: CortexService):
         self._service = service
 
@@ -54,6 +55,7 @@ class CortexGRPCServicer(cortex_pb2_grpc.CortexServiceServicer):
 
 
 async def serve(settings: CortexSettings | None = None) -> None:
+
     if settings is None:
         settings = CortexSettings()
 
