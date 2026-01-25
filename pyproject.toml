@@ -14,13 +14,13 @@ dependencies = [
 members = ["svc/*"]
 
 [tool.uv.sources]
+cortexsvc = { workspace = true}
 proxysvc = { workspace = true}
 motorsvc = { workspace = true}
-cortexsvc = { workspace = true}
 qbrixcore = { path = "../../lib/core", editable = true }
-qbrixstore = { path = "../../lib/store", editable = true }
-qbrixproto = { path = "../../lib/proto", editable = true }
 qbrixlog = { path = "../../lib/log", editable = true }
+qbrixproto = { path = "../../lib/proto", editable = true }
+qbrixstore = { path = "../../lib/store", editable = true }
 
 [[tool.uv.index]]
 name = "envelope"
