@@ -3,7 +3,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$SCRIPT_DIR/.."
-OUT_DIR="$ROOT_DIR/lib/proto/src/qbrixproto"
+OUT_DIR="$ROOT_DIR/lib/proto/qbrixproto"
 
 cd "$ROOT_DIR/proto"
 
