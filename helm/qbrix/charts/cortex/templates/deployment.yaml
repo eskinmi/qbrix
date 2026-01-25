@@ -5,11 +5,12 @@ metadata:
   labels:
     {{- include "cortex.labels" . | nindent 4 }}
 spec:
-  # cortex does NOT support horizontal scaling yet
-  # do not change this without implementing distributed training
+  # single instance by design (event sourcing pattern)
+  # ensures correct parameter updates without race conditions
+  # training is NOT on the hot path - doesn't affect selection latency
   replicas: 1
   strategy:
-    type: Recreate  # ensure only one instance at a time
+    type: Recreate  # clean handoff during updates
   selector:
     matchLabels:
       {{- include "cortex.selectorLabels" . | nindent 6 }}

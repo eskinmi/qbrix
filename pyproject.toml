@@ -20,7 +20,7 @@ cortexsvc = { workspace = true}
 qbrixcore = { path = "../../lib/core", editable = true }
 qbrixstore = { path = "../../lib/store", editable = true }
 qbrixproto = { path = "../../lib/proto", editable = true }
-qbrixlog = { path = "../../lib/logging", editable = true }
+qbrixlog = { path = "../../lib/log", editable = true }
 
 [[tool.uv.index]]
 name = "envelope"

@@ -1,14 +1,21 @@
 # cortex service values
-# training service - SINGLE REPLICA ONLY
+# training service - SINGLE INSTANCE BY DESIGN
 #
-# important: cortex does NOT support horizontal scaling yet due to:
-# - redis stream consumer name conflicts (all pods would use same name)
-# - local in-memory pending batch buffer (no coordination between pods)
-# - local asyncio.Lock (doesn't work across pods)
+# architecture decision: cortex runs as a single instance (event sourcing pattern)
 #
-# distributed training support is planned for future releases
+# why single instance?
+# - training is NOT on the hot path (doesn't affect selection latency)
+# - ensures correct parameter updates (no race conditions between pods)
+# - redis streams provides back-pressure (buffers spikes in feedback volume)
+# - training operations are computationally cheap (handles thousands of events/sec)
+# - simplicity: no distributed locks, no coordination overhead
+#
+# if cortex becomes a bottleneck:
+# 1. vertical scaling (increase cpu/memory)
+# 2. increase batch size for better throughput
+# 3. shard by experiment (each cortex owns subset of experiments)
 
-# fixed at 1 - do not increase without implementing distributed training
+# single instance - this is intentional, not a limitation
 replicaCount: 1
 
 image:
@@ -26,15 +33,11 @@ service:
   port: 50052
   annotations: {}
 
-# autoscaling disabled - cortex cannot scale horizontally yet
+# autoscaling disabled - single instance by design
 autoscaling:
   enabled: false
-  # these values are here for future use when distributed training is implemented
-  # minReplicas: 1
-  # maxReplicas: 5
-  # targetCPUUtilizationPercentage: 70
 
-# no PDB needed for single replica
+# no PDB - single instance with Recreate strategy ensures clean handoff
 podDisruptionBudget:
   enabled: false
 
@@ -105,8 +108,6 @@ config:
   stream:
     name: "qbrix:feedback"
     consumerGroup: "cortex"
-    # consumer name - unique identifier for this worker
-    # when distributed training is implemented, this should be dynamically generated
     consumerName: "worker-0"
 
   # batch processing settings

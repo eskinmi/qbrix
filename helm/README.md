@@ -33,8 +33,9 @@ Helm charts for deploying Qbrix - a distributed multi-armed bandit system for si
                                          │ Write (batch)
                               ┌─────────────────────┐
                               │     cortexsvc       │
-                              │   (single replica)  │
-                              │    TRAINING PATH    │
+                              │  (single instance)  │
+                              │   TRAINING PATH     │
+                              │  event sourcing     │
                               └──────────┬──────────┘
                                          │ Consume
                               ┌─────────────────────┐
@@ -59,7 +60,27 @@ Helm charts for deploying Qbrix - a distributed multi-armed bandit system for si
 |---------|---------|--------|
 | **proxy** | Horizontal (HPA) | Stateless gateway, cache with Redis fallback |
 | **motor** | Horizontal (HPA) | Stateless selection, TTL cache |
-| **cortex** | Single replica | Fixed consumer name, local batch buffer |
+| **cortex** | Single instance | By design - see below |
+
+### Why Cortex is Single Instance
+
+Cortex uses the **event sourcing pattern** - a single consumer processes all training events:
+
+```
+Feedback → Redis Streams (buffer) → Cortex (single) → Params in Redis
+```
+
+This is a deliberate design choice:
+
+1. **Not on the hot path** - Training doesn't affect selection latency
+2. **Correct by construction** - No race conditions in parameter updates
+3. **Back-pressure via Redis Streams** - Buffers traffic spikes automatically
+4. **Computationally cheap** - Single instance handles thousands of events/sec
+
+If cortex becomes a bottleneck:
+1. Vertical scaling (more CPU/memory)
+2. Increase batch size
+3. Shard by experiment (each cortex owns subset)
 
 ## Prerequisites
 
