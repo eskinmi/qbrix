@@ -64,14 +64,15 @@ class AgentFactory:
                 self._param_backend.set(experiment_id, params)
             return agent
 
-        # if there is no agent, it's either because:
-        # 1. it's the first request for an experiment
-        # 2. there is a new replica / or instance restarted
-        # 3. agent cache is expired / invalidated
-
-        # in all cases we need to regenerate the agent, meaning we need to fetch the protocol, pool, etc.
-        # if it is not the first request, we already must have parameters, so we will fetch the
-        # parameters from the cache or redis.
+        # attention:
+        #  if there is no agent, it's either because:
+        #  1. it's the first request for an experiment
+        #  2. there is a new replica / or instance restarted
+        #  3. agent cache is expired / invalidated
+        #  <->
+        #  in all cases we need to regenerate the agent, meaning we need to fetch the protocol, pool, etc.
+        #  if it is not the first request, we already must have parameters, so we will fetch the
+        #  parameters from the cache or redis.
 
         protocol_name = experiment_data["protocol"]
         protocol_cls = PROTOCOL_MAP.get(protocol_name)

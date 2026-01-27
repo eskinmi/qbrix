@@ -22,6 +22,7 @@ PROTOCOL_MAP = _build_protocol_map()
 
 
 class BatchTrainer:
+
     def __init__(self, redis_client: RedisClient):
         self._redis = redis_client
 
@@ -44,6 +45,29 @@ class BatchTrainer:
         if protocol_cls is None:
             return 0
 
+        # attention: in a distributed setup, where cortex node has multiple replicas, this below
+        #  read and train loop would be a problem (per experiment) as there would be race conditions:
+        #  <->
+        #  consider:
+        #   ==========
+        #   for experiment Ei;
+        #   t1: redis read, in instance X
+        #   t2: experiment train
+        #   t3: redis read, in instance Y
+        #   t4: redis write, trained parameters, in instance X
+        #   t5: experiment train
+        #   t6: redis write, trained parameters, in instance Y
+        #   ==========
+        #  currently the setup imposes that the cortex instance shall only have single replica as it
+        #  operates on event sourcing. however, in the future, if we would like to scale the
+        #  trainers (cortex instances) as well, we'd have to change the parameter update logic, as it
+        #  is presented here.
+        #  <->
+        #  a solution to this is to make experiment level separation where; different cortex instances
+        #  train different set of experiment, which likely requires additional metadata services like etcd
+        #  and a coordination setup.
+
+
         params = await self._redis.get_params(experiment_id)
         if params is None:
             num_arms = len(experiment_record["pool"]["arms"])
@@ -51,7 +75,9 @@ class BatchTrainer:
                 num_arms=num_arms, **experiment_record.get("protocol_params", {})
             )
         else:
-            param_state = protocol_cls.param_state_cls.model_validate(params)
+            param_state = protocol_cls.param_state_cls.model_validate(
+                params
+            )
 
         for event in events:
             context = Context(
@@ -59,7 +85,7 @@ class BatchTrainer:
                 vector=np.array(event.context_vector, dtype=np.float16),
                 metadata=event.context_metadata,
             )
-
+            # train and retrieve the updated parameter state.
             param_state = protocol_cls.train(
                 ps=param_state,
                 context=context,
@@ -72,8 +98,8 @@ class BatchTrainer:
 
     async def train(self, events: list[FeedbackEvent]) -> dict[str, int]:
         ledger = dict()
-        events_per_experiment = self._group_per_experiment(events)
-        for experiment_id, experiment_events in events_per_experiment.items():
+        grouped_events = self._group_per_experiment(events)
+        for experiment_id, experiment_events in grouped_events.items():
             count = await self._train_experiment(
                 experiment_id,
                 experiment_events

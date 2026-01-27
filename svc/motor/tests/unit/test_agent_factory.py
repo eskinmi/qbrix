@@ -108,6 +108,8 @@ class TestAgentFactoryGetOrCreate:
 
         agent = await factory.get_or_create(experiment_data_dict)
 
+        backend.set.assert_called_once()  # todo: checkout
+        backend.get.assert_called_once()
         assert agent is not None
         assert agent.experiment_id == "exp-123"
         assert len(agent.pool.arms) == 3
@@ -126,6 +128,7 @@ class TestAgentFactoryGetOrCreate:
         agent = await factory.get_or_create(experiment_data_dict)
 
         cached_agent = motor_cache.get_agent("exp-123")
+        backend.set.assert_called_once()
         assert cached_agent is not None
         assert cached_agent.experiment_id == agent.experiment_id
 
@@ -141,7 +144,6 @@ class TestAgentFactoryGetOrCreate:
 
         await factory.get_or_create(experiment_data_dict)
 
-        # verify params were initialized and set
         backend.set.assert_called_once()
         call_args = backend.set.call_args
         assert call_args[0][0] == "exp-123"  # experiment_id
@@ -159,11 +161,16 @@ class TestAgentFactoryGetOrCreate:
         factory = AgentFactory(motor_cache, backend)
 
         # custom protocol params
-        experiment_data_dict["protocol_params"] = {"alpha_prior": 2.0, "beta_prior": 3.0}
+        init_alpha_prior = 2.0
+        init_beta_prior = 3.0
+        experiment_data_dict["protocol_params"] = {"alpha_prior": init_alpha_prior, "beta_prior": init_beta_prior}
 
         agent = await factory.get_or_create(experiment_data_dict)
 
-        assert agent.init_params == {"alpha_prior": 2.0, "beta_prior": 3.0}
+        assert agent.init_params == {
+            "alpha_prior": init_alpha_prior,
+            "beta_prior": init_beta_prior
+        }
 
     @pytest.mark.asyncio
     async def test_get_or_create_raises_error_for_unknown_protocol(
@@ -173,7 +180,7 @@ class TestAgentFactoryGetOrCreate:
         backend.get.return_value = None
         factory = AgentFactory(motor_cache, backend)
 
-        experiment_data_dict["protocol"] = "UnknownProtocol"
+        experiment_data_dict["protocol"] = "ProtocolThatMustNotExist"
 
         with pytest.raises(ValueError, match="Unknown protocol"):
             await factory.get_or_create(experiment_data_dict)
