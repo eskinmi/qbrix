@@ -17,12 +17,13 @@ service CortexService {
 
 // Feedback event (used in Redis Streams, not gRPC directly)
 message FeedbackEvent {
-  string experiment_id = 1;
-  string request_id = 2;     // Correlates with SelectResponse.request_id
-  int32 arm_index = 3;
-  double reward = 4;
-  qbrix.common.Context context = 5;
-  int64 timestamp_ms = 6;
+  string tenant_id = 1;
+  string experiment_id = 2;
+  string request_id = 3;     // Correlates with SelectResponse.request_id
+  int32 arm_index = 4;
+  double reward = 5;
+  qbrix.common.Context context = 6;
+  int64 timestamp_ms = 7;
 }
 
 message FlushBatchRequest {

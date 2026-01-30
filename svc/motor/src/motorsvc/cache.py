@@ -15,21 +15,26 @@ class MotorCache:
             maxsize=settings.agent_cache_maxsize, ttl=settings.agent_cache_ttl
         )
 
-    def get_params(self, experiment_id: str) -> BaseParamState | None:
-        return self._params.get(experiment_id)
+    @staticmethod
+    def _cache_key(tenant_id: str, experiment_id: str) -> str:
+        return f"{tenant_id}:{experiment_id}"
 
-    def set_params(self, experiment_id: str, params: BaseParamState) -> None:
-        self._params[experiment_id] = params
+    def get_params(self, tenant_id: str, experiment_id: str) -> BaseParamState | None:
+        return self._params.get(self._cache_key(tenant_id, experiment_id))
 
-    def get_agent(self, experiment_id: str):
-        return self._agents.get(experiment_id)
+    def set_params(self, tenant_id: str, experiment_id: str, params: BaseParamState) -> None:
+        self._params[self._cache_key(tenant_id, experiment_id)] = params
 
-    def set_agent(self, experiment_id: str, agent) -> None:
-        self._agents[experiment_id] = agent
+    def get_agent(self, tenant_id: str, experiment_id: str):
+        return self._agents.get(self._cache_key(tenant_id, experiment_id))
 
-    def invalidate_experiment(self, experiment_id: str) -> None:
-        self._params.pop(experiment_id, None)
-        self._agents.pop(experiment_id, None)
+    def set_agent(self, tenant_id: str, experiment_id: str, agent) -> None:
+        self._agents[self._cache_key(tenant_id, experiment_id)] = agent
+
+    def invalidate_experiment(self, tenant_id: str, experiment_id: str) -> None:
+        cache_key = self._cache_key(tenant_id, experiment_id)
+        self._params.pop(cache_key, None)
+        self._agents.pop(cache_key, None)
 
     def clear(self) -> None:
         self._params.clear()

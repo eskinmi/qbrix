@@ -98,9 +98,10 @@ class CortexService:
         message_ids = [mid for mid, _ in messages]
         events = [event for _, event in messages]
         ledger = await self._trainer.train(events)
-        for experiment_id, count in ledger.items():
-            self._stats[experiment_id]["total"] += count
-            self._stats[experiment_id]["last_train"] = int(time.time() * 1000)
+        for (tenant_id, experiment_id), count in ledger.items():
+            stats_key = f"{tenant_id}:{experiment_id}"
+            self._stats[stats_key]["total"] += count
+            self._stats[stats_key]["last_train"] = int(time.time() * 1000)
         await self._consumer.ack(message_ids)
         logger.info(
             "trained batch: %d events across %d experiments",
@@ -143,13 +144,24 @@ class CortexService:
                 logger.error("error processing batch: %s", e)
                 await asyncio.sleep(1)
 
-    async def flush_batch(self, experiment_id: str | None = None) -> int:
-        """force flush pending batch, optionally filtered by experiment_id."""
+    async def flush_batch(
+        self, tenant_id: str | None = None, experiment_id: str | None = None
+    ) -> int:
+        """force flush pending batch, optionally filtered by tenant_id and/or experiment_id."""
         async with self._batch_lock:
             if not self._pending:
                 return 0
 
-            if experiment_id:
+            if tenant_id and experiment_id:
+                to_flush = [
+                    (mid, ev) for mid, ev in self._pending
+                    if ev.tenant_id == tenant_id and ev.experiment_id == experiment_id
+                ]
+                to_keep = [
+                    (mid, ev) for mid, ev in self._pending
+                    if not (ev.tenant_id == tenant_id and ev.experiment_id == experiment_id)
+                ]
+            elif experiment_id:
                 to_flush = [
                     (mid, ev) for mid, ev in self._pending
                     if ev.experiment_id == experiment_id
@@ -172,13 +184,28 @@ class CortexService:
             logger.info("force flushed %d events", count)
             return count
 
-    def get_stats(self, experiment_id: str | None = None) -> list[dict]:
-        if experiment_id:
-            stats = self._stats.get(experiment_id)
+    def get_stats(
+        self, tenant_id: str | None = None, experiment_id: str | None = None
+    ) -> list[dict]:
+        """get stats, optionally filtered by tenant_id and/or experiment_id."""
+        if tenant_id and experiment_id:
+            stats_key = f"{tenant_id}:{experiment_id}"
+            stats = self._stats.get(stats_key)
             if stats:
-                return [{"experiment_id": experiment_id, **stats}]
+                return [{"tenant_id": tenant_id, "experiment_id": experiment_id, **stats}]
             return []
-        return [{"experiment_id": k, **v} for k, v in self._stats.items()]
+
+        results = []
+        for key, stats in self._stats.items():
+            parts = key.split(":", 1)
+            if len(parts) == 2:
+                t_id, e_id = parts
+                if tenant_id and t_id != tenant_id:
+                    continue
+                if experiment_id and e_id != experiment_id:
+                    continue
+                results.append({"tenant_id": t_id, "experiment_id": e_id, **stats})
+        return results
 
     async def health(self) -> bool:
         try:

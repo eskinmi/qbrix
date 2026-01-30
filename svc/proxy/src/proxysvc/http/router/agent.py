@@ -7,6 +7,7 @@ from fastapi import Depends
 from pydantic import BaseModel
 
 from proxysvc.http.auth.dependencies import get_current_user_id
+from proxysvc.http.auth.dependencies import get_current_tenant_id
 from proxysvc.http.auth.dependencies import require_scopes
 from proxysvc.http.exception import SelectionException
 from proxysvc.http.exception import FeedbackException
@@ -56,12 +57,14 @@ class AgentFeedbackRequest(BaseModel):
 )
 async def agent_select(
     body: AgentSelectRequest,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),  # noqa
     _user=Depends(require_scopes(["agent:read"])),
 ):
     try:
         svc = get_proxy_service()
         response = await svc.select(
+            tenant_id=tenant_id,
             experiment_id=body.experiment_id,
             context_id=body.context.id,
             context_vector=body.context.vector,

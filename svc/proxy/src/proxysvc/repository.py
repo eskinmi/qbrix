@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from qbrixstore.postgres.models import Pool, Arm, Experiment, FeatureGate
+from qbrixstore.postgres.models import Tenant, Pool, Arm, Experiment, FeatureGate
 from qbrixstore.postgres.models import User
 from qbrixstore.postgres.models import APIKey
 
@@ -25,13 +25,113 @@ from proxysvc.gate.model.rule import Rule
 
 
 
-class PoolRepository:
+class TenantRepository:
 
     def __init__(self, session: AsyncSession):
         self._session = session
 
+    async def create(self, name: str, slug: str) -> Tenant:
+        """
+        Create a tenant for the given name and slug in the database.
+        Parameters
+        ----------
+        name: string
+            tenant name
+        slug: string
+            tenant slug
+
+        Returns
+        -------
+            Tenant object
+        """
+        tenant = Tenant(name=name, slug=slug)
+        self._session.add(tenant)
+        await self._session.flush()
+        return tenant
+
+    async def get(self, tenant_id: str) -> Tenant | None:
+        """
+        Get a tenant for the given tenant_id from the database.
+        Parameters
+        ----------
+        tenant_id: string
+
+        Returns
+        -------
+        Tenant object
+        """
+        stmt = select(Tenant).where(Tenant.id == tenant_id)
+        response = await self._session.execute(stmt)
+        return response.scalar_one_or_none()
+
+    async def get_by_slug(self, slug: str) -> Tenant | None:
+        """
+        Get a tenant for the given slug from the database.
+
+        Parameters
+        ----------
+        slug: string
+
+        Returns
+        -------
+        Tenant object
+        """
+        stmt = select(Tenant).where(Tenant.slug == slug)
+        response = await self._session.execute(stmt)
+        return response.scalar_one_or_none()
+
+    async def list(self, limit: int = 100, offset: int = 0) -> list[Tenant]:
+        """
+        List all the tenants in the database.
+        Parameters
+        ----------
+        limit: int
+            default: 1000
+        offset: int
+            default: 0
+
+        Returns
+        -------
+        List of Tenant objects
+        """
+        stmt = (
+            select(Tenant)
+            .where(Tenant.is_active == True)
+            .order_by(Tenant.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        response = await self._session.execute(stmt)
+        return list(response.scalars().all())
+
+    async def deactivate(self, tenant_id: str) -> bool:
+        """
+        Deactivate a tenant for the given tenant_id from the database.
+
+        Parameters
+        ----------
+        tenant_id: string
+
+        Returns
+        -------
+        Bool
+        """
+        tenant = await self.get(tenant_id)
+        if tenant is None:
+            return False
+        tenant.is_active = False
+        await self._session.flush()
+        return True
+
+
+class PoolRepository:
+
+    def __init__(self, session: AsyncSession, tenant_id: str):
+        self._session = session
+        self._tenant_id = tenant_id
+
     async def create(self, name: str, arms: list[dict]) -> Pool:
-        pool = Pool(name=name)
+        pool = Pool(name=name, tenant_id=self._tenant_id)
         for i, arm_data in enumerate(arms):
             arm = Arm(
                 name=arm_data["name"], index=i, metadata_=arm_data.get("metadata", {})
@@ -42,12 +142,20 @@ class PoolRepository:
         return pool
 
     async def get(self, pool_id: str) -> Pool | None:
-        stmt = select(Pool).options(selectinload(Pool.arms)).where(Pool.id == pool_id)
+        stmt = (
+            select(Pool)
+            .options(selectinload(Pool.arms))
+            .where(Pool.id == pool_id, Pool.tenant_id == self._tenant_id)
+        )
         response = await self._session.execute(stmt)
         return response.scalar_one_or_none()
 
     async def get_by_name(self, name: str) -> Pool | None:
-        stmt = select(Pool).options(selectinload(Pool.arms)).where(Pool.name == name)
+        stmt = (
+            select(Pool)
+            .options(selectinload(Pool.arms))
+            .where(Pool.name == name, Pool.tenant_id == self._tenant_id)
+        )
         response = await self._session.execute(stmt)
         return response.scalar_one_or_none()
 
@@ -63,6 +171,7 @@ class PoolRepository:
         stmt = (
             select(Pool)
             .options(selectinload(Pool.arms))
+            .where(Pool.tenant_id == self._tenant_id)
             .order_by(Pool.created_at.desc())
             .limit(limit)
             .offset(offset)
@@ -73,8 +182,9 @@ class PoolRepository:
 
 class ExperimentRepository:
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession, tenant_id: str):
         self._session = session
+        self._tenant_id = tenant_id
 
     async def create(
         self,
@@ -87,6 +197,7 @@ class ExperimentRepository:
     ) -> Experiment:
         experiment = Experiment(
             name=name,
+            tenant_id=self._tenant_id,
             pool_id=pool_id,
             protocol=protocol,
             protocol_params=protocol_params,
@@ -119,7 +230,7 @@ class ExperimentRepository:
                 selectinload(Experiment.pool).selectinload(Pool.arms),
                 selectinload(Experiment.feature_gate),
             )
-            .where(Experiment.id == experiment_id)
+            .where(Experiment.id == experiment_id, Experiment.tenant_id == self._tenant_id)
         )
         response = await self._session.execute(stmt)
         return response.scalar_one_or_none()
@@ -131,7 +242,7 @@ class ExperimentRepository:
                 selectinload(Experiment.pool).selectinload(Pool.arms),
                 selectinload(Experiment.feature_gate),
             )
-            .where(Experiment.name == name)
+            .where(Experiment.name == name, Experiment.tenant_id == self._tenant_id)
         )
         response = await self._session.execute(stmt)
         return response.scalar_one_or_none()
@@ -163,6 +274,7 @@ class ExperimentRepository:
                 selectinload(Experiment.pool).selectinload(Pool.arms),
                 selectinload(Experiment.feature_gate),
             )
+            .where(Experiment.tenant_id == self._tenant_id)
             .order_by(Experiment.created_at.desc())
             .limit(limit)
             .offset(offset)
@@ -280,12 +392,14 @@ class UserRepository:
         self,
         email: str,
         password_hash: str,
+        tenant_id: str,
         plan_tier: str = "free",
         role: str = "member",
     ) -> User:
         user = User(
             email=email,
             password_hash=password_hash,
+            tenant_id=tenant_id,
             plan_tier=plan_tier,
             role=role,
         )

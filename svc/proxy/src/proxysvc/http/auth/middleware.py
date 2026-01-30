@@ -53,6 +53,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
             request.state.api_key = None
             request.state.user_id = "dev-user"
+            request.state.tenant_id = "dev-tenant"
             response = await call_next(request)
             process_time = time.time() - start_time
             logger.debug(
@@ -72,6 +73,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             request.state.api_key = api_key
             request.state.user_id = api_key.user_id if api_key else user.id
             request.state.user = user
+            request.state.tenant_id = user.tenant_id
 
             response = await call_next(request)
 

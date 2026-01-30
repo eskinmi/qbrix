@@ -62,34 +62,34 @@ class ProxyService:
         if self._redis:
             await self._redis.close()
 
-    async def create_pool(self, name: str, arms: list[dict]) -> dict:
+    async def create_pool(self, tenant_id: str, name: str, arms: list[dict]) -> dict:
         async with get_session() as session:
-            repo = PoolRepository(session)
+            repo = PoolRepository(session, tenant_id)
             pool = await repo.create(name, arms)
             return self._pool_to_dict(pool)
 
-    async def get_pool(self, pool_id: str) -> dict | None:
+    async def get_pool(self, tenant_id: str, pool_id: str) -> dict | None:
         async with get_session() as session:
-            repo = PoolRepository(session)
+            repo = PoolRepository(session, tenant_id)
             pool = await repo.get(pool_id)
             if pool is None:
                 return None
             return self._pool_to_dict(pool)
 
-    async def list_pools(self, limit: int = 100, offset: int = 0) -> list[dict]:
+    async def list_pools(self, tenant_id: str, limit: int = 100, offset: int = 0) -> list[dict]:
         async with get_session() as session:
-            repo = PoolRepository(session)
+            repo = PoolRepository(session, tenant_id)
             pools = await repo.list(limit=limit, offset=offset)
             return [self._pool_to_dict(pool) for pool in pools]
 
-    @staticmethod
-    async def delete_pool(pool_id: str) -> bool:
+    async def delete_pool(self, tenant_id: str, pool_id: str) -> bool:
         async with get_session() as session:
-            repo = PoolRepository(session)
+            repo = PoolRepository(session, tenant_id)
             return await repo.delete(pool_id)
 
     async def create_experiment(
         self,
+        tenant_id: str,
         name: str,
         pool_id: str,
         protocol: str,
@@ -98,7 +98,7 @@ class ProxyService:
         feature_gate_config: dict | None = None,
     ) -> dict:
         async with get_session() as session:
-            repo = ExperimentRepository(session)
+            repo = ExperimentRepository(session, tenant_id)
             experiment = await repo.create(
                 name=name,
                 pool_id=pool_id,
@@ -116,46 +116,46 @@ class ProxyService:
                 gate = await gate_repo.get(experiment_id)
                 if gate:
                     gate_config = gate_repo.to_config(gate)
-                    await self._gate_service.set_config(experiment_id, gate_config)
+                    await self._gate_service.set_config(tenant_id, experiment_id, gate_config)
 
-        await self._sync_experiment_to_redis(experiment_id, pool_id)
+        await self._sync_experiment_to_redis(tenant_id, experiment_id, pool_id)
         return exp_dict
 
-    async def get_experiment(self, experiment_id: str) -> dict | None:
+    async def get_experiment(self, tenant_id: str, experiment_id: str) -> dict | None:
         async with get_session() as session:
-            repo = ExperimentRepository(session)
+            repo = ExperimentRepository(session, tenant_id)
             experiment = await repo.get(experiment_id)
             if experiment is None:
                 return None
             return self._experiment_to_dict(experiment)
 
-    async def list_experiments(self, limit: int = 100, offset: int = 0) -> list[dict]:
+    async def list_experiments(self, tenant_id: str, limit: int = 100, offset: int = 0) -> list[dict]:
         async with get_session() as session:
-            repo = ExperimentRepository(session)
+            repo = ExperimentRepository(session, tenant_id)
             experiments = await repo.list(limit=limit, offset=offset)
             return [self._experiment_to_dict(exp) for exp in experiments]
 
-    async def update_experiment(self, experiment_id: str, **kwargs) -> dict | None:
+    async def update_experiment(self, tenant_id: str, experiment_id: str, **kwargs) -> dict | None:
         async with get_session() as session:
-            repo = ExperimentRepository(session)
+            repo = ExperimentRepository(session, tenant_id)
             experiment = await repo.update(experiment_id, **kwargs)
             if experiment is None:
                 return None
             exp_dict = self._experiment_to_dict(experiment)
             pool_id = experiment.pool_id
-        await self._sync_experiment_to_redis(experiment_id, pool_id)
+        await self._sync_experiment_to_redis(tenant_id, experiment_id, pool_id)
         return exp_dict
 
-    async def delete_experiment(self, experiment_id: str) -> bool:
+    async def delete_experiment(self, tenant_id: str, experiment_id: str) -> bool:
         async with get_session() as session:
-            repo = ExperimentRepository(session)
+            repo = ExperimentRepository(session, tenant_id)
             deleted = await repo.delete(experiment_id)
         if deleted:
-            await self._redis.delete_experiment(experiment_id)
-            await self._gate_service.delete_config(experiment_id)
+            await self._redis.delete_experiment(tenant_id, experiment_id)
+            await self._gate_service.delete_config(tenant_id, experiment_id)
         return deleted
 
-    async def create_gate_config(self, experiment_id: str, config: dict) -> dict | None:
+    async def create_gate_config(self, tenant_id: str, experiment_id: str, config: dict) -> dict | None:
         """create feature gate config for an experiment."""
         async with get_session() as session:
             repo = FeatureGateRepository(session)
@@ -163,17 +163,17 @@ class ProxyService:
             # reload to get default_arm relationship
             gate = await repo.get(experiment_id)
             gate_config = repo.to_config(gate)
-        await self._gate_service.set_config(experiment_id, gate_config)
+        await self._gate_service.set_config(tenant_id, experiment_id, gate_config)
         return gate_config.model_dump(mode="json")
 
-    async def get_gate_config(self, experiment_id: str) -> dict | None:
+    async def get_gate_config(self, tenant_id: str, experiment_id: str) -> dict | None:
         """get feature gate config for an experiment."""
-        config = await self._gate_service.get_config(experiment_id)
+        config = await self._gate_service.get_config(tenant_id, experiment_id)
         if config is None:
             return None
         return config.model_dump(mode="json")
 
-    async def update_gate_config(self, experiment_id: str, config: dict) -> dict | None:
+    async def update_gate_config(self, tenant_id: str, experiment_id: str, config: dict) -> dict | None:
         """update feature gate config for an experiment."""
         async with get_session() as session:
             repo = FeatureGateRepository(session)
@@ -183,21 +183,22 @@ class ProxyService:
             # reload to get default_arm relationship
             gate = await repo.get(experiment_id)
             gate_config = repo.to_config(gate)
-        self._gate_service.invalidate(experiment_id)
-        await self._gate_service.set_config(experiment_id, gate_config)
+        self._gate_service.invalidate(tenant_id, experiment_id)
+        await self._gate_service.set_config(tenant_id, experiment_id, gate_config)
         return gate_config.model_dump(mode="json")
 
-    async def delete_gate_config(self, experiment_id: str) -> bool:
+    async def delete_gate_config(self, tenant_id: str, experiment_id: str) -> bool:
         """delete feature gate config for an experiment."""
         async with get_session() as session:
             repo = FeatureGateRepository(session)
             deleted = await repo.delete(experiment_id)
         if deleted:
-            await self._gate_service.delete_config(experiment_id)
+            await self._gate_service.delete_config(tenant_id, experiment_id)
         return deleted
 
     async def select(
         self,
+        tenant_id: str,
         experiment_id: str,
         context_id: str,
         context_vector: list[float],
@@ -205,15 +206,17 @@ class ProxyService:
     ) -> dict:
         # evaluate feature gate first
         committed_arm = await self._gate_service.evaluate(
+            tenant_id=tenant_id,
             experiment_id=experiment_id,
             context_id=context_id,
             context_metadata=context_metadata,
         )
 
         if committed_arm is not None and committed_arm.index is not None:
-            # gate determined the arm - skip bandit
+            # gate will be determined at the gate level, skips selection routing.
             token = SelectionToken.encode(
                 secret=self._settings.token_secret_bytes,
+                tenant_id=tenant_id,
                 experiment_id=experiment_id,
                 arm_index=committed_arm.index,
                 context_id=context_id,
@@ -230,8 +233,9 @@ class ProxyService:
                 "is_default": True,
             }
 
-        # bandit selection via motorsvc
+        # gate selection not valid, route to motorsvc for actual algorithmic selection.
         response = await self._motor_client.select(
+            tenant_id=tenant_id,
             experiment_id=experiment_id,
             context_id=context_id,
             context_vector=context_vector,
@@ -240,6 +244,7 @@ class ProxyService:
 
         token = SelectionToken.encode(
             secret=self._settings.token_secret_bytes,
+            tenant_id=tenant_id,
             experiment_id=experiment_id,
             arm_index=response["arm"]["index"],
             context_id=context_id,
@@ -271,6 +276,7 @@ class ProxyService:
         )
 
         event = FeedbackEvent(
+            tenant_id=selection.tenant_id,
             experiment_id=selection.experiment_id,
             request_id=request_id,
             arm_index=selection.arm_index,
@@ -283,16 +289,17 @@ class ProxyService:
         await self._publisher.publish(event)
         return True
 
-    async def _sync_experiment_to_redis(self, experiment_id: str, pool_id: str) -> None:
+    async def _sync_experiment_to_redis(self, tenant_id: str, experiment_id: str, pool_id: str) -> None:
         """Sync experiment with full pool data to Redis for motorsvc."""
         async with get_session() as session:
-            pool_repo = PoolRepository(session)
+            pool_repo = PoolRepository(session, tenant_id)
             pool = await pool_repo.get(pool_id)
-            experiment_repo = ExperimentRepository(session)
+            experiment_repo = ExperimentRepository(session, tenant_id)
             experiment = await experiment_repo.get(experiment_id)
 
             redis_data = {
                 "id": experiment.id,
+                "tenant_id": tenant_id,
                 "name": experiment.name,
                 "pool_id": experiment.pool_id,
                 "pool": self._pool_to_dict(pool),
@@ -300,7 +307,7 @@ class ProxyService:
                 "protocol_params": experiment.protocol_params,
                 "enabled": experiment.enabled,
             }
-            await self._redis.set_experiment(experiment_id, redis_data)
+            await self._redis.set_experiment(tenant_id, experiment_id, redis_data)
 
     async def health(self) -> bool:
         try:

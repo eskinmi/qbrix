@@ -35,6 +35,7 @@ class TokenInvalidError(TokenError):
 class SelectionEntry:
     """decoded selection data from token."""
 
+    tenant_id: str
     experiment_id: str
     arm_index: int
     context_id: str
@@ -48,6 +49,7 @@ class SelectionToken:
     @staticmethod
     def encode(
         secret: bytes,
+        tenant_id: str,
         experiment_id: str,
         arm_index: int,
         context_id: str,
@@ -59,6 +61,7 @@ class SelectionToken:
 
         args:
             secret: hmac signing key
+            tenant_id: tenant identifier
             experiment_id: experiment identifier
             arm_index: selected arm index
             context_id: context identifier
@@ -69,6 +72,7 @@ class SelectionToken:
             base64-encoded signed token
         """
         payload = {
+            "tnt_id": tenant_id,
             "exp_id": experiment_id,
             "arm_idx": arm_index,
             "ctx_id": context_id,
@@ -126,6 +130,7 @@ class SelectionToken:
                 raise TokenExpiredError(f"token expired ({age_ms}ms > {max_age_ms}ms)")
 
         return SelectionEntry(
+            tenant_id=payload["tnt_id"],
             experiment_id=payload["exp_id"],
             arm_index=payload["arm_idx"],
             context_id=payload["ctx_id"],

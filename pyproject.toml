@@ -36,6 +36,7 @@ dev = [
     "pytest-mock>=3.14.1",
     "mypy-protobuf>=5.0.0",
     "locust>=2.43.1",
+    "aiosqlite>=0.22.1",
 ]
 
 [tool.pytest.ini_options]

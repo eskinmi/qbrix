@@ -41,7 +41,7 @@ class AgentFactory:
             pool.add_arm(arm)
         return pool
 
-    async def get_or_create(self, experiment_data: dict) -> Agent:
+    async def get_or_create(self, tenant_id: str, experiment_data: dict) -> Agent:
         """
         Get cached agent or create new one.
 
@@ -51,17 +51,17 @@ class AgentFactory:
         """
         experiment_id = experiment_data["id"]
 
-        agent = self._cache.get_agent(experiment_id)
+        agent = self._cache.get_agent(tenant_id, experiment_id)
         if agent is not None:
-            if (params := self._param_backend.get(experiment_id)) is None:
+            if (params := self._param_backend.get(tenant_id, experiment_id)) is None:
                 params = await self._param_backend.update_params(
-                    experiment_id, agent.protocol
+                    tenant_id, experiment_id, agent.protocol
                 )
             if params is None:
                 params = agent.protocol.init_params(
                     num_arms=len(agent.pool), **agent.init_params
                 )
-                self._param_backend.set(experiment_id, params)
+                self._param_backend.set(tenant_id, experiment_id, params)
             return agent
 
         # attention:
@@ -81,26 +81,29 @@ class AgentFactory:
                 f"Unknown protocol: {protocol_name}. Available: {list(PROTOCOL_MAP.keys())}"
             )
 
-        if self._param_backend.get(experiment_id) is None:
+        if self._param_backend.get(tenant_id, experiment_id) is None:
             params = await self._param_backend.update_params(
-                experiment_id, protocol_cls
+                tenant_id, experiment_id, protocol_cls
             )
             if params is None:
                 params = protocol_cls.init_params(
                     num_arms=len(experiment_data["pool"]["arms"]),
                     **experiment_data.get("protocol_params", {}),
                 )
-                self._param_backend.set(experiment_id, params)
+                self._param_backend.set(tenant_id, experiment_id, params)
 
         pool = self._build_pool(experiment_data["pool"])
+
+        # create a tenant-scoped param backend for the agent
+        scoped_param_backend = self._param_backend.scoped(tenant_id)
 
         agent = Agent(
             experiment_id=experiment_id,
             pool=pool,
             protocol=protocol_cls,
             init_params=experiment_data.get("protocol_params", {}),
-            param_backend=self._param_backend,
+            param_backend=scoped_param_backend,
         )
 
-        self._cache.set_agent(experiment_id, agent)
+        self._cache.set_agent(tenant_id, experiment_id, agent)
         return agent

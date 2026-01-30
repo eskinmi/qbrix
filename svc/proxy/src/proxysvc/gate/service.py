@@ -26,7 +26,7 @@ class GateService:
         self._settings = settings
 
     async def evaluate(
-        self, experiment_id: str, context_id: str, context_metadata: dict
+        self, tenant_id: str, experiment_id: str, context_id: str, context_metadata: dict
     ) -> BaseArmModel | None:
         """evaluate feature gate for a select request.
 
@@ -37,7 +37,7 @@ class GateService:
         safety: returns None on any error (fail-open to bandit path)
         """
         try:
-            config = await self._cache.get(experiment_id)
+            config = await self._cache.get(tenant_id, experiment_id)
             if config is None:
                 return None
 
@@ -49,18 +49,18 @@ class GateService:
             )
             return None
 
-    async def get_config(self, experiment_id: str) -> FeatureGateConfig | None:
+    async def get_config(self, tenant_id: str, experiment_id: str) -> FeatureGateConfig | None:
         """get gate config from cache."""
-        return await self._cache.get(experiment_id)
+        return await self._cache.get(tenant_id, experiment_id)
 
-    async def set_config(self, experiment_id: str, config: FeatureGateConfig) -> None:
+    async def set_config(self, tenant_id: str, experiment_id: str, config: FeatureGateConfig) -> None:
         """set gate config in cache."""
-        await self._cache.set(experiment_id, config)
+        await self._cache.set(tenant_id, experiment_id, config)
 
-    async def delete_config(self, experiment_id: str) -> None:
+    async def delete_config(self, tenant_id: str, experiment_id: str) -> None:
         """delete gate config from cache."""
-        await self._cache.delete(experiment_id)
+        await self._cache.delete(tenant_id, experiment_id)
 
-    def invalidate(self, experiment_id: str) -> None:
+    def invalidate(self, tenant_id: str, experiment_id: str) -> None:
         """invalidate l1 cache entry."""
-        self._cache.invalidate(experiment_id)
+        self._cache.invalidate(tenant_id, experiment_id)

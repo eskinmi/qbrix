@@ -1,6 +1,7 @@
 from datetime import datetime, time, timezone
 from uuid import uuid4
 from sqlalchemy import String, Boolean, Float, Integer, ForeignKey, JSON, DateTime, Time
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -8,13 +9,15 @@ class Base(DeclarativeBase):
     pass
 
 
-class Pool(Base):
-    __tablename__ = "pools"
+class Tenant(Base):
+    __tablename__ = "tenants"
 
     id: Mapped[str] = mapped_column(
         String(32), primary_key=True, default=lambda: uuid4().hex
     )
-    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    slug: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
@@ -24,6 +27,40 @@ class Pool(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
+    pools: Mapped[list["Pool"]] = relationship(
+        "Pool", back_populates="tenant", cascade="all, delete-orphan"
+    )
+    experiments: Mapped[list["Experiment"]] = relationship(
+        "Experiment", back_populates="tenant", cascade="all, delete-orphan"
+    )
+    users: Mapped[list["User"]] = relationship(
+        "User", back_populates="tenant", cascade="all, delete-orphan"
+    )
+
+
+class Pool(Base):
+    __tablename__ = "pools"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "name", name="uq_pool_tenant_name"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(32), primary_key=True, default=lambda: uuid4().hex
+    )
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id"), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="pools")
     arms: Mapped[list["Arm"]] = relationship(
         "Arm", back_populates="pool", cascade="all, delete-orphan"
     )
@@ -54,11 +91,17 @@ class Arm(Base):
 
 class Experiment(Base):
     __tablename__ = "experiments"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "name", name="uq_experiment_tenant_name"),
+    )
 
     id: Mapped[str] = mapped_column(
         String(32), primary_key=True, default=lambda: uuid4().hex
     )
-    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id"), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     pool_id: Mapped[str] = mapped_column(
         String(32), ForeignKey("pools.id"), nullable=False
     )
@@ -74,6 +117,7 @@ class Experiment(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
+    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="experiments")
     pool: Mapped["Pool"] = relationship("Pool", back_populates="experiments")
     feature_gate: Mapped["FeatureGate"] = relationship(
         "FeatureGate",
@@ -131,6 +175,9 @@ class User(Base):
     id: Mapped[str] = mapped_column(
         String(32), primary_key=True, default=lambda: uuid4().hex
     )
+    tenant_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("tenants.id"), nullable=False
+    )
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     plan_tier: Mapped[str] = mapped_column(String(32), nullable=False, default="free")
@@ -145,6 +192,7 @@ class User(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
+    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="users")
     api_keys: Mapped[list["APIKey"]] = relationship(
         "APIKey", back_populates="user", cascade="all, delete-orphan"
     )

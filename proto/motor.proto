@@ -13,8 +13,9 @@ service MotorService {
 }
 
 message SelectRequest {
-  string experiment_id = 1;
-  qbrix.common.Context context = 2;
+  string tenant_id = 1;
+  string experiment_id = 2;
+  qbrix.common.Context context = 3;
 }
 
 message SelectResponse {

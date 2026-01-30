@@ -41,16 +41,17 @@ class MotorService:
 
     async def select(
         self,
+        tenant_id: str,
         experiment_id: str,
         context_id: str,
         context_vector: list[float],
         context_metadata: dict,
     ) -> dict:
-        experiment_record = await self._redis.get_experiment(experiment_id)
+        experiment_record = await self._redis.get_experiment(tenant_id, experiment_id)
         if experiment_record is None:
             raise ValueError(f"experiment not found: {experiment_id}")
 
-        agent = await self._agent_factory.get_or_create(experiment_record)
+        agent = await self._agent_factory.get_or_create(tenant_id, experiment_record)
         context = Context(
             id=context_id,
             vector=context_vector or [],

@@ -7,6 +7,7 @@ from fastapi import Depends
 from pydantic import BaseModel
 
 from proxysvc.http.auth.dependencies import get_current_user_id
+from proxysvc.http.auth.dependencies import get_current_tenant_id
 from proxysvc.http.auth.dependencies import require_scopes
 from proxysvc.http.exception import ExperimentNotFoundException
 from proxysvc.http.exception import ExperimentCreationException
@@ -71,6 +72,7 @@ class ExperimentResponse(BaseModel):
 )
 async def create_experiment(
     body: ExperimentCreateRequest,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["experiment:write"])),
 ):
@@ -88,6 +90,7 @@ async def create_experiment(
             }
 
         experiment = await service.create_experiment(
+            tenant_id=tenant_id,
             name=body.name,
             pool_id=body.pool_id,
             protocol=body.protocol,
@@ -119,12 +122,13 @@ async def create_experiment(
 )
 async def get_experiment(
     experiment_id: str,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["experiment:read"])),
 ):
     """get experiment by id."""
     service = get_proxy_service()
-    experiment = await service.get_experiment(experiment_id)
+    experiment = await service.get_experiment(tenant_id, experiment_id)
 
     if experiment is None:
         raise ExperimentNotFoundException(f"experiment not found: {experiment_id}")
@@ -147,6 +151,7 @@ async def get_experiment(
 async def update_experiment(
     experiment_id: str,
     body: ExperimentUpdateRequest,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["experiment:write"])),
 ):
@@ -160,7 +165,7 @@ async def update_experiment(
         if body.protocol_params is not None:
             kwargs["protocol_params"] = body.protocol_params
 
-        experiment = await service.update_experiment(experiment_id, **kwargs)
+        experiment = await service.update_experiment(tenant_id, experiment_id, **kwargs)
 
         if experiment is None:
             raise ExperimentNotFoundException(f"experiment not found: {experiment_id}")
@@ -187,12 +192,13 @@ async def update_experiment(
 )
 async def delete_experiment(
     experiment_id: str,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["experiment:delete"])),
 ):
     """delete experiment by id."""
     service = get_proxy_service()
-    deleted = await service.delete_experiment(experiment_id)
+    deleted = await service.delete_experiment(tenant_id, experiment_id)
 
     if not deleted:
         raise ExperimentNotFoundException(f"experiment not found: {experiment_id}")
@@ -215,12 +221,13 @@ class ExperimentListResponse(BaseModel):
 async def list_experiments(
     limit: int = 100,
     offset: int = 0,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["experiment:read"])),
 ):
     """list all experiments with pagination."""
     service = get_proxy_service()
-    experiments = await service.list_experiments(limit=limit, offset=offset)
+    experiments = await service.list_experiments(tenant_id, limit=limit, offset=offset)
 
     return ExperimentListResponse(
         experiments=[

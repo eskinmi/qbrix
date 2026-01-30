@@ -10,6 +10,7 @@ import bcrypt
 from qbrixstore.postgres.session import get_session
 from qbrixstore.redis.client import RedisClient
 
+from proxysvc.repository import TenantRepository
 from proxysvc.repository import UserRepository
 from proxysvc.repository import APIKeyRepository
 from proxysvc.http.auth.config import ROLE_SCOPES
@@ -31,24 +32,47 @@ class AuthService:
         self,
         email: str,
         password: str,
+        tenant_id: str | None = None,
         plan_tier: str = "free",
         role: str = "member",
     ) -> dict:
-        """register a new user with email and password."""
-        async with get_session() as session:
-            repo = UserRepository(session)
+        """register a new user with email and password.
 
-            existing = await repo.get_by_email(email)
+        if tenant_id is not provided, creates a new tenant for the user
+        using the email prefix as the tenant slug.
+        """
+        async with get_session() as session:
+            user_repo = UserRepository(session)
+
+            existing = await user_repo.get_by_email(email)
             if existing:
                 raise ValueError(f"user with email {email} already exists")
+
+            # create tenant if not provided
+            if tenant_id is None:
+                tenant_repo = TenantRepository(session)
+                slug = email.split("@")[0].lower().replace(".", "-")
+                # ensure unique slug
+                base_slug = slug
+                counter = 1
+                while await tenant_repo.get_by_slug(slug):
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+                tenant = await tenant_repo.create(
+                    name=f"{email}'s Workspace",
+                    slug=slug,
+                )
+                tenant_id = tenant.id
+                logger.info(f"created tenant {tenant_id} with slug {slug}")
 
             password_hash = bcrypt.hashpw(
                 password.encode("utf-8"), bcrypt.gensalt()
             ).decode("utf-8")
 
-            user = await repo.create(
+            user = await user_repo.create(
                 email=email,
                 password_hash=password_hash,
+                tenant_id=tenant_id,
                 plan_tier=plan_tier,
                 role=role,
             )
@@ -345,6 +369,7 @@ class AuthService:
     def _user_to_dict(user) -> dict:
         return {
             "id": user.id,
+            "tenant_id": user.tenant_id,
             "email": user.email,
             "plan_tier": user.plan_tier,
             "role": user.role,

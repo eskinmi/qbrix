@@ -22,33 +22,42 @@ class GateConfigCache:
             maxsize=settings.gate_cache_maxsize, ttl=settings.gate_cache_ttl
         )
 
-    async def get(self, experiment_id: str) -> FeatureGateConfig | None:
+    @staticmethod
+    def _cache_key(tenant_id: str, experiment_id: str) -> str:
+        return f"{tenant_id}:{experiment_id}"
+
+    async def get(self, tenant_id: str, experiment_id: str) -> FeatureGateConfig | None:
         """get gate config from cache hierarchy (l1 -> l2)."""
-        if (cached := self._cache.get(experiment_id)) is not None:
+        cache_key = self._cache_key(tenant_id, experiment_id)
+        if (cached := self._cache.get(cache_key)) is not None:
             return cached
 
-        data = await self._redis.get_gate_config(experiment_id)
+        data = await self._redis.get_gate_config(tenant_id, experiment_id)
         if data is None:
             return None
 
         config = FeatureGateConfig.model_validate(data)
-        self._cache[experiment_id] = config
+        self._cache[cache_key] = config
         return config
 
-    async def set(self, experiment_id: str, config: FeatureGateConfig) -> None:
+    async def set(self, tenant_id: str, experiment_id: str, config: FeatureGateConfig) -> None:
         """set gate config in both cache levels."""
         await self._redis.set_gate_config(
+            tenant_id=tenant_id,
             experiment_id=experiment_id,
             config=config.model_dump(mode="json"),
             ttl=self._settings.gate_redis_ttl,
         )
-        self._cache[experiment_id] = config
+        cache_key = self._cache_key(tenant_id, experiment_id)
+        self._cache[cache_key] = config
 
-    async def delete(self, experiment_id: str) -> None:
+    async def delete(self, tenant_id: str, experiment_id: str) -> None:
         """delete gate config from both cache levels."""
-        await self._redis.delete_gate_config(experiment_id)
-        self._cache.pop(experiment_id, None)
+        await self._redis.delete_gate_config(tenant_id, experiment_id)
+        cache_key = self._cache_key(tenant_id, experiment_id)
+        self._cache.pop(cache_key, None)
 
-    def invalidate(self, experiment_id: str) -> None:
+    def invalidate(self, tenant_id: str, experiment_id: str) -> None:
         """invalidate l1 cache entry."""
-        self._cache.pop(experiment_id, None)
+        cache_key = self._cache_key(tenant_id, experiment_id)
+        self._cache.pop(cache_key, None)

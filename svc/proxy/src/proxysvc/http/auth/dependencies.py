@@ -40,11 +40,22 @@ async def get_current_user_id(request: Request) -> str:
     return user_id
 
 
+async def get_current_tenant_id(request: Request) -> str:
+    """extract tenant id from request state."""
+    if hasattr(request.state, "tenant_id"):
+        return request.state.tenant_id
+
+    raise UnauthorizedException(
+        "tenant context not available - ensure authentication is configured"
+    )
+
+
 class _DevUserWrapper:
     """wrapper for dev user to provide attribute access."""
 
     def __init__(self):
         self.id = "dev-user"
+        self.tenant_id = "dev-tenant"
         self.email = "dev@optiq.io"
         self.role = "admin"
         self.plan_tier = "enterprise"

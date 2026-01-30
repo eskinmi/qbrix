@@ -20,6 +20,7 @@ class MotorGRPCServicer(motor_pb2_grpc.MotorServiceServicer):
     async def Select(self, request, context):
         try:
             result = await self._service.select(
+                tenant_id=request.tenant_id,
                 experiment_id=request.experiment_id,
                 context_id=request.context.id,
                 context_vector=list(request.context.vector),

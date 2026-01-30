@@ -30,60 +30,61 @@ class RedisClient:
         return self._client
 
     @staticmethod
-    def _param_key(experiment_id: str) -> str:
-        return f"qbrix:params:{experiment_id}"
+    def _param_key(tenant_id: str, experiment_id: str) -> str:
+        return f"qbrix:tenant:{tenant_id}:params:{experiment_id}"
 
     @staticmethod
-    def _experiment_key(experiment_id: str) -> str:
-        return f"qbrix:experiment:{experiment_id}"
+    def _experiment_key(tenant_id: str, experiment_id: str) -> str:
+        return f"qbrix:tenant:{tenant_id}:experiment:{experiment_id}"
 
     @staticmethod
-    def _gate_key(experiment_id: str) -> str:
-        return f"qbrix:gate:{experiment_id}"
+    def _gate_key(tenant_id: str, experiment_id: str) -> str:
+        return f"qbrix:tenant:{tenant_id}:gate:{experiment_id}"
 
-    async def get_params(self, experiment_id: str) -> dict | None:
-        data = await self.client.get(self._param_key(experiment_id))
+    async def get_params(self, tenant_id: str, experiment_id: str) -> dict | None:
+        data = await self.client.get(self._param_key(tenant_id, experiment_id))
         if data is None:
             return None
         return json.loads(data)
 
     async def set_params(
-        self, experiment_id: str, params: dict, ttl: int | None = None
+        self, tenant_id: str, experiment_id: str, params: dict, ttl: int | None = None
     ) -> None:
-        key = self._param_key(experiment_id)
+        key = self._param_key(tenant_id, experiment_id)
         await self.client.set(key, json.dumps(params), ex=ttl)
 
-    async def get_experiment(self, experiment_id: str) -> dict | None:
-        data = await self.client.get(self._experiment_key(experiment_id))
+    async def get_experiment(self, tenant_id: str, experiment_id: str) -> dict | None:
+        data = await self.client.get(self._experiment_key(tenant_id, experiment_id))
         if data is None:
             return None
         return json.loads(data)
 
     async def set_experiment(
-        self, experiment_id: str, experiment: dict, ttl: int | None = None
+        self, tenant_id: str, experiment_id: str, experiment: dict, ttl: int | None = None
     ) -> None:
-        key = self._experiment_key(experiment_id)
+        key = self._experiment_key(tenant_id, experiment_id)
         await self.client.set(key, json.dumps(experiment), ex=ttl)
 
-    async def delete_experiment(self, experiment_id: str) -> None:
+    async def delete_experiment(self, tenant_id: str, experiment_id: str) -> None:
         await self.client.delete(
-            self._experiment_key(experiment_id), self._param_key(experiment_id)
+            self._experiment_key(tenant_id, experiment_id),
+            self._param_key(tenant_id, experiment_id)
         )
 
-    async def get_gate_config(self, experiment_id: str) -> dict | None:
-        data = await self.client.get(self._gate_key(experiment_id))
+    async def get_gate_config(self, tenant_id: str, experiment_id: str) -> dict | None:
+        data = await self.client.get(self._gate_key(tenant_id, experiment_id))
         if data is None:
             return None
         return json.loads(data)
 
     async def set_gate_config(
-        self, experiment_id: str, config: dict, ttl: int | None = None
+        self, tenant_id: str, experiment_id: str, config: dict, ttl: int | None = None
     ) -> None:
-        key = self._gate_key(experiment_id)
+        key = self._gate_key(tenant_id, experiment_id)
         await self.client.set(key, json.dumps(config), ex=ttl)
 
-    async def delete_gate_config(self, experiment_id: str) -> None:
-        await self.client.delete(self._gate_key(experiment_id))
+    async def delete_gate_config(self, tenant_id: str, experiment_id: str) -> None:
+        await self.client.delete(self._gate_key(tenant_id, experiment_id))
 
     async def publish_gate_invalidation(self, channel: str, experiment_id: str) -> None:
         """publish gate config invalidation event for cache listeners."""

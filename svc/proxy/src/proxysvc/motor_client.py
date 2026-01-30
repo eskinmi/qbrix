@@ -27,6 +27,7 @@ class MotorClient:
 
     async def select(
         self,
+        tenant_id: str,
         experiment_id: str,
         context_id: str,
         context_vector: List[Union[int, float]],
@@ -36,6 +37,7 @@ class MotorClient:
             raise RuntimeError("MotorClient not connected. Call connect() first.")
 
         request = motor_pb2.SelectRequest(
+            tenant_id=tenant_id,
             experiment_id=experiment_id,
             context=common_pb2.Context(
                 id=context_id,

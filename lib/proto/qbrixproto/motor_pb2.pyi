@@ -21,20 +21,23 @@ DESCRIPTOR: _descriptor.FileDescriptor
 class SelectRequest(_message.Message):
     DESCRIPTOR: _descriptor.Descriptor
 
+    TENANT_ID_FIELD_NUMBER: _builtins.int
     EXPERIMENT_ID_FIELD_NUMBER: _builtins.int
     CONTEXT_FIELD_NUMBER: _builtins.int
+    tenant_id: _builtins.str
     experiment_id: _builtins.str
     @_builtins.property
     def context(self) -> _common_pb2.Context: ...
     def __init__(
         self,
         *,
+        tenant_id: _builtins.str = ...,
         experiment_id: _builtins.str = ...,
         context: _common_pb2.Context | None = ...,
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["context", b"context"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["context", b"context", "experiment_id", b"experiment_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["context", b"context", "experiment_id", b"experiment_id", "tenant_id", b"tenant_id"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___SelectRequest: _TypeAlias = SelectRequest  # noqa: Y015
@@ -44,20 +47,16 @@ class SelectResponse(_message.Message):
     DESCRIPTOR: _descriptor.Descriptor
 
     ARM_FIELD_NUMBER: _builtins.int
-    REQUEST_ID_FIELD_NUMBER: _builtins.int
-    request_id: _builtins.str
-    """for tracking/correlation"""
     @_builtins.property
     def arm(self) -> _common_pb2.Arm: ...
     def __init__(
         self,
         *,
         arm: _common_pb2.Arm | None = ...,
-        request_id: _builtins.str = ...,
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm", "request_id", b"request_id"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm", b"arm"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___SelectResponse: _TypeAlias = SelectResponse  # noqa: Y015

@@ -28,6 +28,7 @@ class AuthOperator:
         self,
         email: str,
         password: str,
+        tenant_id: str | None = None,
         plan_tier: str = "free",
         role: str = "member",
     ):
@@ -35,6 +36,7 @@ class AuthOperator:
         user_dict = await self._service.register_user(
             email=email,
             password=password,
+            tenant_id=tenant_id,
             plan_tier=plan_tier,
             role=role,
         )
@@ -159,6 +161,7 @@ class TokenOperator:
         )
         payload = {
             "sub": user.id,
+            "tenant_id": user.tenant_id,
             "email": user.email,
             "role": user.role,
             "plan_tier": user.plan_tier,
@@ -242,6 +245,10 @@ class _UserWrapper:
     @property
     def id(self) -> str:
         return self._data["id"]
+
+    @property
+    def tenant_id(self) -> str:
+        return self._data["tenant_id"]
 
     @property
     def email(self) -> str:

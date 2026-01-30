@@ -25,12 +25,14 @@ class FeedbackEvent(_message.Message):
 
     DESCRIPTOR: _descriptor.Descriptor
 
+    TENANT_ID_FIELD_NUMBER: _builtins.int
     EXPERIMENT_ID_FIELD_NUMBER: _builtins.int
     REQUEST_ID_FIELD_NUMBER: _builtins.int
     ARM_INDEX_FIELD_NUMBER: _builtins.int
     REWARD_FIELD_NUMBER: _builtins.int
     CONTEXT_FIELD_NUMBER: _builtins.int
     TIMESTAMP_MS_FIELD_NUMBER: _builtins.int
+    tenant_id: _builtins.str
     experiment_id: _builtins.str
     request_id: _builtins.str
     """Correlates with SelectResponse.request_id"""
@@ -42,6 +44,7 @@ class FeedbackEvent(_message.Message):
     def __init__(
         self,
         *,
+        tenant_id: _builtins.str = ...,
         experiment_id: _builtins.str = ...,
         request_id: _builtins.str = ...,
         arm_index: _builtins.int = ...,
@@ -51,7 +54,7 @@ class FeedbackEvent(_message.Message):
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["context", b"context"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm_index", b"arm_index", "context", b"context", "experiment_id", b"experiment_id", "request_id", b"request_id", "reward", b"reward", "timestamp_ms", b"timestamp_ms"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["arm_index", b"arm_index", "context", b"context", "experiment_id", b"experiment_id", "request_id", b"request_id", "reward", b"reward", "tenant_id", b"tenant_id", "timestamp_ms", b"timestamp_ms"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___FeedbackEvent: _TypeAlias = FeedbackEvent  # noqa: Y015

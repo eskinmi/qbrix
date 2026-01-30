@@ -9,6 +9,7 @@ from fastapi import Depends
 from pydantic import BaseModel
 
 from proxysvc.http.auth.dependencies import get_current_user_id
+from proxysvc.http.auth.dependencies import get_current_tenant_id
 from proxysvc.http.auth.dependencies import require_scopes
 from proxysvc.http.exception import GateNotFoundException
 from proxysvc.http.exception import ExperimentNotFoundException
@@ -70,6 +71,7 @@ class GateConfigResponse(BaseModel):
 async def create_gate_config(
     experiment_id: str,
     body: GateConfigRequest,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["gate:write"])),
 ):
@@ -93,7 +95,7 @@ async def create_gate_config(
             ],
         }
 
-        result = await service.create_gate_config(experiment_id, config)
+        result = await service.create_gate_config(tenant_id, experiment_id, config)
 
         if result is None:
             raise ExperimentNotFoundException(f"experiment not found: {experiment_id}")
@@ -123,12 +125,13 @@ async def create_gate_config(
 )
 async def get_gate_config(
     experiment_id: str,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["gate:read"])),
 ):
     """get feature gate config for an experiment."""
     service = get_proxy_service()
-    result = await service.get_gate_config(experiment_id)
+    result = await service.get_gate_config(tenant_id, experiment_id)
 
     if result is None:
         raise GateNotFoundException(
@@ -151,6 +154,7 @@ async def get_gate_config(
 async def update_gate_config(
     experiment_id: str,
     body: GateConfigRequest,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["gate:write"])),
 ):
@@ -174,7 +178,7 @@ async def update_gate_config(
             ],
         }
 
-        result = await service.update_gate_config(experiment_id, config)
+        result = await service.update_gate_config(tenant_id, experiment_id, config)
 
         if result is None:
             raise GateNotFoundException(
@@ -205,12 +209,13 @@ async def update_gate_config(
 )
 async def delete_gate_config(
     experiment_id: str,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["gate:write"])),
 ):
     """delete feature gate config for an experiment."""
     service = get_proxy_service()
-    deleted = await service.delete_gate_config(experiment_id)
+    deleted = await service.delete_gate_config(tenant_id, experiment_id)
 
     if not deleted:
         raise GateNotFoundException(

@@ -27,16 +27,18 @@ class BatchTrainer:
         self._redis = redis_client
 
     @staticmethod
-    def _group_per_experiment(events: list[FeedbackEvent]):
+    def _group_per_tenant_experiment(events: list[FeedbackEvent]):
+        """group events by (tenant_id, experiment_id) tuple."""
         grouped = defaultdict(list)
         for event in events:
-            grouped[event.experiment_id].append(event)
+            key = (event.tenant_id, event.experiment_id)
+            grouped[key].append(event)
         return grouped
 
     async def _train_experiment(
-        self, experiment_id: str, events: list[FeedbackEvent]
+        self, tenant_id: str, experiment_id: str, events: list[FeedbackEvent]
     ) -> int:
-        experiment_record = await self._redis.get_experiment(experiment_id)
+        experiment_record = await self._redis.get_experiment(tenant_id, experiment_id)
         if experiment_record is None:
             return 0
 
@@ -68,7 +70,7 @@ class BatchTrainer:
         #  and a coordination setup.
 
 
-        params = await self._redis.get_params(experiment_id)
+        params = await self._redis.get_params(tenant_id, experiment_id)
         if params is None:
             num_arms = len(experiment_record["pool"]["arms"])
             param_state = protocol_cls.init_params(
@@ -93,16 +95,22 @@ class BatchTrainer:
                 reward=event.reward,
             )
 
-        await self._redis.set_params(experiment_id, param_state.model_dump())
+        await self._redis.set_params(tenant_id, experiment_id, param_state.model_dump())
         return len(events)
 
-    async def train(self, events: list[FeedbackEvent]) -> dict[str, int]:
+    async def train(self, events: list[FeedbackEvent]) -> dict[tuple[str, str], int]:
+        """train all experiments in the batch.
+
+        returns:
+            dict mapping (tenant_id, experiment_id) to count of events trained
+        """
         ledger = dict()
-        grouped_events = self._group_per_experiment(events)
-        for experiment_id, experiment_events in grouped_events.items():
+        grouped_events = self._group_per_tenant_experiment(events)
+        for (tenant_id, experiment_id), experiment_events in grouped_events.items():
             count = await self._train_experiment(
+                tenant_id,
                 experiment_id,
                 experiment_events
             )
-            ledger[experiment_id] = count
+            ledger[(tenant_id, experiment_id)] = count
         return ledger

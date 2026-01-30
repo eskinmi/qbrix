@@ -7,6 +7,13 @@ global:
   imagePullSecrets: []
   storageClass: ""
 
+  # multi-tenancy configuration
+  multitenancy:
+    enabled: true
+    defaultTenant:
+      name: "Default"
+      slug: "default"
+
   postgres:
     host: "qbrix-postgres"
     port: 5432

@@ -8,6 +8,7 @@ from fastapi import Depends
 from pydantic import BaseModel
 
 from proxysvc.http.auth.dependencies import get_current_user_id
+from proxysvc.http.auth.dependencies import get_current_tenant_id
 from proxysvc.http.auth.dependencies import require_scopes
 from proxysvc.http.exception import PoolNotFoundException
 from proxysvc.http.exception import PoolCreationException
@@ -64,6 +65,7 @@ class PoolResponse(BaseModel):
 )
 async def create_pool(
     body: PoolCreateRequest,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["pool:write"])),
 ):
@@ -71,7 +73,7 @@ async def create_pool(
     try:
         service = get_proxy_service()
         arms_data = [{"name": arm.name, "metadata": arm.metadata} for arm in body.arms]
-        pool = await service.create_pool(body.name, arms_data)
+        pool = await service.create_pool(tenant_id, body.name, arms_data)
 
         logger.info(f"pool created: {pool['id']} by user {user_id}")
         return PoolResponse(
@@ -101,12 +103,13 @@ async def create_pool(
 )
 async def get_pool(
     pool_id: str,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["pool:read"])),
 ):
     """get pool by id."""
     service = get_proxy_service()
-    pool = await service.get_pool(pool_id)
+    pool = await service.get_pool(tenant_id, pool_id)
 
     if pool is None:
         raise PoolNotFoundException(f"pool not found: {pool_id}")
@@ -132,12 +135,13 @@ async def get_pool(
 )
 async def delete_pool(
     pool_id: str,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["pool:delete"])),
 ):
     """delete pool by id."""
     service = get_proxy_service()
-    deleted = await service.delete_pool(pool_id)
+    deleted = await service.delete_pool(tenant_id, pool_id)
 
     if not deleted:
         raise PoolNotFoundException(f"pool not found: {pool_id}")
@@ -160,12 +164,13 @@ class PoolListResponse(BaseModel):
 async def list_pools(
     limit: int = 100,
     offset: int = 0,
+    tenant_id: str = Depends(get_current_tenant_id),
     user_id: str = Depends(get_current_user_id),
     _user=Depends(require_scopes(["pool:read"])),
 ):
     """list all pools with pagination."""
     service = get_proxy_service()
-    pools = await service.list_pools(limit=limit, offset=offset)
+    pools = await service.list_pools(tenant_id, limit=limit, offset=offset)
 
     return PoolListResponse(
         pools=[

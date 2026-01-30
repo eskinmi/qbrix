@@ -9,6 +9,7 @@ from qbrixstore.config import RedisSettings
 
 @dataclass
 class FeedbackEvent:
+    tenant_id: str
     experiment_id: str
     request_id: str
     arm_index: int
@@ -20,6 +21,7 @@ class FeedbackEvent:
 
     def to_dict(self) -> dict:
         return {
+            "tenant_id": self.tenant_id,
             "experiment_id": self.experiment_id,
             "request_id": self.request_id,
             "arm_index": str(self.arm_index),
@@ -33,6 +35,7 @@ class FeedbackEvent:
     @classmethod
     def from_dict(cls, data: dict) -> "FeedbackEvent":
         return cls(
+            tenant_id=data["tenant_id"],
             experiment_id=data["experiment_id"],
             request_id=data["request_id"],
             arm_index=int(data["arm_index"]),
