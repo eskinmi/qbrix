@@ -7,14 +7,14 @@ CodeGraph builds a semantic knowledge graph of codebases for faster, smarter cod
 
 **Use codegraph tools for faster exploration.** These tools provide instant lookups via the code graph instead of scanning files:
 
-| Tool | Use For |
-|------|---------|
-| `codegraph_search` | Find symbols by name (functions, classes, types) |
-| `codegraph_context` | Get relevant code context for a task |
-| `codegraph_callers` | Find what calls a function |
-| `codegraph_callees` | Find what a function calls |
-| `codegraph_impact` | See what's affected by changing a symbol |
-| `codegraph_node` | Get details + source code for a symbol |
+| Tool                | Use For                                          |
+|---------------------|--------------------------------------------------|
+| `codegraph_search`  | Find symbols by name (functions, classes, types) |
+| `codegraph_context` | Get relevant code context for a task             |
+| `codegraph_callers` | Find what calls a function                       |
+| `codegraph_callees` | Find what a function calls                       |
+| `codegraph_impact`  | See what's affected by changing a symbol         |
+| `codegraph_node`    | Get details + source code for a symbol           |
 
 **When spawning Explore agents in a codegraph-enabled project:**
 

@@ -21,7 +21,7 @@ async def db_engine():
         "sqlite+aiosqlite:///:memory:",
         echo=False,
     )
-    async with engine.begin() as conn:
+    async with engine.begin() as conn:  # noqa
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     await engine.dispose()
