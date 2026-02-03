@@ -1,9 +1,12 @@
 import time
 
+from qbrixlog import get_logger
 from qbrixstore.postgres.session import init_db, get_session, create_tables
 from qbrixstore.postgres.models import Pool, Experiment
 from qbrixstore.redis.client import RedisClient
-from qbrixstore.redis.streams import RedisStreamPublisher, FeedbackEvent
+from qbrixstore.redis.streams import RedisStreamPublisher
+from qbrixstore.redis.streams import FeedbackEvent
+from qbrixstore.redis.streams import SelectionEvent
 from qbrixstore.config import PostgresSettings, RedisSettings
 
 from proxysvc.config import ProxySettings
@@ -16,12 +19,15 @@ from proxysvc.motor_client import MotorClient
 from proxysvc.token import SelectionToken
 from proxysvc.gate import GateService
 
+logger = get_logger(__name__)
+
 
 class ProxyService:
     def __init__(self, settings: ProxySettings):
         self._settings = settings
         self._redis: RedisClient | None = None
         self._publisher: RedisStreamPublisher | None = None
+        self._selection_publisher: RedisStreamPublisher | None = None
         self._motor_client: MotorClient | None = None
         self._gate_service: GateService | None = None
 
@@ -49,6 +55,18 @@ class ProxyService:
         self._publisher = RedisStreamPublisher(redis_settings)
         await self._publisher.connect()
 
+        if self._settings.ee_enabled:
+            selection_redis_settings = RedisSettings(
+                host=self._settings.redis_host,
+                port=self._settings.redis_port,
+                password=self._settings.redis_password,
+                db=self._settings.redis_db,
+                stream_name=self._settings.selection_stream_name,
+            )
+            self._selection_publisher = RedisStreamPublisher(selection_redis_settings)
+            await self._selection_publisher.connect()
+            logger.info("ee enabled: selection publisher connected")
+
         self._motor_client = MotorClient(self._settings.motor_address)
         await self._motor_client.connect()
 
@@ -59,6 +77,8 @@ class ProxyService:
             await self._motor_client.close()
         if self._publisher:
             await self._publisher.close()
+        if self._selection_publisher:
+            await self._selection_publisher.close()
         if self._redis:
             await self._redis.close()
 
@@ -223,7 +243,7 @@ class ProxyService:
                 context_vector=context_vector,
                 context_metadata=context_metadata,
             )
-            return {
+            result = {
                 "arm": {
                     "id": committed_arm.id,
                     "name": committed_arm.name,
@@ -232,6 +252,23 @@ class ProxyService:
                 "request_id": token,
                 "is_default": True,
             }
+
+            if self._selection_publisher:
+                await self._publish_selection_event(
+                    tenant_id=tenant_id,
+                    experiment_id=experiment_id,
+                    request_id=token,
+                    arm_id=committed_arm.id,
+                    arm_name=committed_arm.name,
+                    arm_index=committed_arm.index,
+                    is_default=True,
+                    context_id=context_id,
+                    context_vector=context_vector,
+                    context_metadata=context_metadata,
+                    protocol="gate",
+                )
+
+            return result
 
         # gate selection not valid, route to motorsvc for actual algorithmic selection.
         response = await self._motor_client.select(
@@ -253,7 +290,65 @@ class ProxyService:
         )
         response["request_id"] = token
         response["is_default"] = False
+
+        if self._selection_publisher:
+            protocol = await self._get_experiment_protocol(tenant_id, experiment_id)
+            await self._publish_selection_event(
+                tenant_id=tenant_id,
+                experiment_id=experiment_id,
+                request_id=token,
+                arm_id=response["arm"]["id"],
+                arm_name=response["arm"]["name"],
+                arm_index=response["arm"]["index"],
+                is_default=False,
+                context_id=context_id,
+                context_vector=context_vector,
+                context_metadata=context_metadata,
+                protocol=protocol,
+            )
+
         return response
+
+    async def _publish_selection_event(
+        self,
+        tenant_id: str,
+        experiment_id: str,
+        request_id: str,
+        arm_id: str,
+        arm_name: str,
+        arm_index: int,
+        is_default: bool,
+        context_id: str,
+        context_vector: list[float],
+        context_metadata: dict,
+        protocol: str,
+    ) -> None:
+        """publish selection event for ee tracing."""
+        event = SelectionEvent(
+            tenant_id=tenant_id,
+            experiment_id=experiment_id,
+            request_id=request_id,
+            arm_id=arm_id,
+            arm_name=arm_name,
+            arm_index=arm_index,
+            is_default=is_default,
+            context_id=context_id,
+            context_vector=context_vector,
+            context_metadata=context_metadata,
+            timestamp_ms=int(time.time() * 1000),
+            protocol=protocol,
+        )
+        try:
+            await self._selection_publisher.publish(event)
+        except Exception as e:  # noqa
+            logger.error("failed to publish selection event: %s", e)
+
+    async def _get_experiment_protocol(self, tenant_id: str, experiment_id: str) -> str:
+        """get protocol name for an experiment from redis cache."""
+        experiment = await self._redis.get_experiment(tenant_id, experiment_id)
+        if experiment:
+            return experiment.get("protocol", "unknown")
+        return "unknown"
 
     async def feed(self, request_id: str, reward: float) -> bool:
         """

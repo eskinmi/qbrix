@@ -97,6 +97,13 @@ app.include_router(pool_router, prefix="/api/v1")
 app.include_router(gate_router, prefix="/api/v1")
 app.include_router(agent_router, prefix="/api/v1")
 
+if settings.ee_enabled:
+    from proxysvc.http.router.ee.traces import router as traces_router
+    from proxysvc.http.router.ee.analytics import router as analytics_router
+    app.include_router(traces_router, prefix="/api/v1")
+    app.include_router(analytics_router, prefix="/api/v1")
+    logger.info("ee endpoints registered")
+
 
 @app.exception_handler(BaseAPIException)
 async def handle_api_exception(request: Request, exc: BaseAPIException):

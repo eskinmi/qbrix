@@ -1,8 +1,9 @@
 .PHONY: help proto install test lint fmt clean \
-        infra infra-down \
-        dev dev-proxy dev-motor dev-cortex \
+        infra infra-down infra-ee infra-ee-down \
+        dev dev-proxy dev-motor dev-cortex dev-trace \
         docker docker-build docker-build-no-cache docker-up docker-down docker-logs docker-ps \
-        db-reset \
+        docker-ee docker-ee-build docker-ee-up docker-ee-down docker-ee-logs \
+        db-reset clickhouse-reset \
         loadtest loadtest-web loadtest-multi loadtest-multi-web
 
 help:
@@ -15,19 +16,28 @@ help:
 	@echo "Development:"
 	@echo "  make infra                Start infrastructure (postgres + redis)"
 	@echo "  make infra-down           Stop infrastructure"
+	@echo "  make infra-ee             Start EE infrastructure (postgres + redis + clickhouse)"
+	@echo "  make infra-ee-down        Stop EE infrastructure"
 	@echo "  make dev                  Start all services locally (requires infra)"
 	@echo "  make dev-proxy            Start proxy service only"
 	@echo "  make dev-motor            Start motor service only"
 	@echo "  make dev-cortex           Start cortex service only"
+	@echo "  make dev-trace            Start trace service only (EE)"
 	@echo ""
-	@echo "Docker:"
-	@echo "  make docker               Build and start all containers"
-	@echo "  make docker-build         Build all containers"
-	@echo "  make docker-build-no-cache  Build all containers without cache"
-	@echo "  make docker-up            Start all containers"
+	@echo "Docker (core services):"
+	@echo "  make docker               Build and start core containers"
+	@echo "  make docker-build         Build core containers"
+	@echo "  make docker-up            Start core containers"
 	@echo "  make docker-down          Stop all containers"
 	@echo "  make docker-logs          Tail logs from all containers"
 	@echo "  make docker-ps            Show running containers"
+	@echo ""
+	@echo "Docker EE (with trace + clickhouse):"
+	@echo "  make docker-ee            Build and start all containers (including EE)"
+	@echo "  make docker-ee-build      Build all containers (including EE)"
+	@echo "  make docker-ee-up         Start all containers (including EE)"
+	@echo "  make docker-ee-down       Stop all containers (including EE)"
+	@echo "  make docker-ee-logs       Tail logs from EE containers"
 	@echo ""
 	@echo "Testing & Quality:"
 	@echo "  make test                 Run all tests"
@@ -42,6 +52,7 @@ help:
 	@echo ""
 	@echo "Utilities:"
 	@echo "  make db-reset             Reset postgres database"
+	@echo "  make clickhouse-reset     Reset clickhouse database (EE)"
 	@echo "  make clean                Clean generated files and caches"
 
 # ============================================================================
@@ -67,6 +78,15 @@ infra:
 infra-down:
 	docker compose down postgres redis
 
+infra-ee:
+	docker compose --profile ee up -d postgres redis clickhouse
+	@echo "Waiting for services to be healthy..."
+	@sleep 5
+	@docker compose --profile ee ps
+
+infra-ee-down:
+	docker compose --profile ee down postgres redis clickhouse
+
 dev: infra
 	@echo "Starting all services..."
 	@trap 'kill 0' EXIT; \
@@ -90,6 +110,10 @@ dev-cortex:
 	CORTEX_REDIS_HOST=localhost \
 	uv run python -m cortexsvc.cli
 
+dev-trace:
+	TRACE_REDIS_HOST=localhost TRACE_CLICKHOUSE_HOST=localhost \
+	uv run python -m tracesvc.cli
+
 # ============================================================================
 # Docker Compose (full containerized setup)
 # ============================================================================
@@ -105,6 +129,34 @@ docker-build-no-cache:
 docker-up:
 	docker compose up -d
 	@docker compose ps
+
+docker-down:
+	docker compose down
+
+docker-logs:
+	docker compose logs -f
+
+docker-ps:
+	docker compose ps
+
+# ============================================================================
+# Docker Compose EE (with trace + clickhouse)
+# ============================================================================
+
+docker-ee: docker-ee-build docker-ee-up
+
+docker-ee-build:
+	QBRIX_EE_ENABLED=true docker compose --profile ee build
+
+docker-ee-up:
+	QBRIX_EE_ENABLED=true docker compose --profile ee up -d
+	@docker compose --profile ee ps
+
+docker-ee-down:
+	docker compose --profile ee down
+
+docker-ee-logs:
+	docker compose --profile ee logs -f trace clickhouse
 
 # ============================================================================
 # Testing & Quality
@@ -130,6 +182,13 @@ db-reset:
 	docker compose up -d postgres
 	@echo "Waiting for postgres to be ready..."
 	@sleep 3
+
+clickhouse-reset:
+	docker compose --profile ee down clickhouse
+	docker volume rm qbrix_clickhouse_data 2>/dev/null || true
+	docker compose --profile ee up -d clickhouse
+	@echo "Waiting for clickhouse to be ready..."
+	@sleep 5
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true

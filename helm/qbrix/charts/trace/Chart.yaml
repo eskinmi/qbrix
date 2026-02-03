@@ -1,0 +1,13 @@
+apiVersion: v2
+name: trace
+description: Qbrix Trace Service - EE event persistence to ClickHouse
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+keywords:
+  - qbrix
+  - trace
+  - analytics
+  - clickhouse
+  - grpc

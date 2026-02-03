@@ -34,6 +34,22 @@ class RedisSettings(BaseSettings):
         return f"redis://{auth}{self.host}:{self.port}/{self.db}"
 
 
+class ClickHouseSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="CLICKHOUSE_")
+
+    host: str = "localhost"
+    port: int = 8123
+    user: str = "default"
+    password: str = ""
+    database: str = "qbrix"
+
+    # batch settings for tracesvc
+    batch_size: int = 1000
+    flush_interval_sec: float = 5.0
+    ttl_days: int = 90
+
+
 class StoreSettings(BaseSettings):
     postgres: PostgresSettings = PostgresSettings()
     redis: RedisSettings = RedisSettings()
+    clickhouse: ClickHouseSettings = ClickHouseSettings()

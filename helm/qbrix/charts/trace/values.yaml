@@ -1,0 +1,121 @@
+# trace service values
+# ee event persistence - HORIZONTALLY SCALABLE
+#
+# architecture decision: trace can run multiple instances
+#
+# why horizontally scalable?
+# - append-only writes to clickhouse (no read-modify-write)
+# - redis streams distributes messages across consumer group
+# - no race conditions between instances
+# - each message delivered to exactly one consumer
+
+replicaCount: 2
+
+image:
+  repository: qbrix/trace
+  pullPolicy: IfNotPresent
+  tag: ""  # defaults to chart appVersion
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# service configuration
+service:
+  type: ClusterIP
+  port: 50053
+  annotations: {}
+
+# autoscaling enabled - horizontally scalable
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+# pdb for high availability
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+
+# grpc health check probes
+livenessProbe:
+  grpc:
+    port: 50053
+  initialDelaySeconds: 15
+  periodSeconds: 20
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  grpc:
+    port: 50053
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# node selection
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# pod annotations and labels
+podAnnotations: {}
+podLabels: {}
+
+# security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# environment-specific config
+config:
+  logLevel: "INFO"
+
+  # grpc settings
+  grpc:
+    host: "0.0.0.0"
+    port: 50053
+
+  # redis stream settings
+  stream:
+    feedbackName: "qbrix:feedback"
+    selectionName: "qbrix:selection"
+    consumerGroup: "trace"
+    # consumer name is auto-generated from pod name
+
+  # batch processing settings
+  batch:
+    size: 500
+    flushIntervalSec: 5.0
+
+# extra environment variables
+extraEnv: []
+
+# extra volumes and mounts
+extraVolumes: []
+extraVolumeMounts: []

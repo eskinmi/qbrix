@@ -47,6 +47,57 @@ class FeedbackEvent:
         )
 
 
+@dataclass
+class SelectionEvent:
+    """event emitted when an arm is selected for a context."""
+
+    tenant_id: str
+    experiment_id: str
+    request_id: str
+    arm_id: str
+    arm_name: str
+    arm_index: int
+    is_default: bool
+    context_id: str
+    context_vector: list[float]
+    context_metadata: dict
+    timestamp_ms: int
+    protocol: str
+
+    def to_dict(self) -> dict:
+        return {
+            "tenant_id": self.tenant_id,
+            "experiment_id": self.experiment_id,
+            "request_id": self.request_id,
+            "arm_id": self.arm_id,
+            "arm_name": self.arm_name,
+            "arm_index": str(self.arm_index),
+            "is_default": "1" if self.is_default else "0",
+            "context_id": self.context_id,
+            "context_vector": json.dumps(self.context_vector),
+            "context_metadata": json.dumps(self.context_metadata),
+            "timestamp_ms": str(self.timestamp_ms),
+            "protocol": self.protocol,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "SelectionEvent":
+        return cls(
+            tenant_id=data["tenant_id"],
+            experiment_id=data["experiment_id"],
+            request_id=data["request_id"],
+            arm_id=data["arm_id"],
+            arm_name=data["arm_name"],
+            arm_index=int(data["arm_index"]),
+            is_default=data["is_default"] == "1",
+            context_id=data["context_id"],
+            context_vector=json.loads(data["context_vector"]),
+            context_metadata=json.loads(data["context_metadata"]),
+            timestamp_ms=int(data["timestamp_ms"]),
+            protocol=data["protocol"],
+        )
+
+
 class RedisStreamPublisher:
     def __init__(self, settings: RedisSettings | None = None):
         if settings is None:
@@ -61,7 +112,7 @@ class RedisStreamPublisher:
         if self._client:
             await self._client.close()
 
-    async def publish(self, event: FeedbackEvent) -> str:
+    async def publish(self, event: FeedbackEvent | SelectionEvent) -> str:
         if self._client is None:
             raise RuntimeError("Publisher not connected. Call connect() first.")
         message_id = await self._client.xadd(

@@ -31,6 +31,15 @@ global:
     existingSecret: ""
     password: ""
 
+  clickhouse:
+    host: "qbrix-clickhouse"
+    port: 8123
+    user: "default"
+    database: "qbrix"
+    # use existingSecret in production (must have key: password)
+    existingSecret: ""
+    password: ""
+
   logging:
     format: "json"
     level: "WARNING"
@@ -42,6 +51,12 @@ motor:
   enabled: true
 cortex:
   enabled: true
+
+# enterprise edition features
+ee:
+  enabled: false
+  trace:
+    enabled: false
 
 # in-cluster infrastructure (disabled by default - use external managed services)
 infrastructure:
@@ -79,4 +94,22 @@ infrastructure:
     persistence:
       enabled: true
       size: "5Gi"
+      storageClass: ""
+
+  clickhouse:
+    enabled: false
+    image:
+      repository: clickhouse/clickhouse-server
+      tag: "24.1"
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "200m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+    persistence:
+      enabled: true
+      size: "20Gi"
       storageClass: ""

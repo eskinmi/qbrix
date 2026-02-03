@@ -52,7 +52,7 @@ services:
       PROXY_GATE_CACHE_MAXSIZE: "1000"
       PROXY_GATE_CACHE_TTL: "30.0"
       PROXY_GATE_REDIS_TTL: "300"
-      PROXY_JWT_SECRET_KEY: "docker-dev-secret-change-in-production"
+      PROXY_JWT_SECRET_KEY: "docker-dev-secret-change-in-production"  # todo: update
       PROXY_JWT_ALGORITHM: "HS256"
       PROXY_JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "30"
       PROXY_JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
@@ -60,6 +60,13 @@ services:
       PROXY_DEFAULT_TENANT_SLUG: "default"
       PROXY_LOG_LEVEL: "WARNING"
       LOG_FORMAT: "json"
+      PROXY_EE_ENABLED: "${QBRIX_EE_ENABLED:-false}"
+      PROXY_SELECTION_STREAM_NAME: "qbrix:selection"
+      PROXY_CLICKHOUSE_HOST: clickhouse
+      PROXY_CLICKHOUSE_PORT: "8123"
+      PROXY_CLICKHOUSE_USER: "default"
+      PROXY_CLICKHOUSE_PASSWORD: ""
+      PROXY_CLICKHOUSE_DATABASE: "qbrix"
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,6 +113,57 @@ services:
     deploy:
       replicas: 1
 
+  # EE services (enabled with --profile ee)
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1
+    profiles: ["ee"]
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    environment:
+      CLICKHOUSE_DB: qbrix
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  trace:
+    profiles: ["ee"]
+    build:
+      context: .
+      dockerfile: ee/svc/trace/Dockerfile
+    ports:
+      - "50053:50053"
+    environment:
+      TRACE_GRPC_HOST: "0.0.0.0"
+      TRACE_GRPC_PORT: "50053"
+      TRACE_REDIS_HOST: redis
+      TRACE_REDIS_PORT: "6379"
+      TRACE_FEEDBACK_STREAM_NAME: "qbrix:feedback"
+      TRACE_SELECTION_STREAM_NAME: "qbrix:selection"
+      TRACE_CONSUMER_GROUP: "trace"
+      TRACE_CONSUMER_NAME: "worker-0"
+      TRACE_CLICKHOUSE_HOST: clickhouse
+      TRACE_CLICKHOUSE_PORT: "8123"
+      TRACE_CLICKHOUSE_USER: "default"
+      TRACE_CLICKHOUSE_PASSWORD: ""
+      TRACE_CLICKHOUSE_DATABASE: "qbrix"
+      TRACE_BATCH_SIZE: "500"
+      TRACE_FLUSH_INTERVAL_SEC: "5.0"
+      TRACE_LOG_LEVEL: "WARNING"
+      LOG_FORMAT: "json"
+    depends_on:
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    deploy:
+      replicas: 1
+
 volumes:
   postgres_data:
   redis_data:
+  clickhouse_data:

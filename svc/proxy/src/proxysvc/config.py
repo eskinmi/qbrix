@@ -42,6 +42,17 @@ class ProxySettings(BaseSettings):
     http_host: str = "0.0.0.0"
     http_port: int = 8080
 
+    # ee settings
+    ee_enabled: bool = False
+    selection_stream_name: str = "qbrix:selection"
+
+    # ee clickhouse settings (for analytics endpoints)
+    clickhouse_host: str = "localhost"
+    clickhouse_port: int = 8123
+    clickhouse_user: str = "default"
+    clickhouse_password: str = ""
+    clickhouse_database: str = "qbrix"
+
     @property
     def postgres_dsn(self) -> str:
         return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_database}"

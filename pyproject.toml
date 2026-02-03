@@ -7,16 +7,18 @@ requires-python = ">=3.10"
 dependencies = [
     "motorsvc",
     "cortexsvc",
-    "proxysvc"
+    "proxysvc",
+    "tracesvc"
 ]
 
 [tool.uv.workspace]
-members = ["svc/*"]
+members = ["svc/*", "ee/svc/*"]
 
 [tool.uv.sources]
 cortexsvc = { workspace = true}
 proxysvc = { workspace = true}
 motorsvc = { workspace = true}
+tracesvc = { workspace = true}
 qbrixcore = { path = "../../lib/core", editable = true }
 qbrixlog = { path = "../../lib/log", editable = true }
 qbrixproto = { path = "../../lib/proto", editable = true }

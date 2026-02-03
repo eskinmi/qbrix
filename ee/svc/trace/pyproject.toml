@@ -1,0 +1,64 @@
+[project]
+name = "tracesvc"
+version = "0.1.0"
+description = "Qbrix Trace Service - EE event persistence to ClickHouse"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.3.1",
+    "grpcio>=1.76.0",
+    "grpcio-reflection>=1.76.0",
+    "grpcio-tools>=1.76.0",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.12.0",
+    "qbrixstore==0.1.0a0",
+    "qbrixproto==0.1.0a0",
+    "qbrixlog==0.1.0a0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.0.0",
+    "pre-commit>=4.0.1",
+    "black>=26.1.0",
+    "pytest-mock>=3.14.1",
+    "pytest-asyncio>=0.24.0",
+]
+
+[tool.uv]
+prerelease = "if-necessary-or-explicit"
+
+[tool.uv.sources]
+qbrixstore = { path = "../../../lib/store", editable = true }
+qbrixproto = { path = "../../../lib/proto", editable = true }
+qbrixlog = { path = "../../../lib/log", editable = true }
+
+[[tool.uv.index]]
+name = "envelope"
+url = "https://app.envelope.dev/simple"
+explicit = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=tracesvc",
+    "--cov-report=term-missing",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+]
+
+[project.scripts]
+server = "tracesvc.cli:run"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
