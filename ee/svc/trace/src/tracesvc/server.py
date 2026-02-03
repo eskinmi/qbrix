@@ -19,7 +19,7 @@ class TraceGRPCServicer:
     def __init__(self, service: TraceService):
         self._service = service
 
-    async def Health(self, request, context):
+    async def Health(self, request, context):  # noqa
         healthy = await self._service.health()
         return common_pb2.HealthCheckResponse(
             status=(

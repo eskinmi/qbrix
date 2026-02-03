@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from typing import Callable, Awaitable
+from typing import Callable, Awaitable, Generic, TypeVar
 
 import redis.asyncio as redis
 
@@ -124,14 +124,21 @@ class RedisStreamPublisher:
         return message_id
 
 
-class RedisStreamConsumer:
+EventT = TypeVar("EventT", FeedbackEvent, SelectionEvent)
+
+
+class RedisStreamConsumer(Generic[EventT]):
     def __init__(
-        self, settings: RedisSettings | None = None, consumer_name: str = "worker-0"
+        self,
+        settings: RedisSettings | None = None,
+        consumer_name: str = "worker-0",
+        event_class: type[EventT] | None = None,
     ):
         if settings is None:
             settings = RedisSettings()
         self._settings = settings
         self._consumer_name = consumer_name
+        self._event_class: type = event_class or FeedbackEvent
         self._client: redis.Redis | None = None
 
     async def connect(self) -> None:
@@ -153,7 +160,7 @@ class RedisStreamConsumer:
 
     async def consume(
         self, batch_size: int = 100, block_ms: int = 5000
-    ) -> list[tuple[str, FeedbackEvent]]:
+    ) -> list[tuple[str, EventT]]:
         if self._client is None:
             raise RuntimeError("Consumer not connected. Call connect() first.")
 
@@ -168,7 +175,7 @@ class RedisStreamConsumer:
         events = []
         for stream_name, messages in results:
             for message_id, data in messages:
-                event = FeedbackEvent.from_dict(data)
+                event = self._event_class.from_dict(data)
                 events.append((message_id, event))
 
         return events
@@ -203,7 +210,7 @@ class RedisStreamConsumer:
 
     async def claim_pending(
         self, count: int = 100, min_idle_ms: int = 0
-    ) -> list[tuple[str, FeedbackEvent]]:
+    ) -> list[tuple[str, EventT]]:
         """claim pending messages that were read but not acked (e.g., after crash)."""
         if self._client is None:
             raise RuntimeError("Consumer not connected. Call connect() first.")
@@ -225,14 +232,14 @@ class RedisStreamConsumer:
         events = []
         for message_id, data in messages:
             if data:
-                event = FeedbackEvent.from_dict(data)
+                event = self._event_class.from_dict(data)
                 events.append((message_id, event))
 
         return events
 
     async def run(
         self,
-        handler: Callable[[list[FeedbackEvent]], Awaitable[None]],
+        handler: Callable[[list[EventT]], Awaitable[None]],
         batch_size: int = 100,
         block_ms: int = 5000,
     ) -> None:

@@ -7,13 +7,13 @@ from collections import defaultdict
 from qbrixlog import get_logger
 from qbrixstore.clickhouse.client import ClickHouseClient
 from qbrixstore.clickhouse.migrations import create_tables
-from qbrixstore.redis.streams import SelectionEvent
 from qbrixstore.redis.streams import FeedbackEvent
+from qbrixstore.redis.streams import RedisStreamConsumer
+from qbrixstore.redis.streams import SelectionEvent
 from qbrixstore.config import RedisSettings
 from qbrixstore.config import ClickHouseSettings
 
 from tracesvc.config import TraceSettings
-from tracesvc.consumer import GenericStreamConsumer
 
 logger = get_logger(__name__)
 
@@ -24,8 +24,8 @@ class TraceService:
     def __init__(self, settings: TraceSettings):
         self._settings = settings
         self._clickhouse: ClickHouseClient | None = None
-        self._selection_consumer: GenericStreamConsumer[SelectionEvent] | None = None
-        self._feedback_consumer: GenericStreamConsumer[FeedbackEvent] | None = None
+        self._selection_consumer: RedisStreamConsumer[SelectionEvent] | None = None
+        self._feedback_consumer: RedisStreamConsumer[FeedbackEvent] | None = None
         self._stats: dict[str, dict] = defaultdict(
             lambda: {"selections": 0, "feedback": 0, "last_write": 0}
         )
@@ -63,7 +63,7 @@ class TraceService:
             stream_name=self._settings.selection_stream_name,
             consumer_group=self._settings.consumer_group,
         )
-        self._selection_consumer = GenericStreamConsumer(
+        self._selection_consumer = RedisStreamConsumer(
             settings=selection_redis_settings,
             consumer_name=self._settings.consumer_name,
             event_class=SelectionEvent,
@@ -79,7 +79,7 @@ class TraceService:
             stream_name=self._settings.feedback_stream_name,
             consumer_group=self._settings.consumer_group,
         )
-        self._feedback_consumer = GenericStreamConsumer(
+        self._feedback_consumer = RedisStreamConsumer(
             settings=feedback_redis_settings,
             consumer_name=self._settings.consumer_name,
             event_class=FeedbackEvent,
