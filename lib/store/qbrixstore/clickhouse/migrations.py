@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from clickhouse_connect.driver.client import Client
 
-from qbrixstore.config import ClickHouseSettings
-
 
 SELECTION_EVENTS_TABLE = """
 CREATE TABLE IF NOT EXISTS selection_events (

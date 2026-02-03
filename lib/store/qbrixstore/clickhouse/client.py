@@ -49,7 +49,6 @@ class ClickHouseClient:
 
     def connect(self, create_database: bool = True) -> None:
         if create_database:
-            # first connect without database to create it if needed
             init_client = clickhouse_connect.get_client(
                 host=self._settings.host,
                 port=self._settings.port,
@@ -215,11 +214,11 @@ class ClickHouseClient:
 
         if start_ms:
             conditions.append("timestamp_ms >= {start_ms:Int64}")
-            params["start_ms"] = start_ms
+            params["start_ms"] = start_ms  # noqa
 
         if end_ms:
             conditions.append("timestamp_ms < {end_ms:Int64}")
-            params["end_ms"] = end_ms
+            params["end_ms"] = end_ms  # noqa
 
         where_clause = " AND ".join(conditions)
 
@@ -324,11 +323,11 @@ class ClickHouseClient:
 
         if start_ms:
             conditions.append("timestamp_ms >= {start_ms:Int64}")
-            params["start_ms"] = start_ms
+            params["start_ms"] = start_ms  # noqa
 
         if end_ms:
             conditions.append("timestamp_ms < {end_ms:Int64}")
-            params["end_ms"] = end_ms
+            params["end_ms"] = end_ms  # noqa
 
         where_clause = " AND ".join(conditions)
 
@@ -377,5 +376,5 @@ class ClickHouseClient:
         try:
             result = self.client.query("SELECT 1")
             return result.result_rows == [(1,)]
-        except Exception:
+        except Exception:  # noqa
             return False

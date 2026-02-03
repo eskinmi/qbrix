@@ -17,3 +17,4 @@ wheels/
 
 # Claude
 .claude/settings.local.json
+/lib/core/.coverage
