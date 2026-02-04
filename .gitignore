@@ -25,4 +25,5 @@ terraform/
 *.tfvarsi\
 
 # TMP
-tmp/
+.tmp/
+*tmp/
