@@ -1,10 +1,10 @@
-"""Unit tests for FPLProtocol."""
+"""Unit tests for FPLPolicy."""
 
 import numpy as np
 import pytest
 
-from qbrixcore.protoc.adversarial.fpl import FPLProtocol
-from qbrixcore.protoc.adversarial.fpl import FPLParamState
+from qbrixcore.policy.adversarial.fpl import FPLPolicy
+from qbrixcore.policy.adversarial.fpl import FPLParamState
 from qbrixcore.context import Context
 
 
@@ -56,25 +56,25 @@ class TestFPLParamState:
         assert ps1.id != ps2.id
 
 
-class TestFPLProtocol:
-    def test_protocol_name(self):
-        """test protocol has correct name."""
-        assert FPLProtocol.name == "FPLProtocol"
+class TestFPLPolicy:
+    def test_policy_name(self):
+        """test policy has correct name."""
+        assert FPLPolicy.name == "FPLPolicy"
 
-    def test_protocol_param_state_cls(self):
-        """test protocol has correct param state class."""
-        assert FPLProtocol.param_state_cls == FPLParamState
+    def test_policy_param_state_cls(self):
+        """test policy has correct param state class."""
+        assert FPLPolicy.param_state_cls == FPLParamState
 
     def test_init_params(self):
         """test init_params creates correct param state."""
-        params = FPLProtocol.init_params(num_arms=4)
+        params = FPLPolicy.init_params(num_arms=4)
 
         assert isinstance(params, FPLParamState)
         assert params.num_arms == 4
 
     def test_init_params_with_custom_eta(self):
         """test init_params with custom eta."""
-        params = FPLProtocol.init_params(num_arms=3, eta=8.0)
+        params = FPLPolicy.init_params(num_arms=3, eta=8.0)
 
         assert params.eta == 8.0
 
@@ -83,7 +83,7 @@ class TestFPLProtocol:
         ps = FPLParamState(num_arms=5)
         ctx = Context()
 
-        arm_index = FPLProtocol.select(ps, ctx)
+        arm_index = FPLPolicy.select(ps, ctx)
 
         assert isinstance(arm_index, int)
         assert 0 <= arm_index < 5
@@ -94,7 +94,7 @@ class TestFPLProtocol:
         ctx = Context()
 
         # run multiple selections
-        selections = [FPLProtocol.select(ps, ctx) for _ in range(100)]
+        selections = [FPLPolicy.select(ps, ctx) for _ in range(100)]
 
         # with zero rewards and noise, all arms should be selected
         assert len(set(selections)) == 3
@@ -105,10 +105,10 @@ class TestFPLProtocol:
         ctx = Context()
 
         np.random.seed(42)
-        result1 = FPLProtocol.select(ps, ctx)
+        result1 = FPLPolicy.select(ps, ctx)
 
         np.random.seed(42)
-        result2 = FPLProtocol.select(ps, ctx)
+        result2 = FPLPolicy.select(ps, ctx)
 
         assert result1 == result2
 
@@ -122,7 +122,7 @@ class TestFPLProtocol:
         ctx = Context()
 
         # run multiple selections
-        selections = [FPLProtocol.select(ps, ctx) for _ in range(100)]
+        selections = [FPLPolicy.select(ps, ctx) for _ in range(100)]
         arm_0_count = selections.count(0)
 
         # arm 0 should be selected most often due to high cumulative reward
@@ -133,7 +133,7 @@ class TestFPLProtocol:
         ps = FPLParamState(num_arms=1)
         ctx = Context()
 
-        arm_index = FPLProtocol.select(ps, ctx)
+        arm_index = FPLPolicy.select(ps, ctx)
 
         assert arm_index == 0
 
@@ -142,7 +142,7 @@ class TestFPLProtocol:
         ps = FPLParamState(num_arms=3)
         ctx = Context()
 
-        updated = FPLProtocol.train(ps, ctx, choice=1, reward=2.5)
+        updated = FPLPolicy.train(ps, ctx, choice=1, reward=2.5)
 
         assert updated.r[1] == 2.5
         # other arms unchanged
@@ -154,7 +154,7 @@ class TestFPLProtocol:
         ps = FPLParamState(num_arms=3)
         ctx = Context()
 
-        updated = FPLProtocol.train(ps, ctx, choice=0, reward=-1.5)
+        updated = FPLPolicy.train(ps, ctx, choice=0, reward=-1.5)
 
         assert updated.r[0] == -1.5
 
@@ -163,9 +163,9 @@ class TestFPLProtocol:
         ps = FPLParamState(num_arms=3)
         ctx = Context()
 
-        ps = FPLProtocol.train(ps, ctx, choice=0, reward=1.0)
-        ps = FPLProtocol.train(ps, ctx, choice=0, reward=2.0)
-        ps = FPLProtocol.train(ps, ctx, choice=0, reward=0.5)
+        ps = FPLPolicy.train(ps, ctx, choice=0, reward=1.0)
+        ps = FPLPolicy.train(ps, ctx, choice=0, reward=2.0)
+        ps = FPLPolicy.train(ps, ctx, choice=0, reward=0.5)
 
         assert ps.r[0] == 3.5
 
@@ -175,7 +175,7 @@ class TestFPLProtocol:
         ctx = Context()
         original_r = ps.r.copy()
 
-        updated = FPLProtocol.train(ps, ctx, choice=1, reward=1.0)
+        updated = FPLPolicy.train(ps, ctx, choice=1, reward=1.0)
 
         # original unchanged
         assert np.array_equal(ps.r, original_r)
@@ -188,7 +188,7 @@ class TestFPLProtocol:
         ps = FPLParamState(num_arms=3)
         ctx = Context()
 
-        updated = FPLProtocol.train(ps, ctx, choice=0, reward=np.float64(1.5))
+        updated = FPLPolicy.train(ps, ctx, choice=0, reward=np.float64(1.5))
 
         assert updated.r[0] == 1.5
 
@@ -197,9 +197,9 @@ class TestFPLProtocol:
         ps = FPLParamState(num_arms=3)
         ctx = Context()
 
-        ps = FPLProtocol.train(ps, ctx, choice=0, reward=1.0)
-        ps = FPLProtocol.train(ps, ctx, choice=1, reward=2.0)
-        ps = FPLProtocol.train(ps, ctx, choice=2, reward=0.5)
+        ps = FPLPolicy.train(ps, ctx, choice=0, reward=1.0)
+        ps = FPLPolicy.train(ps, ctx, choice=1, reward=2.0)
+        ps = FPLPolicy.train(ps, ctx, choice=2, reward=0.5)
 
         assert ps.r[0] == 1.0
         assert ps.r[1] == 2.0
@@ -211,15 +211,15 @@ class TestFPLProtocol:
         ctx = Context()
 
         # select arm
-        arm = FPLProtocol.select(ps, ctx)
+        arm = FPLPolicy.select(ps, ctx)
         assert 0 <= arm < 3
 
         # train on selection
-        updated_ps = FPLProtocol.train(ps, ctx, choice=arm, reward=1.0)
+        updated_ps = FPLPolicy.train(ps, ctx, choice=arm, reward=1.0)
         assert updated_ps.r[arm] == 1.0
 
         # select again with updated params
-        arm2 = FPLProtocol.select(updated_ps, ctx)
+        arm2 = FPLPolicy.select(updated_ps, ctx)
         assert 0 <= arm2 < 3
 
     def test_eta_affects_exploration(self):
@@ -231,11 +231,11 @@ class TestFPLProtocol:
         ctx = Context()
 
         # with low eta (low noise), arm 0 should be selected very consistently
-        selections_low = [FPLProtocol.select(ps_low_eta, ctx) for _ in range(100)]
+        selections_low = [FPLPolicy.select(ps_low_eta, ctx) for _ in range(100)]
         arm_0_count_low = selections_low.count(0)
 
         # with high eta (high noise), more exploration expected
-        selections_high = [FPLProtocol.select(ps_high_eta, ctx) for _ in range(100)]
+        selections_high = [FPLPolicy.select(ps_high_eta, ctx) for _ in range(100)]
         arm_0_count_high = selections_high.count(0)
 
         # low eta should have higher consistency on best arm
@@ -249,7 +249,7 @@ class TestFPLProtocol:
         # with zero rewards, selection is purely based on exponential noise
         # run many selections and verify distribution properties
         np.random.seed(42)
-        selections = [FPLProtocol.select(ps, ctx) for _ in range(1000)]
+        selections = [FPLPolicy.select(ps, ctx) for _ in range(1000)]
 
         # all arms should be selected (exploratory behavior)
         assert len(set(selections)) == 3

@@ -5,12 +5,12 @@ from pydantic import Field, model_validator
 
 from qbrixcore.param.var import ArrayParam
 from qbrixcore.param.state import BaseParamState
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.context import Context
 
 
 class EXP3ParamState(BaseParamState):
-    """Parameter state for EXP3 (Exponential-weight) protocol."""
+    """Parameter state for EXP3 (Exponential-weight) policy."""
 
     gamma: float = Field(default=0.1, ge=0.0, le=1.0)
     w: ArrayParam | None = None
@@ -22,17 +22,17 @@ class EXP3ParamState(BaseParamState):
         return self
 
 
-class EXP3Protocol(BaseProtocol):
+class EXP3Policy(BasePolicy):
     """
     EXP3 (Exponential-weight algorithm for Exploration and Exploitation)
-    protocol for adversarial multi-armed bandit.
+    policy for adversarial multi-armed bandit.
 
     EXP3 maintains weights for each arm and uses importance-weighted
     reward estimates to update them. The gamma parameter controls
     the exploration-exploitation tradeoff.
     """
 
-    name: ClassVar[str] = "EXP3Protocol"
+    name: ClassVar[str] = "EXP3Policy"
     param_state_cls: type[BaseParamState] = EXP3ParamState
 
     @staticmethod
@@ -43,7 +43,7 @@ class EXP3Protocol(BaseProtocol):
     @staticmethod
     def select(ps: EXP3ParamState, context: Context) -> int:
         """Arm selection using EXP3."""
-        proba = EXP3Protocol._proba(ps)
+        proba = EXP3Policy._proba(ps)
         return int(np.random.choice(ps.num_arms, p=proba))
 
     @classmethod

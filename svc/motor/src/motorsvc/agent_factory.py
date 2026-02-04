@@ -1,12 +1,12 @@
 from qbrixcore.pool import Pool, Arm
 from qbrixcore.agent import Agent
-from qbrixcore.protoc import BaseProtocol
+from qbrixcore.policy import BasePolicy
 
 from motorsvc.cache import MotorCache
 from motorsvc.param_backend import RedisBackedInMemoryParamBackend
 
 
-def _build_protocol_map() -> dict[str, type[BaseProtocol]]:
+def _build_policy_map() -> dict[str, type[BasePolicy]]:
     registry = {}
 
     def collect(cls):
@@ -15,11 +15,11 @@ def _build_protocol_map() -> dict[str, type[BaseProtocol]]:
                 registry[subclass.name] = subclass
             collect(subclass)
 
-    collect(BaseProtocol)
+    collect(BasePolicy)
     return registry
 
 
-PROTOCOL_MAP = _build_protocol_map()
+PROTOCOL_MAP = _build_policy_map()
 
 
 class AgentFactory:
@@ -55,10 +55,10 @@ class AgentFactory:
         if agent is not None:
             if (params := self._param_backend.get(tenant_id, experiment_id)) is None:
                 params = await self._param_backend.update_params(
-                    tenant_id, experiment_id, agent.protocol
+                    tenant_id, experiment_id, agent.policy
                 )
             if params is None:
-                params = agent.protocol.init_params(
+                params = agent.policy.init_params(
                     num_arms=len(agent.pool), **agent.init_params
                 )
                 self._param_backend.set(tenant_id, experiment_id, params)
@@ -70,25 +70,25 @@ class AgentFactory:
         #  2. there is a new replica / or instance restarted
         #  3. agent cache is expired / invalidated
         #  <->
-        #  in all cases we need to regenerate the agent, meaning we need to fetch the protocol, pool, etc.
+        #  in all cases we need to regenerate the agent, meaning we need to fetch the policy, pool, etc.
         #  if it is not the first request, we already must have parameters, so we will fetch the
         #  parameters from the cache or redis.
 
-        protocol_name = experiment_record["protocol"]
-        protocol_cls = PROTOCOL_MAP.get(protocol_name)
-        if protocol_cls is None:
+        policy_name = experiment_record["policy"]
+        policy_cls = PROTOCOL_MAP.get(policy_name)
+        if policy_cls is None:
             raise ValueError(
-                f"Unknown protocol: {protocol_name}. Available: {list(PROTOCOL_MAP.keys())}"
+                f"Unknown policy: {policy_name}. Available: {list(PROTOCOL_MAP.keys())}"
             )
 
         if self._param_backend.get(tenant_id, experiment_id) is None:
             params = await self._param_backend.update_params(
-                tenant_id, experiment_id, protocol_cls
+                tenant_id, experiment_id, policy_cls
             )
             if params is None:
-                params = protocol_cls.init_params(
+                params = policy_cls.init_params(
                     num_arms=len(experiment_record["pool"]["arms"]),
-                    **experiment_record.get("protocol_params", {}),
+                    **experiment_record.get("policy_params", {}),
                 )
                 self._param_backend.set(tenant_id, experiment_id, params)
 
@@ -97,8 +97,8 @@ class AgentFactory:
         agent = Agent(
             experiment_id=experiment_id,
             pool=pool,
-            protocol=protocol_cls,
-            init_params=experiment_record.get("protocol_params", {}),
+            policy=policy_cls,
+            init_params=experiment_record.get("policy_params", {}),
             param_backend=scoped_param_backend,
         )
 

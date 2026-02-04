@@ -6,12 +6,12 @@ from pydantic import Field, model_validator
 
 from qbrixcore.param.var import ArrayParam
 from qbrixcore.param.state import BaseParamState
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.context import Context
 
 
 class UCB1TunedParamState(BaseParamState):
-    """Parameter state for UCB1-Tuned protocol."""
+    """Parameter state for UCB1-Tuned policy."""
 
     alpha: float = Field(default=2.0, gt=0.0)
     mu: ArrayParam | None = None
@@ -30,14 +30,14 @@ class UCB1TunedParamState(BaseParamState):
         return self
 
 
-class UCB1TunedProtocol(BaseProtocol):
+class UCB1TunedPolicy(BasePolicy):
     """
-    UCB1-Tuned protocol for multi-armed bandit.
+    UCB1-Tuned policy for multi-armed bandit.
 
     Uses variance estimates to compute tighter confidence bounds than UCB1.
     """
 
-    name: ClassVar[str] = "UCB1TunedProtocol"
+    name: ClassVar[str] = "UCB1TunedPolicy"
     param_state_cls: type[BaseParamState] = UCB1TunedParamState
 
     @staticmethod
@@ -54,7 +54,7 @@ class UCB1TunedProtocol(BaseProtocol):
         """Calculate upper confidence bound."""
         if ps.T[arm] == 0:
             return float("inf")
-        sigma_bound = min(0.25, UCB1TunedProtocol._arm_var_upper_bound(ps, arm))
+        sigma_bound = min(0.25, UCB1TunedPolicy._arm_var_upper_bound(ps, arm))
         return float(
             ps.mu[arm] + math.sqrt(sigma_bound * math.log(ps.round + 1) / ps.T[arm])
         )
@@ -64,7 +64,7 @@ class UCB1TunedProtocol(BaseProtocol):
         """Arm selection using UCB1-Tuned."""
         # Note: round increment happens in train, use current round for selection
         upper_bounds = [
-            UCB1TunedProtocol._upper_bound(ps, i) for i in range(ps.num_arms)
+            UCB1TunedPolicy._upper_bound(ps, i) for i in range(ps.num_arms)
         ]
         return int(np.argmax(upper_bounds))
 
@@ -97,7 +97,7 @@ class UCB1TunedProtocol(BaseProtocol):
 
 
 class KLUCBParamState(BaseParamState):
-    """Parameter state for KL-UCB protocol."""
+    """Parameter state for KL-UCB policy."""
 
     c: float = Field(default=0.0, ge=0.0)
     S: ArrayParam | None = None
@@ -113,9 +113,9 @@ class KLUCBParamState(BaseParamState):
         return self
 
 
-class KLUCBProtocol(BaseProtocol):
+class KLUCBPolicy(BasePolicy):
     """
-    KL-UCB (Kullback-Leibler Upper Confidence Bound) protocol.
+    KL-UCB (Kullback-Leibler Upper Confidence Bound) policy.
 
     Based on "The KL-UCB Algorithm for Bounded Stochastic Bandits and Beyond"
     by Garivier & Cappe (2011).
@@ -124,7 +124,7 @@ class KLUCBProtocol(BaseProtocol):
     achieving the Lai-Robbins lower bound for Bernoulli rewards.
     """
 
-    name: ClassVar[str] = "KLUCBProtocol"
+    name: ClassVar[str] = "KLUCBPolicy"
     param_state_cls: type[BaseParamState] = KLUCBParamState
 
     tolerance: float = 1e-6
@@ -222,14 +222,14 @@ class KLUCBProtocol(BaseProtocol):
         )
 
 
-class KLUCBPlusProtocol(KLUCBProtocol):
+class KLUCBPlusPolicy(KLUCBPolicy):
     """
     KL-UCB+ variant using log(t/N[a]) instead of log(t) in exploration bonus.
 
     This variant can provide better empirical performance. Inspired by MOSS and DMED+.
     """
 
-    name: ClassVar[str] = "KLUCBPlusProtocol"
+    name: ClassVar[str] = "KLUCBPlusPolicy"
     param_state_cls: type[BaseParamState] = KLUCBParamState
 
     def _compute_ucb(self, ps: KLUCBParamState, arm: int, t: int) -> float:

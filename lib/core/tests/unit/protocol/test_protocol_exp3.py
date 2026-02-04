@@ -1,10 +1,10 @@
-"""Unit tests for EXP3Protocol."""
+"""Unit tests for EXP3Policy."""
 
 import numpy as np
 import pytest
 
-from qbrixcore.protoc.adversarial.exp import EXP3Protocol
-from qbrixcore.protoc.adversarial.exp import EXP3ParamState
+from qbrixcore.policy.adversarial.exp import EXP3Policy
+from qbrixcore.policy.adversarial.exp import EXP3ParamState
 from qbrixcore.context import Context
 
 
@@ -64,25 +64,25 @@ class TestEXP3ParamState:
         assert ps1.id != ps2.id
 
 
-class TestEXP3Protocol:
-    def test_protocol_name(self):
-        """test protocol has correct name."""
-        assert EXP3Protocol.name == "EXP3Protocol"
+class TestEXP3Policy:
+    def test_policy_name(self):
+        """test policy has correct name."""
+        assert EXP3Policy.name == "EXP3Policy"
 
-    def test_protocol_param_state_cls(self):
-        """test protocol has correct param state class."""
-        assert EXP3Protocol.param_state_cls == EXP3ParamState
+    def test_policy_param_state_cls(self):
+        """test policy has correct param state class."""
+        assert EXP3Policy.param_state_cls == EXP3ParamState
 
     def test_init_params(self):
         """test init_params creates correct param state."""
-        params = EXP3Protocol.init_params(num_arms=4)
+        params = EXP3Policy.init_params(num_arms=4)
 
         assert isinstance(params, EXP3ParamState)
         assert params.num_arms == 4
 
     def test_init_params_with_custom_gamma(self):
         """test init_params with custom gamma."""
-        params = EXP3Protocol.init_params(num_arms=3, gamma=0.2)
+        params = EXP3Policy.init_params(num_arms=3, gamma=0.2)
 
         assert params.gamma == 0.2
 
@@ -90,7 +90,7 @@ class TestEXP3Protocol:
         """test probability calculation with uniform weights."""
         ps = EXP3ParamState(num_arms=3, gamma=0.3)
 
-        proba = EXP3Protocol._proba(ps)
+        proba = EXP3Policy._proba(ps)
 
         # with uniform weights, all probabilities should be equal
         expected_prob = 1.0 / 3.0
@@ -100,7 +100,7 @@ class TestEXP3Protocol:
         """test probability calculation with non-uniform weights."""
         ps = EXP3ParamState(num_arms=3, gamma=0.1, w=np.array([1.0, 2.0, 3.0]))
 
-        proba = EXP3Protocol._proba(ps)
+        proba = EXP3Policy._proba(ps)
 
         # probabilities should sum to 1
         assert np.isclose(np.sum(proba), 1.0)
@@ -111,7 +111,7 @@ class TestEXP3Protocol:
         """test probabilities always sum to one."""
         ps = EXP3ParamState(num_arms=5, gamma=0.15, w=np.array([0.5, 1.5, 2.0, 0.3, 1.2]))
 
-        proba = EXP3Protocol._proba(ps)
+        proba = EXP3Policy._proba(ps)
 
         assert np.isclose(np.sum(proba), 1.0)
 
@@ -119,7 +119,7 @@ class TestEXP3Protocol:
         """test gamma=0 means no forced exploration."""
         ps = EXP3ParamState(num_arms=3, gamma=0.0, w=np.array([1.0, 2.0, 3.0]))
 
-        proba = EXP3Protocol._proba(ps)
+        proba = EXP3Policy._proba(ps)
 
         # should be purely proportional to weights
         w_sum = 6.0  # noqa
@@ -129,7 +129,7 @@ class TestEXP3Protocol:
         """test gamma=1 means fully uniform exploration."""
         ps = EXP3ParamState(num_arms=3, gamma=1.0, w=np.array([100.0, 1.0, 1.0]))
 
-        proba = EXP3Protocol._proba(ps)
+        proba = EXP3Policy._proba(ps)
 
         # should be uniform regardless of weights
         assert np.allclose(proba, [1.0/3.0, 1.0/3.0, 1.0/3.0])
@@ -139,7 +139,7 @@ class TestEXP3Protocol:
         ps = EXP3ParamState(num_arms=5)
         ctx = Context()
 
-        arm_index = EXP3Protocol.select(ps, ctx)
+        arm_index = EXP3Policy.select(ps, ctx)
 
         assert isinstance(arm_index, int)
         assert 0 <= arm_index < 5
@@ -150,7 +150,7 @@ class TestEXP3Protocol:
         ctx = Context()
 
         # run multiple selections
-        selections = [EXP3Protocol.select(ps, ctx) for _ in range(100)]
+        selections = [EXP3Policy.select(ps, ctx) for _ in range(100)]
 
         # all arms should be selected at least once
         assert len(set(selections)) == 3
@@ -161,10 +161,10 @@ class TestEXP3Protocol:
         ctx = Context()
 
         np.random.seed(42)
-        result1 = EXP3Protocol.select(ps, ctx)
+        result1 = EXP3Policy.select(ps, ctx)
 
         np.random.seed(42)
-        result2 = EXP3Protocol.select(ps, ctx)
+        result2 = EXP3Policy.select(ps, ctx)
 
         assert result1 == result2
 
@@ -178,7 +178,7 @@ class TestEXP3Protocol:
         ctx = Context()
 
         # run many selections
-        selections = [EXP3Protocol.select(ps, ctx) for _ in range(100)]
+        selections = [EXP3Policy.select(ps, ctx) for _ in range(100)]
         arm_2_count = selections.count(2)
 
         # arm 2 should be selected most often
@@ -190,7 +190,7 @@ class TestEXP3Protocol:
         ctx = Context()
         original_w = ps.w.copy()
 
-        updated = EXP3Protocol.train(ps, ctx, choice=1, reward=1.0)
+        updated = EXP3Policy.train(ps, ctx, choice=1, reward=1.0)
 
         # weights should be updated
         assert not np.array_equal(updated.w, original_w)
@@ -202,7 +202,7 @@ class TestEXP3Protocol:
         ps = EXP3ParamState(num_arms=3, gamma=0.1)
         ctx = Context()
 
-        updated = EXP3Protocol.train(ps, ctx, choice=1, reward=0.0)
+        updated = EXP3Policy.train(ps, ctx, choice=1, reward=0.0)
 
         # weights should still be normalized
         assert np.isclose(np.sum(updated.w), 1.0)
@@ -212,7 +212,7 @@ class TestEXP3Protocol:
         ps = EXP3ParamState(num_arms=3, gamma=0.1)
         ctx = Context()
 
-        updated = EXP3Protocol.train(ps, ctx, choice=0, reward=1.0)
+        updated = EXP3Policy.train(ps, ctx, choice=0, reward=1.0)
 
         # after normalization, chosen arm should have higher relative weight
         # compared to other arms (since it got positive reward)
@@ -227,7 +227,7 @@ class TestEXP3Protocol:
         ctx = Context()
         original_w = ps.w.copy()
 
-        updated = EXP3Protocol.train(ps, ctx, choice=1, reward=1.0)
+        updated = EXP3Policy.train(ps, ctx, choice=1, reward=1.0)
 
         # original unchanged
         assert np.array_equal(ps.w, original_w)
@@ -239,9 +239,9 @@ class TestEXP3Protocol:
         ps = EXP3ParamState(num_arms=3, gamma=0.1)
         ctx = Context()
 
-        ps = EXP3Protocol.train(ps, ctx, choice=0, reward=1.0)
-        ps = EXP3Protocol.train(ps, ctx, choice=0, reward=1.0)
-        ps = EXP3Protocol.train(ps, ctx, choice=0, reward=1.0)
+        ps = EXP3Policy.train(ps, ctx, choice=0, reward=1.0)
+        ps = EXP3Policy.train(ps, ctx, choice=0, reward=1.0)
+        ps = EXP3Policy.train(ps, ctx, choice=0, reward=1.0)
 
         # after multiple positive rewards, arm 0 should have higher weight
         assert ps.w[0] > ps.w[1]
@@ -252,7 +252,7 @@ class TestEXP3Protocol:
         ps = EXP3ParamState(num_arms=3, gamma=0.1)
         ctx = Context()
 
-        updated = EXP3Protocol.train(ps, ctx, choice=0, reward=-1.0)
+        updated = EXP3Policy.train(ps, ctx, choice=0, reward=-1.0)
 
         # negative reward should decrease relative weight
         relative_change = updated.w[0] / ps.w[0]
@@ -263,7 +263,7 @@ class TestEXP3Protocol:
         ps = EXP3ParamState(num_arms=3)
         ctx = Context()
 
-        updated = EXP3Protocol.train(ps, ctx, choice=0, reward=np.float64(1.0))
+        updated = EXP3Policy.train(ps, ctx, choice=0, reward=np.float64(1.0))
 
         assert updated is not None
         assert np.isclose(np.sum(updated.w), 1.0)
@@ -273,7 +273,7 @@ class TestEXP3Protocol:
         ps = EXP3ParamState(num_arms=1)
         ctx = Context()
 
-        arm_index = EXP3Protocol.select(ps, ctx)
+        arm_index = EXP3Policy.select(ps, ctx)
 
         assert arm_index == 0
 
@@ -283,17 +283,17 @@ class TestEXP3Protocol:
         ctx = Context()
 
         # select arm
-        arm = EXP3Protocol.select(ps, ctx)
+        arm = EXP3Policy.select(ps, ctx)
         assert 0 <= arm < 3
 
         # train on selection with positive reward
-        updated_ps = EXP3Protocol.train(ps, ctx, choice=arm, reward=1.0)
+        updated_ps = EXP3Policy.train(ps, ctx, choice=arm, reward=1.0)
 
         # weights should be normalized
         assert np.isclose(np.sum(updated_ps.w), 1.0)
 
         # select again with updated params
-        arm2 = EXP3Protocol.select(updated_ps, ctx)
+        arm2 = EXP3Policy.select(updated_ps, ctx)
         assert 0 <= arm2 < 3
 
     def test_train_normalization_prevents_overflow(self):
@@ -303,7 +303,7 @@ class TestEXP3Protocol:
 
         # perform many updates with high rewards
         for _ in range(100):
-            ps = EXP3Protocol.train(ps, ctx, choice=0, reward=10.0)
+            ps = EXP3Policy.train(ps, ctx, choice=0, reward=10.0)
 
         # weights should still be normalized
         assert np.isclose(np.sum(ps.w), 1.0)
@@ -317,8 +317,8 @@ class TestEXP3Protocol:
         ps_low_gamma = EXP3ParamState(num_arms=3, gamma=0.01, w=w.copy())
         ps_high_gamma = EXP3ParamState(num_arms=3, gamma=0.5, w=w.copy())
 
-        proba_low = EXP3Protocol._proba(ps_low_gamma)
-        proba_high = EXP3Protocol._proba(ps_high_gamma)
+        proba_low = EXP3Policy._proba(ps_low_gamma)
+        proba_high = EXP3Policy._proba(ps_high_gamma)
 
         # with higher gamma, probabilities should be more uniform
         # (less difference between max and min probabilities)

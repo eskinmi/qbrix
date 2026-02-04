@@ -6,7 +6,7 @@ import numpy as np
 
 from qbrixcore.param.var import ArrayParam
 from qbrixcore.param.state import BaseParamState
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.context import Context
 
 
@@ -25,9 +25,9 @@ class EpsilonParamState(BaseParamState):
         return self
 
 
-class EpsilonProtocol(BaseProtocol):
+class EpsilonPolicy(BasePolicy):
 
-    name: ClassVar[str] = "EpsilonProtocol"
+    name: ClassVar[str] = "EpsilonPolicy"
     param_state_cls: type[BaseParamState] = EpsilonParamState
 
     @staticmethod

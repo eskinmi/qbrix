@@ -1,10 +1,10 @@
-"""Unit tests for LinUCBProtocol."""
+"""Unit tests for LinUCBPolicy."""
 
 import numpy as np
 import pytest
 
-from qbrixcore.protoc.contextual.ucb import LinUCBProtocol
-from qbrixcore.protoc.contextual.ucb import LinUCBParamState
+from qbrixcore.policy.contextual.ucb import LinUCBPolicy
+from qbrixcore.policy.contextual.ucb import LinUCBParamState
 from qbrixcore.context import Context
 
 
@@ -65,18 +65,18 @@ class TestLinUCBParamState:
             LinUCBParamState(num_arms=3, dim=5, alpha=0.0)
 
 
-class TestLinUCBProtocol:
-    def test_protocol_name(self):
-        """test protocol has correct name."""
-        assert LinUCBProtocol.name == "LinUCBProtocol"
+class TestLinUCBPolicy:
+    def test_policy_name(self):
+        """test policy has correct name."""
+        assert LinUCBPolicy.name == "LinUCBPolicy"
 
-    def test_protocol_param_state_cls(self):
-        """test protocol has correct param state class."""
-        assert LinUCBProtocol.param_state_cls == LinUCBParamState
+    def test_policy_param_state_cls(self):
+        """test policy has correct param state class."""
+        assert LinUCBPolicy.param_state_cls == LinUCBParamState
 
     def test_init_params(self):
         """test init_params creates correct param state."""
-        params = LinUCBProtocol.init_params(num_arms=3, dim=5)
+        params = LinUCBPolicy.init_params(num_arms=3, dim=5)
 
         assert isinstance(params, LinUCBParamState)
         assert params.num_arms == 3
@@ -86,7 +86,7 @@ class TestLinUCBProtocol:
         """test reshaping context vector from list to column vector."""
         ctx = Context(vector=[1.0, 2.0, 3.0])
 
-        reshaped = LinUCBProtocol._reshape_context_vector(ctx)
+        reshaped = LinUCBPolicy._reshape_context_vector(ctx)
 
         assert isinstance(reshaped, np.ndarray)
         assert reshaped.shape == (3, 1)
@@ -96,7 +96,7 @@ class TestLinUCBProtocol:
         """test reshaping 1d numpy array to column vector."""
         ctx = Context(vector=np.array([1.0, 2.0, 3.0]))
 
-        reshaped = LinUCBProtocol._reshape_context_vector(ctx)
+        reshaped = LinUCBPolicy._reshape_context_vector(ctx)
 
         assert reshaped.shape == (3, 1)
 
@@ -104,7 +104,7 @@ class TestLinUCBProtocol:
         """test context vector already in column form is unchanged."""
         ctx = Context(vector=np.array([[1.0], [2.0], [3.0]]))
 
-        reshaped = LinUCBProtocol._reshape_context_vector(ctx)
+        reshaped = LinUCBPolicy._reshape_context_vector(ctx)
 
         assert reshaped.shape == (3, 1)
 
@@ -113,7 +113,7 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=3, dim=4)
         ctx = Context(vector=[1.0, 0.5, -0.3, 0.8])
 
-        arm_index = LinUCBProtocol.select(ps, ctx)
+        arm_index = LinUCBPolicy.select(ps, ctx)
 
         assert isinstance(arm_index, int)
         assert 0 <= arm_index < 3
@@ -125,7 +125,7 @@ class TestLinUCBProtocol:
 
         # all arms should have equal upper bounds initially
         # so selection should be deterministic based on argmax
-        arm_index = LinUCBProtocol.select(ps, ctx)
+        arm_index = LinUCBPolicy.select(ps, ctx)
 
         assert arm_index in [0, 1, 2]
 
@@ -140,7 +140,7 @@ class TestLinUCBProtocol:
 
         ctx = Context(vector=[1.0, 1.0])
 
-        arm_index = LinUCBProtocol.select(ps, ctx)
+        arm_index = LinUCBPolicy.select(ps, ctx)
 
         # arm 0 should be preferred
         assert arm_index == 0
@@ -150,7 +150,7 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 2.0])
 
-        updated = LinUCBProtocol.train(ps, ctx, choice=1, reward=0.5)
+        updated = LinUCBPolicy.train(ps, ctx, choice=1, reward=0.5)
 
         # d[1] should be updated with x*x.T
         expected_update = np.array([[1.0, 2.0], [2.0, 4.0]])
@@ -166,7 +166,7 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 2.0])
 
-        updated = LinUCBProtocol.train(ps, ctx, choice=1, reward=0.5)
+        updated = LinUCBPolicy.train(ps, ctx, choice=1, reward=0.5)
 
         # r[1] should be updated with reward * x
         expected_r = np.array([[0.5], [1.0]])
@@ -183,7 +183,7 @@ class TestLinUCBProtocol:
         original_d = ps.d.copy()
         original_r = ps.r.copy()
 
-        updated = LinUCBProtocol.train(ps, ctx, choice=1, reward=0.5)
+        updated = LinUCBPolicy.train(ps, ctx, choice=1, reward=0.5)
 
         # original unchanged
         assert np.array_equal(ps.d, original_d)
@@ -196,9 +196,9 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 1.0])
 
-        ps = LinUCBProtocol.train(ps, ctx, choice=0, reward=1.0)
-        ps = LinUCBProtocol.train(ps, ctx, choice=0, reward=0.5)
-        ps = LinUCBProtocol.train(ps, ctx, choice=0, reward=0.0)
+        ps = LinUCBPolicy.train(ps, ctx, choice=0, reward=1.0)
+        ps = LinUCBPolicy.train(ps, ctx, choice=0, reward=0.5)
+        ps = LinUCBPolicy.train(ps, ctx, choice=0, reward=0.0)
 
         # design matrix should accumulate
         assert not np.array_equal(ps.d[0], np.identity(2))
@@ -211,7 +211,7 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 2.0])
 
-        updated = LinUCBProtocol.train(ps, ctx, choice=0, reward=0.5)
+        updated = LinUCBPolicy.train(ps, ctx, choice=0, reward=0.5)
 
         assert updated is not None
         assert not np.array_equal(updated.d[0], ps.d[0])
@@ -221,7 +221,7 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=3, dim=2)
         ctx = Context(vector=np.array([1.0, 2.0]))
 
-        updated = LinUCBProtocol.train(ps, ctx, choice=0, reward=0.5)
+        updated = LinUCBPolicy.train(ps, ctx, choice=0, reward=0.5)
 
         assert updated is not None
         assert not np.array_equal(updated.d[0], ps.d[0])
@@ -231,7 +231,7 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 1.0])
 
-        updated = LinUCBProtocol.train(ps, ctx, choice=0, reward=-1.0)
+        updated = LinUCBPolicy.train(ps, ctx, choice=0, reward=-1.0)
 
         assert updated.r[0][0, 0] == -1.0
         assert updated.r[0][1, 0] == -1.0
@@ -241,7 +241,7 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=3, dim=2)
         ctx_vector = np.array([[1.0], [1.0]])
 
-        upper_bound = LinUCBProtocol._arm_upper_bound(ps, 0, ctx_vector)
+        upper_bound = LinUCBPolicy._arm_upper_bound(ps, 0, ctx_vector)
 
         assert isinstance(upper_bound, float)
         assert upper_bound >= 0.0  # with initial state, should be positive
@@ -253,7 +253,7 @@ class TestLinUCBProtocol:
         ps.d[0] = np.zeros((2, 2))
         ctx_vector = np.array([[1.0], [1.0]])
 
-        upper_bound = LinUCBProtocol._arm_upper_bound(ps, 0, ctx_vector)
+        upper_bound = LinUCBPolicy._arm_upper_bound(ps, 0, ctx_vector)
 
         assert upper_bound == float("inf")
 
@@ -262,7 +262,7 @@ class TestLinUCBProtocol:
         ps = LinUCBParamState(num_arms=1, dim=3)
         ctx = Context(vector=[1.0, 0.5, -0.3])
 
-        arm_index = LinUCBProtocol.select(ps, ctx)
+        arm_index = LinUCBPolicy.select(ps, ctx)
 
         assert arm_index == 0
 
@@ -272,12 +272,12 @@ class TestLinUCBProtocol:
         ctx = Context(vector=[1.0, 0.5, -0.3, 0.8])
 
         # select arm
-        arm = LinUCBProtocol.select(ps, ctx)
+        arm = LinUCBPolicy.select(ps, ctx)
         assert 0 <= arm < 3
 
         # train on selection
-        updated_ps = LinUCBProtocol.train(ps, ctx, choice=arm, reward=1.0)
+        updated_ps = LinUCBPolicy.train(ps, ctx, choice=arm, reward=1.0)
 
         # select again with updated params
-        arm2 = LinUCBProtocol.select(updated_ps, ctx)
+        arm2 = LinUCBPolicy.select(updated_ps, ctx)
         assert 0 <= arm2 < 3

@@ -6,12 +6,12 @@ from pydantic import Field, model_validator
 
 from qbrixcore.param.var import ArrayParam
 from qbrixcore.param.state import BaseParamState
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.context import Context
 
 
 class MOSSParamState(BaseParamState):
-    """Parameter state for MOSS (Minimax Optimal Strategy in the Stochastic case) protocol."""
+    """Parameter state for MOSS (Minimax Optimal Strategy in the Stochastic case) policy."""
 
     horizon: int = Field(..., gt=0)
     mu: ArrayParam | None = None
@@ -27,9 +27,9 @@ class MOSSParamState(BaseParamState):
         return self
 
 
-class MOSSProtocol(BaseProtocol):
+class MOSSPolicy(BasePolicy):
     """
-    MOSS (Minimax Optimal Strategy in the Stochastic case) protocol.
+    MOSS (Minimax Optimal Strategy in the Stochastic case) policy.
 
     Based on "Minimax Policies for Adversarial and Stochastic Bandits"
     by Audibert & Bubeck (2009).
@@ -45,7 +45,7 @@ class MOSSProtocol(BaseProtocol):
         - Instance-dependent: R_n <= 23K * sum_i max(log(n*delta_i^2/K), 1) / delta_i
     """
 
-    name: ClassVar[str] = "MOSSProtocol"
+    name: ClassVar[str] = "MOSSPolicy"
     param_state_cls: type[BaseParamState] = MOSSParamState
 
     @staticmethod
@@ -72,7 +72,7 @@ class MOSSProtocol(BaseProtocol):
         Selects the arm with the highest MOSS index:
             argmax_i [mu_i + sqrt(max(log(n/(K*T_i)), 0) / T_i)]
         """
-        moss_indices = [MOSSProtocol._moss_index(ps, i) for i in range(ps.num_arms)]
+        moss_indices = [MOSSPolicy._moss_index(ps, i) for i in range(ps.num_arms)]
         return int(np.argmax(moss_indices))
 
     @classmethod
@@ -104,7 +104,7 @@ class MOSSProtocol(BaseProtocol):
 
 
 class MOSSAnyTimeParamState(BaseParamState):
-    """Parameter state for Anytime MOSS protocol (no horizon required)."""
+    """Parameter state for Anytime MOSS policy (no horizon required)."""
 
     mu: ArrayParam | None = None
     T: ArrayParam | None = None
@@ -119,9 +119,9 @@ class MOSSAnyTimeParamState(BaseParamState):
         return self
 
 
-class MOSSAnyTimeProtocol(BaseProtocol):
+class MOSSAnyTimePolicy(BasePolicy):
     """
-    Anytime MOSS protocol that doesn't require horizon knowledge.
+    Anytime MOSS policy that doesn't require horizon knowledge.
 
     Uses current round number as a proxy for the horizon in the MOSS index:
         mu_i + sqrt(max(log(t/(K*T_i)), 0) / T_i)
@@ -130,7 +130,7 @@ class MOSSAnyTimeProtocol(BaseProtocol):
     in advance, at the cost of slightly worse constants in the regret bound.
     """
 
-    name: ClassVar[str] = "MOSSAnyTimeProtocol"
+    name: ClassVar[str] = "MOSSAnyTimePolicy"
     param_state_cls: type[BaseParamState] = MOSSAnyTimeParamState
 
     @staticmethod
@@ -157,7 +157,7 @@ class MOSSAnyTimeProtocol(BaseProtocol):
     def select(ps: MOSSAnyTimeParamState, context: Context) -> int:
         """Arm selection using anytime MOSS index."""
         moss_indices = [
-            MOSSAnyTimeProtocol._moss_anytime_index(ps, i) for i in range(ps.num_arms)
+            MOSSAnyTimePolicy._moss_anytime_index(ps, i) for i in range(ps.num_arms)
         ]
         return int(np.argmax(moss_indices))
 

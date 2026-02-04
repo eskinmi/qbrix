@@ -2,23 +2,23 @@ from collections import defaultdict
 import numpy as np
 
 from qbrixcore.context import Context
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixstore.redis.client import RedisClient
 from qbrixstore.redis.streams import FeedbackEvent
 
 
-def _build_protocol_map() -> dict[str, type[BaseProtocol]]:
+def _build_policy_map() -> dict[str, type[BasePolicy]]:
     registry = {}
     def collect(cls):
         for subclass in cls.__subclasses__():
             if hasattr(subclass, "name") and subclass.name:
                 registry[subclass.name] = subclass
             collect(subclass)
-    collect(BaseProtocol)
+    collect(BasePolicy)
     return registry
 
 
-PROTOCOL_MAP = _build_protocol_map()
+PROTOCOL_MAP = _build_policy_map()
 
 
 class BatchTrainer:
@@ -42,9 +42,9 @@ class BatchTrainer:
         if experiment_record is None:
             return 0
 
-        protocol_name = experiment_record["protocol"]
-        protocol_cls = PROTOCOL_MAP.get(protocol_name)
-        if protocol_cls is None:
+        policy_name = experiment_record["policy"]
+        policy_cls = PROTOCOL_MAP.get(policy_name)
+        if policy_cls is None:
             return 0
 
         # attention: in a distributed setup, where cortex node has multiple replicas, this below
@@ -73,11 +73,11 @@ class BatchTrainer:
         params = await self._redis.get_params(tenant_id, experiment_id)
         if params is None:
             num_arms = len(experiment_record["pool"]["arms"])
-            param_state = protocol_cls.init_params(
-                num_arms=num_arms, **experiment_record.get("protocol_params", {})
+            param_state = policy_cls.init_params(
+                num_arms=num_arms, **experiment_record.get("policy_params", {})
             )
         else:
-            param_state = protocol_cls.param_state_cls.model_validate(
+            param_state = policy_cls.param_state_cls.model_validate(
                 params
             )
 
@@ -88,7 +88,7 @@ class BatchTrainer:
                 metadata=event.context_metadata,
             )
             # train and retrieve the updated parameter state.
-            param_state = protocol_cls.train(
+            param_state = policy_cls.train(
                 ps=param_state,
                 context=context,
                 choice=event.arm_index,

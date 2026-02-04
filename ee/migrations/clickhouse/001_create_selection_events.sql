@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS selection_events (
     context_vector Array(Float64),
     context_metadata String,
     timestamp_ms Int64,
-    protocol String,
+    policy String,
     event_date Date DEFAULT toDate(fromUnixTimestamp64Milli(timestamp_ms))
 )
 ENGINE = MergeTree()

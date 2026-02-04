@@ -3,32 +3,32 @@ from unittest.mock import AsyncMock
 
 from cortexsvc.trainer import BatchTrainer
 from cortexsvc.trainer import PROTOCOL_MAP
-from cortexsvc.trainer import _build_protocol_map
+from cortexsvc.trainer import _build_policy_map
 from qbrixstore.redis.streams import FeedbackEvent
 
 
-class TestProtocolMapBuilding:
-    """test protocol registry construction."""
+class TestPolicyMapBuilding:
+    """test policy registry construction."""
 
-    def test_build_protocol_map_returns_dict(self):
+    def test_build_policy_map_returns_dict(self):
         # arrange & act
-        protocol_map = _build_protocol_map()
+        policy_map = _build_policy_map()
 
         # assert
-        assert isinstance(protocol_map, dict)
-        assert len(protocol_map) > 0
+        assert isinstance(policy_map, dict)
+        assert len(policy_map) > 0
 
-    def test_protocol_map_contains_beta_ts(self):
+    def test_policy_map_contains_beta_ts(self):
         # arrange & act
         # assert
-        assert "BetaTSProtocol" in PROTOCOL_MAP
-        assert PROTOCOL_MAP["BetaTSProtocol"].name == "BetaTSProtocol"
+        assert "BetaTSPolicy" in PROTOCOL_MAP
+        assert PROTOCOL_MAP["BetaTSPolicy"].name == "BetaTSPolicy"
 
-    def test_protocol_map_contains_ucb1_tuned(self):
+    def test_policy_map_contains_ucb1_tuned(self):
         # arrange & act
         # assert
-        assert "UCB1TunedProtocol" in PROTOCOL_MAP
-        assert PROTOCOL_MAP["UCB1TunedProtocol"].name == "UCB1TunedProtocol"
+        assert "UCB1TunedPolicy" in PROTOCOL_MAP
+        assert PROTOCOL_MAP["UCB1TunedPolicy"].name == "UCB1TunedPolicy"
 
 
 class TestBatchTrainerInit:
@@ -186,14 +186,14 @@ class TestBatchTrainerTrainExperiment:
         mock_redis_client.set_params.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_train_experiment_with_unknown_protocol_returns_zero(
+    async def test_train_experiment_with_unknown_policy_returns_zero(
         self, tenant_id, mock_redis_client, sample_feedback_event
     ):
         # arrange
         trainer = BatchTrainer(mock_redis_client)
         mock_redis_client.get_experiment.return_value = {
             "id": "exp-001",
-            "protocol": "unknown_protocol",
+            "policy": "unknown_policy",
             "pool": {"arms": [{"id": "arm-0", "index": 0}]}
         }
 
@@ -330,15 +330,15 @@ class TestBatchTrainerTrainExperiment:
         mock_redis_client.set_params.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_train_experiment_with_protocol_params(
+    async def test_train_experiment_with_policy_params(
         self, tenant_id, mock_redis_client, sample_feedback_event
     ):
         # arrange
         trainer = BatchTrainer(mock_redis_client)
         experiment_record = {
             "id": "exp-001",
-            "protocol": "BetaTSProtocol",
-            "protocol_params": {"alpha_prior": 2.0, "beta_prior": 2.0},
+            "policy": "BetaTSPolicy",
+            "policy_params": {"alpha_prior": 2.0, "beta_prior": 2.0},
             "pool": {
                 "arms": [
                     {"id": "arm-0", "index": 0},
@@ -355,7 +355,7 @@ class TestBatchTrainerTrainExperiment:
         # assert
         assert count == 1
 
-        # verify protocol params were passed to init_params
+        # verify policy params were passed to init_params
         set_params_call = mock_redis_client.set_params.call_args
         params = set_params_call[0][2]  # tenant_id, experiment_id, params
         # with alpha_prior=2.0, beta_prior=2.0, and reward=1.0 on arm 0

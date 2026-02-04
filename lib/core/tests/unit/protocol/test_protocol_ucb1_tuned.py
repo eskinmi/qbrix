@@ -1,10 +1,10 @@
-"""Unit tests for UCB1TunedProtocol."""
+"""Unit tests for UCB1TunedPolicy."""
 
 import numpy as np
 import pytest
 
-from qbrixcore.protoc.stochastic.ucb import UCB1TunedProtocol
-from qbrixcore.protoc.stochastic.ucb import UCB1TunedParamState
+from qbrixcore.policy.stochastic.ucb import UCB1TunedPolicy
+from qbrixcore.policy.stochastic.ucb import UCB1TunedParamState
 from qbrixcore.context import Context
 
 
@@ -58,18 +58,18 @@ class TestUCB1TunedParamState:
             UCB1TunedParamState(num_arms=3, round=-1)
 
 
-class TestUCB1TunedProtocol:
-    def test_protocol_name(self):
-        """test protocol has correct name."""
-        assert UCB1TunedProtocol.name == "UCB1TunedProtocol"
+class TestUCB1TunedPolicy:
+    def test_policy_name(self):
+        """test policy has correct name."""
+        assert UCB1TunedPolicy.name == "UCB1TunedPolicy"
 
-    def test_protocol_param_state_cls(self):
-        """test protocol has correct param state class."""
-        assert UCB1TunedProtocol.param_state_cls == UCB1TunedParamState
+    def test_policy_param_state_cls(self):
+        """test policy has correct param state class."""
+        assert UCB1TunedPolicy.param_state_cls == UCB1TunedParamState
 
     def test_init_params(self):
         """test init_params creates correct param state."""
-        params = UCB1TunedProtocol.init_params(num_arms=4)
+        params = UCB1TunedPolicy.init_params(num_arms=4)
 
         assert isinstance(params, UCB1TunedParamState)
         assert params.num_arms == 4
@@ -79,7 +79,7 @@ class TestUCB1TunedProtocol:
         ps = UCB1TunedParamState(num_arms=5)
         ctx = Context()
 
-        arm_index = UCB1TunedProtocol.select(ps, ctx)
+        arm_index = UCB1TunedPolicy.select(ps, ctx)
 
         assert isinstance(arm_index, int)
         assert 0 <= arm_index < 5
@@ -94,7 +94,7 @@ class TestUCB1TunedProtocol:
         )
         ctx = Context()
 
-        arm_index = UCB1TunedProtocol.select(ps, ctx)
+        arm_index = UCB1TunedPolicy.select(ps, ctx)
 
         # should select an unplayed arm (1 or 2) because they have inf upper bound
         assert arm_index in [1, 2]
@@ -111,7 +111,7 @@ class TestUCB1TunedProtocol:
         ctx = Context()
 
         # with enough data, arm 0 should be selected
-        arm_index = UCB1TunedProtocol.select(ps, ctx)
+        arm_index = UCB1TunedPolicy.select(ps, ctx)
 
         assert arm_index == 0
 
@@ -120,7 +120,7 @@ class TestUCB1TunedProtocol:
         ps = UCB1TunedParamState(num_arms=3)
         ctx = Context()
 
-        updated = UCB1TunedProtocol.train(ps, ctx, choice=1, reward=0.8)
+        updated = UCB1TunedPolicy.train(ps, ctx, choice=1, reward=0.8)
 
         assert updated.T[1] == 1
         assert updated.mu[1] == pytest.approx(0.8)
@@ -136,15 +136,15 @@ class TestUCB1TunedProtocol:
         ctx = Context()
 
         # first update
-        ps = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=1.0)
+        ps = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=1.0)
         assert ps.mu[0] == pytest.approx(1.0)
 
         # second update
-        ps = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=0.5)
+        ps = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=0.5)
         assert ps.mu[0] == pytest.approx(0.75)  # (1.0 + 0.5) / 2
 
         # third update
-        ps = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=0.0)
+        ps = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=0.0)
         assert ps.mu[0] == pytest.approx(0.5)  # (1.0 + 0.5 + 0.0) / 3
 
     def test_train_increments_round(self):
@@ -152,7 +152,7 @@ class TestUCB1TunedProtocol:
         ps = UCB1TunedParamState(num_arms=3, round=5)
         ctx = Context()
 
-        updated = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=0.5)
+        updated = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=0.5)
 
         assert updated.round == 6
 
@@ -165,7 +165,7 @@ class TestUCB1TunedProtocol:
         original_rsq = ps.rsq.copy()
         original_round = ps.round
 
-        updated = UCB1TunedProtocol.train(ps, ctx, choice=1, reward=0.8)
+        updated = UCB1TunedPolicy.train(ps, ctx, choice=1, reward=0.8)
 
         # original unchanged
         assert np.array_equal(ps.mu, original_mu)
@@ -180,9 +180,9 @@ class TestUCB1TunedProtocol:
         ps = UCB1TunedParamState(num_arms=3)
         ctx = Context()
 
-        ps = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=1.0)
-        ps = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=0.5)
-        ps = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=0.0)
+        ps = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=1.0)
+        ps = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=0.5)
+        ps = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=0.0)
 
         assert ps.T[0] == 3
         assert ps.mu[0] == pytest.approx(0.5)
@@ -193,7 +193,7 @@ class TestUCB1TunedProtocol:
         ps = UCB1TunedParamState(num_arms=3)
         ctx = Context()
 
-        updated = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=-0.5)
+        updated = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=-0.5)
 
         assert updated.mu[0] == -0.5
         assert updated.rsq[0] == 0.25  # (-0.5)^2
@@ -203,7 +203,7 @@ class TestUCB1TunedProtocol:
         ps = UCB1TunedParamState(num_arms=3)
         ctx = Context()
 
-        updated = UCB1TunedProtocol.train(ps, ctx, choice=0, reward=100.0)
+        updated = UCB1TunedPolicy.train(ps, ctx, choice=0, reward=100.0)
 
         assert updated.mu[0] == 100.0
         assert updated.rsq[0] == 10000.0
@@ -212,7 +212,7 @@ class TestUCB1TunedProtocol:
         """test upper bound is infinity for unplayed arms."""
         ps = UCB1TunedParamState(num_arms=3, round=10)
 
-        upper_bound = UCB1TunedProtocol._upper_bound(ps, 0)
+        upper_bound = UCB1TunedPolicy._upper_bound(ps, 0)
 
         assert upper_bound == float("inf")
 
@@ -226,7 +226,7 @@ class TestUCB1TunedProtocol:
             round=10
         )
 
-        upper_bound = UCB1TunedProtocol._upper_bound(ps, 0)
+        upper_bound = UCB1TunedPolicy._upper_bound(ps, 0)
 
         assert isinstance(upper_bound, float)
         assert upper_bound > ps.mu[0]  # should be higher than mean
@@ -235,7 +235,7 @@ class TestUCB1TunedProtocol:
         """test arm variance upper bound is infinity for unplayed arms."""
         ps = UCB1TunedParamState(num_arms=3)
 
-        var_bound = UCB1TunedProtocol._arm_var_upper_bound(ps, 0)
+        var_bound = UCB1TunedPolicy._arm_var_upper_bound(ps, 0)
 
         assert var_bound == float("inf")
 
@@ -244,6 +244,6 @@ class TestUCB1TunedProtocol:
         ps = UCB1TunedParamState(num_arms=1)
         ctx = Context()
 
-        arm_index = UCB1TunedProtocol.select(ps, ctx)
+        arm_index = UCB1TunedPolicy.select(ps, ctx)
 
         assert arm_index == 0

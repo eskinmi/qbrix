@@ -27,8 +27,8 @@ message Experiment {
   string id = 1;
   string name = 2;
   string pool_id = 3;
-  string protocol = 4;  // e.g., "thompson_sampling", "ucb", "epsilon_greedy"
-  map<string, string> protocol_params = 5;
+  string policy = 4;  // e.g., "thompson_sampling", "ucb", "epsilon_greedy"
+  map<string, string> policy_params = 5;
   bool enabled = 6;
 }
 

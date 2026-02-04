@@ -5,12 +5,12 @@ from pydantic import Field, model_validator
 
 from qbrixcore.param.var import ArrayParam
 from qbrixcore.param.state import BaseParamState
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.context import Context
 
 
 class BetaTSParamState(BaseParamState):
-    """Parameter state for Beta-Bernoulli Thompson Sampling protocol."""
+    """Parameter state for Beta-Bernoulli Thompson Sampling policy."""
 
     alpha_prior: float = Field(default=1.0, gt=0.0)
     beta_prior: float = Field(default=1.0, gt=0.0)
@@ -29,16 +29,16 @@ class BetaTSParamState(BaseParamState):
         return self
 
 
-class BetaTSProtocol(BaseProtocol):
+class BetaTSPolicy(BasePolicy):
     """
-    Beta-Bernoulli Thompson Sampling protocol for binary rewards.
+    Beta-Bernoulli Thompson Sampling policy for binary rewards.
 
     Uses Beta distributions as conjugate priors for Bernoulli likelihoods.
     Best suited for binary rewards (0/1) or rewards that can be interpreted
     as success rates.
     """
 
-    name: ClassVar[str] = "BetaTSProtocol"
+    name: ClassVar[str] = "BetaTSPolicy"
     param_state_cls: type[BaseParamState] = BetaTSParamState
 
     @staticmethod
@@ -86,7 +86,7 @@ class BetaTSProtocol(BaseProtocol):
 
 
 class GaussianTSParamState(BaseParamState):
-    """Parameter state for Gaussian Thompson Sampling protocol."""
+    """Parameter state for Gaussian Thompson Sampling policy."""
 
     prior_mean: float = Field(default=0.0)
     prior_precision: float = Field(default=1.0, gt=0.0)
@@ -110,15 +110,15 @@ class GaussianTSParamState(BaseParamState):
         return self
 
 
-class GaussianTSProtocol(BaseProtocol):
+class GaussianTSPolicy(BasePolicy):
     """
-    Gaussian Thompson Sampling protocol for continuous rewards.
+    Gaussian Thompson Sampling policy for continuous rewards.
 
     Uses Gaussian distributions with conjugate Gaussian priors.
     Assumes rewards are normally distributed and updates both mean and precision.
     """
 
-    name: ClassVar[str] = "GaussianTSProtocol"
+    name: ClassVar[str] = "GaussianTSPolicy"
     param_state_cls: type[BaseParamState] = GaussianTSParamState
 
     @staticmethod

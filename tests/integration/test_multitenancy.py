@@ -135,8 +135,8 @@ class TestExperimentTenantIsolation:
         experiment = await exp_repo.create(
             name="test-exp",
             pool_id=pool.id,
-            protocol="beta_ts",
-            protocol_params={},
+            policy="beta_ts",
+            policy_params={},
             enabled=True,
         )
 
@@ -158,15 +158,15 @@ class TestExperimentTenantIsolation:
         exp_a = await exp_repo_a.create(
             name="shared-name",
             pool_id=pool_a.id,
-            protocol="beta_ts",
-            protocol_params={},
+            policy="beta_ts",
+            policy_params={},
             enabled=True,
         )
         exp_b = await exp_repo_b.create(
             name="shared-name",
             pool_id=pool_b.id,
-            protocol="beta_ts",
-            protocol_params={},
+            policy="beta_ts",
+            policy_params={},
             enabled=True,
         )
 
@@ -188,13 +188,13 @@ class TestExperimentTenantIsolation:
         exp_repo_b = ExperimentRepository(db_session, tenant_b.id)
 
         await exp_repo_a.create(
-            name="exp-a1", pool_id=pool_a.id, protocol="beta_ts", protocol_params={}, enabled=True
+            name="exp-a1", pool_id=pool_a.id, policy="beta_ts", policy_params={}, enabled=True
         )
         await exp_repo_a.create(
-            name="exp-a2", pool_id=pool_a.id, protocol="beta_ts", protocol_params={}, enabled=True
+            name="exp-a2", pool_id=pool_a.id, policy="beta_ts", policy_params={}, enabled=True
         )
         await exp_repo_b.create(
-            name="exp-b1", pool_id=pool_b.id, protocol="beta_ts", protocol_params={}, enabled=True
+            name="exp-b1", pool_id=pool_b.id, policy="beta_ts", policy_params={}, enabled=True
         )
 
         exps_a = await exp_repo_a.list()
@@ -217,7 +217,7 @@ class TestExperimentTenantIsolation:
         exp_repo_b = ExperimentRepository(db_session, tenant_b.id)
 
         exp_a = await exp_repo_a.create(
-            name="exp-a", pool_id=pool_a.id, protocol="beta_ts", protocol_params={}, enabled=True
+            name="exp-a", pool_id=pool_a.id, policy="beta_ts", policy_params={}, enabled=True
         )
 
         # tenant_b should not be able to access tenant_a's experiment

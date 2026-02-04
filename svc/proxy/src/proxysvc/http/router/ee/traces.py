@@ -51,7 +51,7 @@ class SelectionTraceResponse(BaseModel):
     is_default: bool
     context_id: str
     timestamp_ms: int
-    protocol: str
+    policy: str
 
 
 class FeedbackTraceResponse(BaseModel):
@@ -109,7 +109,7 @@ async def list_traces(
                 is_default=r["is_default"],
                 context_id=r["context_id"],
                 timestamp_ms=r["timestamp_ms"],
-                protocol=r["protocol"],
+                policy=r["policy"],
             )
             for r in results
         ]
@@ -164,7 +164,7 @@ async def get_trace(
                 is_default=r["is_default"],
                 context_id=r["context_id"],
                 timestamp_ms=r["timestamp_ms"],
-                protocol=r["protocol"],
+                policy=r["policy"],
             )
 
         feedback = None

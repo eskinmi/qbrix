@@ -86,7 +86,7 @@ tests for `RedisBackedInMemoryParamBackend` which integrates redis with in-memor
 - set caches params
 - update_params fetches from redis and caches
 - update_params returns none when redis is empty
-- protocol-specific param state classes
+- policy-specific param state classes
 - param dict validation
 
 ### agent factory tests (test_agent_factory.py)
@@ -94,13 +94,13 @@ tests for `RedisBackedInMemoryParamBackend` which integrates redis with in-memor
 tests for `AgentFactory` which creates and caches agents for experiments.
 
 **key tests:**
-- protocol map contains all protocols
+- policy map contains all policys
 - build pool from experiment data
 - get or create agent (cached vs new)
 - agent caching
 - param initialization
-- protocol params from experiment
-- unknown protocol handling
+- policy params from experiment
+- unknown policy handling
 - param fetching from backend
 
 ### service tests (test_service.py)
@@ -143,7 +143,7 @@ tests for `MotorGRPCServicer` which handles grpc requests.
 
 ### what is NOT mocked
 
-- **protocol logic**: use real qbrixcore protocols (BetaTSProtocol, etc.)
+- **policy logic**: use real qbrixcore policys (BetaTSPolicy, etc.)
 - **cache implementation**: use real MotorCache with cachebox
 - **data structures**: use real Pool, Arm, Context objects
 - **param state**: use real pydantic param state models
@@ -168,7 +168,7 @@ tests for `MotorGRPCServicer` which handles grpc requests.
 - `gaussian_ts_params`: initialized gaussian ts params
 
 ### agents
-- `mock_agent`: mocked agent with beta ts protocol
+- `mock_agent`: mocked agent with beta ts policy
 
 ## edge cases tested
 
@@ -176,7 +176,7 @@ tests for `MotorGRPCServicer` which handles grpc requests.
 - empty metadata
 - missing experiment in redis
 - missing params in redis and cache
-- unknown protocol
+- unknown policy
 - redis connection failure
 - agent cache expiration
 - param cache expiration

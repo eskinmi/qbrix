@@ -2,26 +2,26 @@ import pytest
 from unittest.mock import Mock
 from unittest.mock import AsyncMock
 
-from qbrixcore.protoc.stochastic.ts import BetaTSProtocol
-from qbrixcore.protoc.stochastic.ts import GaussianTSProtocol
-from qbrixcore.protoc.stochastic.ucb import UCB1TunedProtocol
+from qbrixcore.policy.stochastic.ts import BetaTSPolicy
+from qbrixcore.policy.stochastic.ts import GaussianTSPolicy
+from qbrixcore.policy.stochastic.ucb import UCB1TunedPolicy
 
 from motorsvc.agent_factory import AgentFactory
 from motorsvc.agent_factory import PROTOCOL_MAP
 
 
-class TestProtocolMap:
-    def test_protocol_map_contains_beta_ts(self):
-        assert "BetaTSProtocol" in PROTOCOL_MAP
-        assert PROTOCOL_MAP["BetaTSProtocol"] == BetaTSProtocol
+class TestPolicyMap:
+    def test_policy_map_contains_beta_ts(self):
+        assert "BetaTSPolicy" in PROTOCOL_MAP
+        assert PROTOCOL_MAP["BetaTSPolicy"] == BetaTSPolicy
 
-    def test_protocol_map_contains_gaussian_ts(self):
-        assert "GaussianTSProtocol" in PROTOCOL_MAP
-        assert PROTOCOL_MAP["GaussianTSProtocol"] == GaussianTSProtocol
+    def test_policy_map_contains_gaussian_ts(self):
+        assert "GaussianTSPolicy" in PROTOCOL_MAP
+        assert PROTOCOL_MAP["GaussianTSPolicy"] == GaussianTSPolicy
 
-    def test_protocol_map_contains_ucb1_tuned(self):
-        assert "UCB1TunedProtocol" in PROTOCOL_MAP
-        assert PROTOCOL_MAP["UCB1TunedProtocol"] == UCB1TunedProtocol
+    def test_policy_map_contains_ucb1_tuned(self):
+        assert "UCB1TunedPolicy" in PROTOCOL_MAP
+        assert PROTOCOL_MAP["UCB1TunedPolicy"] == UCB1TunedPolicy
 
 
 class TestAgentFactoryBuildPool:
@@ -114,7 +114,7 @@ class TestAgentFactoryGetOrCreate:
         assert agent is not None
         assert agent.experiment_id == "exp-123"
         assert len(agent.pool.arms) == 3
-        assert agent.protocol == BetaTSProtocol
+        assert agent.policy == BetaTSPolicy
 
     @pytest.mark.asyncio
     async def test_get_or_create_caches_newly_created_agent(
@@ -155,7 +155,7 @@ class TestAgentFactoryGetOrCreate:
         assert params.num_arms == 3
 
     @pytest.mark.asyncio
-    async def test_get_or_create_uses_protocol_params_from_experiment(
+    async def test_get_or_create_uses_policy_params_from_experiment(
         self, tenant_id, motor_cache, mock_redis_client, experiment_data_dict
     ):
         backend = Mock()
@@ -165,10 +165,10 @@ class TestAgentFactoryGetOrCreate:
         backend.scoped = Mock(return_value=Mock())
         factory = AgentFactory(motor_cache, backend)
 
-        # custom protocol params
+        # custom policy params
         init_alpha_prior = 2.0
         init_beta_prior = 3.0
-        experiment_data_dict["protocol_params"] = {"alpha_prior": init_alpha_prior, "beta_prior": init_beta_prior}
+        experiment_data_dict["policy_params"] = {"alpha_prior": init_alpha_prior, "beta_prior": init_beta_prior}
 
         agent = await factory.get_or_create(tenant_id, experiment_data_dict)
 
@@ -178,16 +178,16 @@ class TestAgentFactoryGetOrCreate:
         }
 
     @pytest.mark.asyncio
-    async def test_get_or_create_raises_error_for_unknown_protocol(
+    async def test_get_or_create_raises_error_for_unknown_policy(
         self, tenant_id, motor_cache, mock_redis_client, experiment_data_dict
     ):
         backend = Mock()
         backend.get.return_value = None
         factory = AgentFactory(motor_cache, backend)
 
-        experiment_data_dict["protocol"] = "ProtocolThatMustNotExist"
+        experiment_data_dict["policy"] = "PolicyThatMustNotExist"
 
-        with pytest.raises(ValueError, match="Unknown protocol"):
+        with pytest.raises(ValueError, match="Unknown policy"):
             await factory.get_or_create(tenant_id, experiment_data_dict)
 
     @pytest.mark.asyncio
@@ -215,7 +215,7 @@ class TestAgentFactoryGetOrCreate:
         backend = Mock()
         backend.get.return_value = None  # params not in cache
 
-        async def mock_update_params(tid, exp_id, protocol):  # noqa
+        async def mock_update_params(tid, exp_id, policy):  # noqa
             return beta_ts_params
 
         backend.update_params = mock_update_params
@@ -236,7 +236,7 @@ class TestAgentFactoryGetOrCreate:
         backend = Mock()
         backend.get.return_value = None
 
-        async def mock_update_params(tid, exp_id, protocol):  # noqa
+        async def mock_update_params(tid, exp_id, policy):  # noqa
             return None  # no params in redis
 
         backend.update_params = mock_update_params

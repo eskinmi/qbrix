@@ -1,6 +1,6 @@
 ---
 name: unit-test-writer
-description: "Use this agent when you need to create unit tests for functions, classes, or modules in the qbrix system. This includes testing core libraries in lib/ (qbrixcore, qbrixstore, qbrixproto, qbrixlog) and services in svc/ (proxysvc, motorsvc, cortexsvc). Trigger this agent after implementing new functionality, when adding test coverage to existing code, or when refactoring requires test updates.\\n\\nExamples:\\n\\n<example>\\nContext: User has just implemented a new bandit protocol in qbrixcore.\\nuser: \"I just added a new EXP4 protocol to qbrixcore/protoc/adversarial/exp4.py\"\\nassistant: \"I'll use the unit-test-writer agent to create comprehensive tests for your new EXP4 protocol.\"\\n<commentary>\\nSince the user implemented a new protocol, use the unit-test-writer agent to create tests covering select(), train(), and init_params() methods.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User wants to add tests for an existing service handler.\\nuser: \"Can you write tests for the selection handler in motorsvc?\"\\nassistant: \"I'll use the unit-test-writer agent to create unit tests for the motorsvc selection handler.\"\\n<commentary>\\nThe user explicitly requested tests for a service component. Use the unit-test-writer agent to create tests with mocked Redis dependencies.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User just finished implementing a new feature in proxysvc.\\nuser: \"I added JWT token refresh functionality to proxysvc auth module\"\\nassistant: \"Let me use the unit-test-writer agent to create tests for the JWT token refresh functionality.\"\\n<commentary>\\nNew functionality was added to a service. Proactively use the unit-test-writer agent to ensure proper test coverage for the auth module.\\n</commentary>\\n</example>"
+description: "Use this agent when you need to create unit tests for functions, classes, or modules in the qbrix system. This includes testing core libraries in lib/ (qbrixcore, qbrixstore, qbrixproto, qbrixlog) and services in svc/ (proxysvc, motorsvc, cortexsvc). Trigger this agent after implementing new functionality, when adding test coverage to existing code, or when refactoring requires test updates.\\n\\nExamples:\\n\\n<example>\\nContext: User has just implemented a new bandit policy in qbrixcore.\\nuser: \"I just added a new EXP4 policy to qbrixcore/policy/adversarial/exp4.py\"\\nassistant: \"I'll use the unit-test-writer agent to create comprehensive tests for your new EXP4 policy.\"\\n<commentary>\\nSince the user implemented a new policy, use the unit-test-writer agent to create tests covering select(), train(), and init_params() methods.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User wants to add tests for an existing service handler.\\nuser: \"Can you write tests for the selection handler in motorsvc?\"\\nassistant: \"I'll use the unit-test-writer agent to create unit tests for the motorsvc selection handler.\"\\n<commentary>\\nThe user explicitly requested tests for a service component. Use the unit-test-writer agent to create tests with mocked Redis dependencies.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: User just finished implementing a new feature in proxysvc.\\nuser: \"I added JWT token refresh functionality to proxysvc auth module\"\\nassistant: \"Let me use the unit-test-writer agent to create tests for the JWT token refresh functionality.\"\\n<commentary>\\nNew functionality was added to a service. Proactively use the unit-test-writer agent to ensure proper test coverage for the auth module.\\n</commentary>\\n</example>"
 model: sonnet
 color: red
 ---
@@ -24,10 +24,10 @@ You write unit tests for the qbrix distributed multi-armed bandit system. The co
 
 ### File Organization
 - Place tests in a `tests/` directory mirroring the source structure
-- Create sub directories to separate different collection of tests, if relevant (e.g. protocol tests in core lib is under `tests/unit/protocol`)
+- Create sub directories to separate different collection of tests, if relevant (e.g. policy tests in core lib is under `tests/unit/policy`)
 - Use `conftest.py` for shared fixtures at appropriate levels (package, module)
 - Create reusable mock factories for common dependencies (Redis, Postgres, gRPC clients)
-- Group related tests in classes: `class TestProtocolSelect:`, `class TestAgentTraining:`
+- Group related tests in classes: `class TestPolicySelect:`, `class TestAgentTraining:`
 
 ### Naming Conventions
 - Test files: `test_<module>.py`
@@ -39,7 +39,7 @@ You write unit tests for the qbrix distributed multi-armed bandit system. The co
 def test_function_scenario_expected():
     # arrange - set up test data and mocks
     mock_redis = Mock()
-    agent = Agent(protocol=BetaTSProtocol(), backend=mock_redis)
+    agent = Agent(policy=BetaTSPolicy(), backend=mock_redis)
     
     # act - execute the function under test
     result = agent.select(pool)
@@ -97,13 +97,13 @@ def mock_motor_client():
 
 ### Parametrize for Multiple Scenarios
 ```python
-@pytest.mark.parametrize("protocol,expected_type", [
-    (BetaTSProtocol(), BetaTSParams),
-    (GaussianTSProtocol(), GaussianTSParams),
-    (UCB1TunedProtocol(), UCB1Params),
+@pytest.mark.parametrize("policy,expected_type", [
+    (BetaTSPolicy(), BetaTSParams),
+    (GaussianTSPolicy(), GaussianTSParams),
+    (UCB1TunedPolicy(), UCB1Params),
 ])
-def test_init_params_returns_correct_type(protocol, expected_type):
-    params = protocol.init_params(n_arms=3)
+def test_init_params_returns_correct_type(policy, expected_type):
+    params = policy.init_params(n_arms=3)
     assert isinstance(params, expected_type)
 ```
 
@@ -160,22 +160,22 @@ async def redis_client():
 
 ## Qbrix-Specific Patterns
 
-### Testing Protocols
+### Testing Policys
 ```python
-class TestBetaTSProtocol:
+class TestBetaTSPolicy:
     def test_select_returns_valid_arm_index(self, pool_with_arms):
-        protocol = BetaTSProtocol()
-        params = protocol.init_params(n_arms=3)
+        policy = BetaTSPolicy()
+        params = policy.init_params(n_arms=3)
         
-        arm_index = protocol.select(pool_with_arms, params)
+        arm_index = policy.select(pool_with_arms, params)
         
         assert 0 <= arm_index < 3
     
     def test_train_updates_selected_arm_params(self):
-        protocol = BetaTSProtocol()
+        policy = BetaTSPolicy()
         params = BetaTSParams(alpha=[1.0, 1.0], beta=[1.0, 1.0])
         
-        updated = protocol.train(params, arm_index=0, reward=1.0)
+        updated = policy.train(params, arm_index=0, reward=1.0)
         
         assert updated.alpha[0] == 2.0  # alpha increases for success
         assert updated.alpha[1] == 1.0  # other arms unchanged
@@ -198,7 +198,7 @@ async def test_proxy_select_routes_to_motor(mock_motor_client, mock_gate_cache):
 ## Output Format
 
 When writing tests, provide:
-1. The test file path (e.g., `lib/core/tests/unit/test_protocols.py`)
+1. The test file path (e.g., `lib/core/tests/unit/test_policys.py`)
 2. Any required `conftest.py` fixtures
 3. Complete, runnable test code
 4. Brief explanation of what each test verifies

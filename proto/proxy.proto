@@ -54,8 +54,8 @@ message DeletePoolResponse {
 message CreateExperimentRequest {
   string name = 1;
   string pool_id = 2;
-  string protocol = 3;
-  map<string, string> protocol_params = 4;
+  string policy = 3;
+  map<string, string> policy_params = 4;
   bool enabled = 5;
 
   // Feature gate config
@@ -105,7 +105,7 @@ message GetExperimentResponse {
 message UpdateExperimentRequest {
   string experiment_id = 1;
   optional bool enabled = 2;
-  map<string, string> protocol_params = 3;
+  map<string, string> policy_params = 3;
   optional FeatureGateConfig feature_gate = 4;
 }
 

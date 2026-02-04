@@ -2,7 +2,7 @@
         infra infra-down infra-ee infra-ee-down \
         dev dev-proxy dev-motor dev-cortex dev-trace \
         docker docker-build docker-build-no-cache docker-up docker-down docker-logs docker-ps \
-        docker-ee docker-ee-build docker-ee-up docker-ee-down docker-ee-logs \
+        docker-ee docker-ee-build docker-ee-build-no-cache docker-ee-up docker-ee-down docker-ee-logs \
         db-reset clickhouse-reset \
         loadtest loadtest-web loadtest-multi loadtest-multi-web
 
@@ -147,6 +147,9 @@ docker-ee: docker-ee-build docker-ee-up
 
 docker-ee-build:
 	QBRIX_EE_ENABLED=true docker compose --profile ee build
+
+docker-ee-build-no-cache:
+	QBRIX_EE_ENABLED=true docker compose --profile ee build --no-cache
 
 docker-ee-up:
 	QBRIX_EE_ENABLED=true docker compose --profile ee up -d

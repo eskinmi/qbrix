@@ -1,10 +1,10 @@
-"""Unit tests for BetaTSProtocol."""
+"""Unit tests for BetaTSPolicy."""
 
 import numpy as np
 import pytest
 
-from qbrixcore.protoc.stochastic.ts import BetaTSProtocol
-from qbrixcore.protoc.stochastic.ts import BetaTSParamState
+from qbrixcore.policy.stochastic.ts import BetaTSPolicy
+from qbrixcore.policy.stochastic.ts import BetaTSParamState
 from qbrixcore.context import Context
 
 
@@ -76,25 +76,25 @@ class TestBetaTSParamState:
         assert ps1.id != ps2.id
 
 
-class TestBetaTSProtocol:
-    def test_protocol_name(self):
-        """test protocol has correct name."""
-        assert BetaTSProtocol.name == "BetaTSProtocol"
+class TestBetaTSPolicy:
+    def test_policy_name(self):
+        """test policy has correct name."""
+        assert BetaTSPolicy.name == "BetaTSPolicy"
 
-    def test_protocol_param_state_cls(self):
-        """test protocol has correct param state class."""
-        assert BetaTSProtocol.param_state_cls == BetaTSParamState
+    def test_policy_param_state_cls(self):
+        """test policy has correct param state class."""
+        assert BetaTSPolicy.param_state_cls == BetaTSParamState
 
     def test_init_params(self):
         """test init_params creates correct param state."""
-        params = BetaTSProtocol.init_params(num_arms=4)
+        params = BetaTSPolicy.init_params(num_arms=4)
 
         assert isinstance(params, BetaTSParamState)
         assert params.num_arms == 4
 
     def test_init_params_with_custom_priors(self):
         """test init_params with custom priors."""
-        params = BetaTSProtocol.init_params(
+        params = BetaTSPolicy.init_params(
             num_arms=3,
             alpha_prior=2.0,
             beta_prior=3.0
@@ -108,7 +108,7 @@ class TestBetaTSProtocol:
         ps = BetaTSParamState(num_arms=5)
         ctx = Context()
 
-        arm_index = BetaTSProtocol.select(ps, ctx)
+        arm_index = BetaTSPolicy.select(ps, ctx)
 
         assert isinstance(arm_index, int)
         assert 0 <= arm_index < 5
@@ -124,7 +124,7 @@ class TestBetaTSProtocol:
         ctx = Context()
 
         # run multiple times, arm 0 should be selected most often
-        selections = [BetaTSProtocol.select(ps, ctx) for _ in range(100)]
+        selections = [BetaTSPolicy.select(ps, ctx) for _ in range(100)]
         arm_0_count = selections.count(0)
 
         # with these params, arm 0 should be selected the majority of times
@@ -136,10 +136,10 @@ class TestBetaTSProtocol:
         ctx = Context()
 
         np.random.seed(42)
-        result1 = BetaTSProtocol.select(ps, ctx)
+        result1 = BetaTSPolicy.select(ps, ctx)
 
         np.random.seed(42)
-        result2 = BetaTSProtocol.select(ps, ctx)
+        result2 = BetaTSPolicy.select(ps, ctx)
 
         assert result1 == result2
 
@@ -148,7 +148,7 @@ class TestBetaTSProtocol:
         ps = BetaTSParamState(num_arms=3)
         ctx = Context()
 
-        updated = BetaTSProtocol.train(ps, ctx, choice=1, reward=1)
+        updated = BetaTSPolicy.train(ps, ctx, choice=1, reward=1)
 
         assert updated.alpha[1] == 2.0  # increased
         assert updated.beta[1] == 1.0   # unchanged
@@ -162,7 +162,7 @@ class TestBetaTSProtocol:
         ps = BetaTSParamState(num_arms=3)
         ctx = Context()
 
-        updated = BetaTSProtocol.train(ps, ctx, choice=1, reward=0)
+        updated = BetaTSPolicy.train(ps, ctx, choice=1, reward=0)
 
         assert updated.alpha[1] == 1.0  # unchanged
         assert updated.beta[1] == 2.0   # increased
@@ -173,7 +173,7 @@ class TestBetaTSProtocol:
         ps = BetaTSParamState(num_arms=3)
         ctx = Context()
 
-        updated = BetaTSProtocol.train(ps, ctx, choice=0, reward=0.8)
+        updated = BetaTSPolicy.train(ps, ctx, choice=0, reward=0.8)
 
         assert updated.alpha[0] == 2.0
         assert updated.beta[0] == 1.0
@@ -183,7 +183,7 @@ class TestBetaTSProtocol:
         ps = BetaTSParamState(num_arms=3)
         ctx = Context()
 
-        updated = BetaTSProtocol.train(ps, ctx, choice=0, reward=0.3)
+        updated = BetaTSPolicy.train(ps, ctx, choice=0, reward=0.3)
 
         assert updated.alpha[0] == 1.0
         assert updated.beta[0] == 2.0
@@ -193,9 +193,9 @@ class TestBetaTSProtocol:
         ps = BetaTSParamState(num_arms=3)
         ctx = Context()
 
-        ps = BetaTSProtocol.train(ps, ctx, choice=0, reward=1)
-        ps = BetaTSProtocol.train(ps, ctx, choice=0, reward=1)
-        ps = BetaTSProtocol.train(ps, ctx, choice=0, reward=0)
+        ps = BetaTSPolicy.train(ps, ctx, choice=0, reward=1)
+        ps = BetaTSPolicy.train(ps, ctx, choice=0, reward=1)
+        ps = BetaTSPolicy.train(ps, ctx, choice=0, reward=0)
 
         assert ps.alpha[0] == 3.0  # two successes
         assert ps.beta[0] == 2.0   # one failure
@@ -209,7 +209,7 @@ class TestBetaTSProtocol:
         original_beta = ps.beta.copy()
         original_T = ps.T.copy()
 
-        updated = BetaTSProtocol.train(ps, ctx, choice=1, reward=1)
+        updated = BetaTSPolicy.train(ps, ctx, choice=1, reward=1)
 
         # original unchanged
         assert np.array_equal(ps.alpha, original_alpha)
@@ -223,7 +223,7 @@ class TestBetaTSProtocol:
         ps = BetaTSParamState(num_arms=3)
         ctx = Context()
 
-        updated = BetaTSProtocol.train(ps, ctx, choice=0, reward=np.float64(1.0))
+        updated = BetaTSPolicy.train(ps, ctx, choice=0, reward=np.float64(1.0))
 
         assert updated.alpha[0] == 2.0
 
@@ -232,6 +232,6 @@ class TestBetaTSProtocol:
         ps = BetaTSParamState(num_arms=1)
         ctx = Context()
 
-        arm_index = BetaTSProtocol.select(ps, ctx)
+        arm_index = BetaTSPolicy.select(ps, ctx)
 
         assert arm_index == 0

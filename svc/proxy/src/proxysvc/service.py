@@ -112,8 +112,8 @@ class ProxyService:
         tenant_id: str,
         name: str,
         pool_id: str,
-        protocol: str,
-        protocol_params: dict,
+        policy: str,
+        policy_params: dict,
         enabled: bool,
         feature_gate_config: dict | None = None,
     ) -> dict:
@@ -122,8 +122,8 @@ class ProxyService:
             experiment = await repo.create(
                 name=name,
                 pool_id=pool_id,
-                protocol=protocol,
-                protocol_params=protocol_params,
+                policy=policy,
+                policy_params=policy_params,
                 enabled=enabled,
                 feature_gate_config=feature_gate_config,
             )
@@ -265,7 +265,7 @@ class ProxyService:
                     context_id=context_id,
                     context_vector=context_vector,
                     context_metadata=context_metadata,
-                    protocol="gate",
+                    policy="gate",
                 )
 
             return result
@@ -292,7 +292,7 @@ class ProxyService:
         response["is_default"] = False
 
         if self._selection_publisher:
-            protocol = await self._get_experiment_protocol(tenant_id, experiment_id)
+            policy = await self._get_experiment_policy(tenant_id, experiment_id)
             await self._publish_selection_event(
                 tenant_id=tenant_id,
                 experiment_id=experiment_id,
@@ -304,7 +304,7 @@ class ProxyService:
                 context_id=context_id,
                 context_vector=context_vector,
                 context_metadata=context_metadata,
-                protocol=protocol,
+                policy=policy,
             )
 
         return response
@@ -321,7 +321,7 @@ class ProxyService:
         context_id: str,
         context_vector: list[float],
         context_metadata: dict,
-        protocol: str,
+        policy: str,
     ) -> None:
         """publish selection event for ee tracing."""
         event = SelectionEvent(
@@ -336,18 +336,18 @@ class ProxyService:
             context_vector=context_vector,
             context_metadata=context_metadata,
             timestamp_ms=int(time.time() * 1000),
-            protocol=protocol,
+            policy=policy,
         )
         try:
             await self._selection_publisher.publish(event)
         except Exception as e:  # noqa
             logger.error("failed to publish selection event: %s", e)
 
-    async def _get_experiment_protocol(self, tenant_id: str, experiment_id: str) -> str:
-        """get protocol name for an experiment from redis cache."""
+    async def _get_experiment_policy(self, tenant_id: str, experiment_id: str) -> str:
+        """get policy name for an experiment from redis cache."""
         experiment = await self._redis.get_experiment(tenant_id, experiment_id)
         if experiment:
-            return experiment.get("protocol", "unknown")
+            return experiment.get("policy", "unknown")
         return "unknown"
 
     async def feed(self, request_id: str, reward: float) -> bool:
@@ -398,8 +398,8 @@ class ProxyService:
                 "name": experiment.name,
                 "pool_id": experiment.pool_id,
                 "pool": self._pool_to_dict(pool),
-                "protocol": experiment.protocol,
-                "protocol_params": experiment.protocol_params,
+                "policy": experiment.policy,
+                "policy_params": experiment.policy_params,
                 "enabled": experiment.enabled,
             }
             await self._redis.set_experiment(tenant_id, experiment_id, redis_data)
@@ -433,7 +433,7 @@ class ProxyService:
             "id": experiment.id,
             "name": experiment.name,
             "pool_id": experiment.pool_id,
-            "protocol": experiment.protocol,
-            "protocol_params": experiment.protocol_params,
+            "policy": experiment.policy,
+            "policy_params": experiment.policy_params,
             "enabled": experiment.enabled,
         }

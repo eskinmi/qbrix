@@ -5,12 +5,12 @@ from pydantic import Field, model_validator
 
 from qbrixcore.param.var import ArrayParam
 from qbrixcore.param.state import BaseParamState
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.context import Context
 
 
 class LinUCBParamState(BaseParamState):
-    """Parameter state for Linear UCB protocol."""
+    """Parameter state for Linear UCB policy."""
 
     dim: int = Field(..., gt=0)
     alpha: float = Field(default=1.5, gt=0.0)
@@ -28,15 +28,15 @@ class LinUCBParamState(BaseParamState):
         return self
 
 
-class LinUCBProtocol(BaseProtocol):
+class LinUCBPolicy(BasePolicy):
     """
-    Linear UCB protocol for contextual multi-armed bandit.
+    Linear UCB policy for contextual multi-armed bandit.
 
     Uses ridge regression to estimate reward parameters and adds
     confidence bounds based on the design matrix inverse.
     """
 
-    name: ClassVar[str] = "LinUCBProtocol"
+    name: ClassVar[str] = "LinUCBPolicy"
     param_state_cls: type[BaseParamState] = LinUCBParamState
 
     @staticmethod
@@ -66,9 +66,9 @@ class LinUCBProtocol(BaseProtocol):
     @staticmethod
     def select(ps: LinUCBParamState, context: Context) -> int:
         """Arm selection using Linear UCB."""
-        x = LinUCBProtocol._reshape_context_vector(context)
+        x = LinUCBPolicy._reshape_context_vector(context)
         upper_bounds = [
-            LinUCBProtocol._arm_upper_bound(ps, i, x) for i in range(ps.num_arms)
+            LinUCBPolicy._arm_upper_bound(ps, i, x) for i in range(ps.num_arms)
         ]
         return int(np.argmax(upper_bounds))
 

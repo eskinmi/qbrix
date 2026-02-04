@@ -222,7 +222,7 @@ def on_test_start(environment, **kwargs):  # noqa
             experiment_id = client.create_experiment(
                 name=f"{settings.default_experiment_name}-multi-{i}-{uuid.uuid4().hex[:8]}",
                 pool_id=pool_id,
-                protocol=settings.default_protocol,
+                policy=settings.default_policy,
             )
 
             MultiExperimentUser.experiments.append(

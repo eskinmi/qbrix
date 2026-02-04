@@ -11,7 +11,7 @@ class LoadTestSettings(BaseSettings):
     # single experiment scenario defaults
     default_pool_name: str = "loadtest-pool"
     default_experiment_name: str = "loadtest-experiment"
-    default_protocol: str = "BetaTSProtocol"
+    default_policy: str = "BetaTSPolicy"
     default_num_arms: int = 5
 
     # multi experiment scenario defaults

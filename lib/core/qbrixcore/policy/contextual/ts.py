@@ -5,12 +5,12 @@ from pydantic import Field, model_validator
 
 from qbrixcore.param.var import ArrayParam
 from qbrixcore.param.state import BaseParamState
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.context import Context
 
 
 class LinTSParamState(BaseParamState):
-    """Parameter state for Linear Thompson Sampling protocol."""
+    """Parameter state for Linear Thompson Sampling policy."""
 
     dim: int = Field(..., gt=0)
     v: float = Field(default=1.0, gt=0.0)
@@ -28,15 +28,15 @@ class LinTSParamState(BaseParamState):
         return self
 
 
-class LinTSProtocol(BaseProtocol):
+class LinTSPolicy(BasePolicy):
     """
-    Linear Thompson Sampling protocol for contextual multi-armed bandit.
+    Linear Thompson Sampling policy for contextual multi-armed bandit.
 
     Uses Bayesian linear regression with Gaussian priors to model the
     reward function and samples from the posterior to select arms.
     """
 
-    name: ClassVar[str] = "LinTSProtocol"
+    name: ClassVar[str] = "LinTSPolicy"
     param_state_cls: type[BaseParamState] = LinTSParamState
 
     @staticmethod
@@ -70,10 +70,10 @@ class LinTSProtocol(BaseProtocol):
     @staticmethod
     def select(ps: LinTSParamState, context: Context) -> int:
         """Arm selection using Linear Thompson Sampling."""
-        x = LinTSProtocol._reshape_context_vector(context)
+        x = LinTSPolicy._reshape_context_vector(context)
         pred = []
         for arm in range(ps.num_arms):
-            theta_sample = LinTSProtocol._sample_theta(ps, arm)
+            theta_sample = LinTSPolicy._sample_theta(ps, arm)
             expected_reward = np.dot(theta_sample.T, x).item()
             pred.append(expected_reward)
         return int(np.argmax(pred))

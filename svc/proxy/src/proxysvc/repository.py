@@ -190,8 +190,8 @@ class ExperimentRepository:
         self,
         name: str,
         pool_id: str,
-        protocol: str,
-        protocol_params: dict,
+        policy: str,
+        policy_params: dict,
         enabled: bool,
         feature_gate_config: dict | None = None,
     ) -> Experiment:
@@ -199,8 +199,8 @@ class ExperimentRepository:
             name=name,
             tenant_id=self._tenant_id,
             pool_id=pool_id,
-            protocol=protocol,
-            protocol_params=protocol_params,
+            policy=policy,
+            policy_params=policy_params,
             enabled=enabled,
         )
 

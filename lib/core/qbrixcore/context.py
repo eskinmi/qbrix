@@ -8,9 +8,9 @@ import numpy as np
 class Context:
     """Request context for bandit selection.
 
-    The vector field accepts both list[float] and np.ndarray. Contextual protocols
+    The vector field accepts both list[float] and np.ndarray. Contextual policies
     (LinUCB, LinTS) will convert lists to arrays internally when needed.
-    Stochastic protocols ignore the vector entirely.
+    Stochastic policys ignore the vector entirely.
     """
 
     id: str = field(default_factory=lambda: str(uuid.uuid4()))

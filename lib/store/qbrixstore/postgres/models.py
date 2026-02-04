@@ -105,8 +105,8 @@ class Experiment(Base):
     pool_id: Mapped[str] = mapped_column(
         String(32), ForeignKey("pools.id"), nullable=False
     )
-    protocol: Mapped[str] = mapped_column(String(64), nullable=False)
-    protocol_params: Mapped[dict] = mapped_column(JSON, default=dict)
+    policy: Mapped[str] = mapped_column(String(64), nullable=False)
+    policy_params: Mapped[dict] = mapped_column(JSON, default=dict)
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

@@ -36,13 +36,13 @@ def empty_pool():
 
 @pytest.fixture
 def context_without_vector():
-    """Creates a context without a feature vector (for stochastic protocols)."""
+    """Creates a context without a feature vector (for stochastic policies)."""
     return Context(id="ctx-123")
 
 
 @pytest.fixture
 def context_with_vector():
-    """Creates a context with a 5-dimensional feature vector (for contextual protocols)."""
+    """Creates a context with a 5-dimensional feature vector (for contextual policies)."""
     return Context(id="ctx-456", vector=[1.0, 0.5, -0.3, 0.8, 0.2])
 
 

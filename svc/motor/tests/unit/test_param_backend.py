@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 
-from qbrixcore.protoc.stochastic.ts import BetaTSProtocol
-from qbrixcore.protoc.stochastic.ts import GaussianTSProtocol
+from qbrixcore.policy.stochastic.ts import BetaTSPolicy
+from qbrixcore.policy.stochastic.ts import GaussianTSPolicy
 
 from motorsvc.param_backend import RedisBackedInMemoryParamBackend
 
@@ -59,7 +59,7 @@ class TestRedisBackedInMemoryParamBackend:
         }
         mock_redis_client.get_params.return_value = params_dict
 
-        result = await backend.update_params(tenant_id, experiment_id, BetaTSProtocol)
+        result = await backend.update_params(tenant_id, experiment_id, BetaTSPolicy)
 
         assert result is not None
         assert result.num_arms == 3
@@ -79,12 +79,12 @@ class TestRedisBackedInMemoryParamBackend:
 
         mock_redis_client.get_params.return_value = None
 
-        result = await backend.update_params(tenant_id, experiment_id, BetaTSProtocol)
+        result = await backend.update_params(tenant_id, experiment_id, BetaTSPolicy)
 
         assert result is None
 
     @pytest.mark.asyncio
-    async def test_update_params_uses_correct_protocol_param_state_class(
+    async def test_update_params_uses_correct_policy_param_state_class(
         self, tenant_id, mock_redis_client, motor_cache
     ):
         backend = RedisBackedInMemoryParamBackend(mock_redis_client, motor_cache)
@@ -102,10 +102,10 @@ class TestRedisBackedInMemoryParamBackend:
         }
         mock_redis_client.get_params.return_value = params_dict
 
-        result = await backend.update_params(tenant_id, experiment_id, GaussianTSProtocol)
+        result = await backend.update_params(tenant_id, experiment_id, GaussianTSPolicy)
 
         assert result is not None
-        assert isinstance(result, GaussianTSProtocol.param_state_cls)
+        assert isinstance(result, GaussianTSPolicy.param_state_cls)
         assert result.num_arms == 3
         assert np.array_equal(result.posterior_mean, np.array([0.5, 0.3, 0.7]))
 
@@ -126,7 +126,7 @@ class TestRedisBackedInMemoryParamBackend:
         }
         mock_redis_client.get_params.return_value = params_dict
 
-        result = await backend.update_params(tenant_id, experiment_id, BetaTSProtocol)
+        result = await backend.update_params(tenant_id, experiment_id, BetaTSPolicy)
 
         # params should be created with defaults for missing fields
         assert result is not None

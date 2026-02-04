@@ -1,6 +1,6 @@
 import numpy as np
 
-from qbrixcore.protoc.stochastic.ts import BetaTSParamState
+from qbrixcore.policy.stochastic.ts import BetaTSParamState
 
 from motorsvc.cache import MotorCache
 from motorsvc.config import MotorSettings

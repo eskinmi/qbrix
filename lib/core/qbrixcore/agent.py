@@ -4,7 +4,7 @@ import uuid
 
 from qbrixcore import callback
 from qbrixcore.pool import Pool
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.param.backend import BaseParamBackend, InMemoryParamBackend
 from qbrixcore.context import Context
 
@@ -16,8 +16,8 @@ class Agent:
         metadata={"description": "experiment id the agent belongs to."}
     )
     pool: Pool = field(metadata={"description": "pool of arms for the experiment."})
-    protocol: type[BaseProtocol] = field(
-        metadata={"description": "the protocol used for the experiment."}
+    policy: type[BasePolicy] = field(
+        metadata={"description": "the policy used for the experiment."}
     )
     init_params: dict = field(default_factory=dict)
     param_backend: BaseParamBackend | None = field(
@@ -47,7 +47,7 @@ class Agent:
                 f"param state not found for experiment {self.experiment_id}. "
                 f"ensure params are initialized before calling select."
             )
-        choice = self.protocol.select(paramstate, context)
+        choice = self.policy.select(paramstate, context)
         return choice
 
     @callback.register()
@@ -58,7 +58,7 @@ class Agent:
                 f"param state not found for experiment {self.experiment_id}. "
                 f"ensure params are initialized before calling train."
             )
-        paramstate = self.protocol.train(
+        paramstate = self.policy.train(
             ps=paramstate, context=context, choice=choice, reward=reward
         )
         self.param_backend.set(experiment_id=self.experiment_id, params=paramstate)

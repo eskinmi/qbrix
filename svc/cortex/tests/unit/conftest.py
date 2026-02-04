@@ -59,8 +59,8 @@ def sample_experiment_record():
     """create a sample experiment record from redis."""
     return {
         "id": "exp-001",
-        "protocol": "BetaTSProtocol",
-        "protocol_params": {},
+        "policy": "BetaTSPolicy",
+        "policy_params": {},
         "pool": {
             "id": "pool-001",
             "arms": [

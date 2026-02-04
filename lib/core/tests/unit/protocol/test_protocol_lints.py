@@ -1,10 +1,10 @@
-"""Unit tests for LinTSProtocol."""
+"""Unit tests for LinTSPolicy."""
 
 import numpy as np
 import pytest
 
-from qbrixcore.protoc.contextual.ts import LinTSProtocol
-from qbrixcore.protoc.contextual.ts import LinTSParamState
+from qbrixcore.policy.contextual.ts import LinTSPolicy
+from qbrixcore.policy.contextual.ts import LinTSParamState
 from qbrixcore.context import Context
 
 
@@ -75,18 +75,18 @@ class TestLinTSParamState:
         assert ps1.id != ps2.id
 
 
-class TestLinTSProtocol:
-    def test_protocol_name(self):
-        """test protocol has correct name."""
-        assert LinTSProtocol.name == "LinTSProtocol"
+class TestLinTSPolicy:
+    def test_policy_name(self):
+        """test policy has correct name."""
+        assert LinTSPolicy.name == "LinTSPolicy"
 
-    def test_protocol_param_state_cls(self):
-        """test protocol has correct param state class."""
-        assert LinTSProtocol.param_state_cls == LinTSParamState
+    def test_policy_param_state_cls(self):
+        """test policy has correct param state class."""
+        assert LinTSPolicy.param_state_cls == LinTSParamState
 
     def test_init_params(self):
         """test init_params creates correct param state."""
-        params = LinTSProtocol.init_params(num_arms=3, dim=5)
+        params = LinTSPolicy.init_params(num_arms=3, dim=5)
 
         assert isinstance(params, LinTSParamState)
         assert params.num_arms == 3
@@ -94,7 +94,7 @@ class TestLinTSProtocol:
 
     def test_init_params_with_custom_v(self):
         """test init_params with custom noise parameter."""
-        params = LinTSProtocol.init_params(num_arms=3, dim=5, v=2.5)
+        params = LinTSPolicy.init_params(num_arms=3, dim=5, v=2.5)
 
         assert params.v == 2.5
 
@@ -102,7 +102,7 @@ class TestLinTSProtocol:
         """test reshaping context vector from list to column vector."""
         ctx = Context(vector=[1.0, 2.0, 3.0])
 
-        reshaped = LinTSProtocol._reshape_context_vector(ctx)
+        reshaped = LinTSPolicy._reshape_context_vector(ctx)
 
         assert isinstance(reshaped, np.ndarray)
         assert reshaped.shape == (3, 1)
@@ -112,7 +112,7 @@ class TestLinTSProtocol:
         """test reshaping 1d numpy array to column vector."""
         ctx = Context(vector=np.array([1.0, 2.0, 3.0]))
 
-        reshaped = LinTSProtocol._reshape_context_vector(ctx)
+        reshaped = LinTSPolicy._reshape_context_vector(ctx)
 
         assert reshaped.shape == (3, 1)
 
@@ -120,7 +120,7 @@ class TestLinTSProtocol:
         """test context vector already in column form is unchanged."""
         ctx = Context(vector=np.array([[1.0], [2.0], [3.0]]))
 
-        reshaped = LinTSProtocol._reshape_context_vector(ctx)
+        reshaped = LinTSPolicy._reshape_context_vector(ctx)
 
         assert reshaped.shape == (3, 1)
 
@@ -128,7 +128,7 @@ class TestLinTSProtocol:
         """test sample_theta returns correctly shaped column vector."""
         ps = LinTSParamState(num_arms=3, dim=4)
 
-        theta = LinTSProtocol._sample_theta(ps, 0)
+        theta = LinTSPolicy._sample_theta(ps, 0)
 
         assert isinstance(theta, np.ndarray)
         assert theta.shape == (4, 1)
@@ -138,10 +138,10 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=4)
 
         np.random.seed(1)
-        theta1 = LinTSProtocol._sample_theta(ps, 0)
+        theta1 = LinTSPolicy._sample_theta(ps, 0)
 
         np.random.seed(2)
-        theta2 = LinTSProtocol._sample_theta(ps, 0)
+        theta2 = LinTSPolicy._sample_theta(ps, 0)
 
         # different seeds should produce different samples
         assert not np.array_equal(theta1, theta2)
@@ -152,7 +152,7 @@ class TestLinTSProtocol:
         # make design matrix singular
         ps.d[0] = np.zeros((2, 2))
 
-        theta = LinTSProtocol._sample_theta(ps, 0)
+        theta = LinTSPolicy._sample_theta(ps, 0)
 
         # should return something reasonable (zeros via pinv fallback)
         assert theta.shape == (2, 1)
@@ -165,7 +165,7 @@ class TestLinTSProtocol:
         ps.d[0] = np.array([[2.0, 0.5], [0.5, 2.0]])
         ps.r[0] = np.array([[5.0], [3.0]])
 
-        theta = LinTSProtocol._sample_theta(ps, 0)
+        theta = LinTSPolicy._sample_theta(ps, 0)
 
         # should sample around the posterior mean
         assert theta.shape == (2, 1)
@@ -176,7 +176,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=4)
         ctx = Context(vector=[1.0, 0.5, -0.3, 0.8])
 
-        arm_index = LinTSProtocol.select(ps, ctx)
+        arm_index = LinTSPolicy.select(ps, ctx)
 
         assert isinstance(arm_index, int)
         assert 0 <= arm_index < 3
@@ -187,7 +187,7 @@ class TestLinTSProtocol:
         ctx = Context(vector=[1.0, 0.5, -0.3, 0.8])
 
         # run multiple selections with initial state
-        selections = [LinTSProtocol.select(ps, ctx) for _ in range(100)]
+        selections = [LinTSPolicy.select(ps, ctx) for _ in range(100)]
 
         # should explore all arms due to posterior sampling
         assert len(set(selections)) == 3
@@ -198,10 +198,10 @@ class TestLinTSProtocol:
         ctx = Context(vector=[1.0, 0.5, -0.3, 0.8])
 
         np.random.seed(42)
-        result1 = LinTSProtocol.select(ps, ctx)
+        result1 = LinTSPolicy.select(ps, ctx)
 
         np.random.seed(42)
-        result2 = LinTSProtocol.select(ps, ctx)
+        result2 = LinTSPolicy.select(ps, ctx)
 
         assert result1 == result2
 
@@ -217,7 +217,7 @@ class TestLinTSProtocol:
         ctx = Context(vector=[1.0, 1.0])
 
         # run multiple selections
-        selections = [LinTSProtocol.select(ps, ctx) for _ in range(100)]
+        selections = [LinTSPolicy.select(ps, ctx) for _ in range(100)]
         arm_0_count = selections.count(0)
 
         # arm 0 should be selected most often
@@ -228,7 +228,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=1, dim=3)
         ctx = Context(vector=[1.0, 0.5, -0.3])
 
-        arm_index = LinTSProtocol.select(ps, ctx)
+        arm_index = LinTSPolicy.select(ps, ctx)
 
         assert arm_index == 0
 
@@ -237,7 +237,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 2.0])
 
-        updated = LinTSProtocol.train(ps, ctx, choice=1, reward=0.5)
+        updated = LinTSPolicy.train(ps, ctx, choice=1, reward=0.5)
 
         # d[1] should be updated with x*x.T
         expected_update = np.array([[1.0, 2.0], [2.0, 4.0]])
@@ -253,7 +253,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 2.0])
 
-        updated = LinTSProtocol.train(ps, ctx, choice=1, reward=0.5)
+        updated = LinTSPolicy.train(ps, ctx, choice=1, reward=0.5)
 
         # r[1] should be updated with reward * x
         expected_r = np.array([[0.5], [1.0]])
@@ -270,7 +270,7 @@ class TestLinTSProtocol:
         original_d = ps.d.copy()
         original_r = ps.r.copy()
 
-        updated = LinTSProtocol.train(ps, ctx, choice=1, reward=0.5)
+        updated = LinTSPolicy.train(ps, ctx, choice=1, reward=0.5)
 
         # original unchanged
         assert np.array_equal(ps.d, original_d)
@@ -283,9 +283,9 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 1.0])
 
-        ps = LinTSProtocol.train(ps, ctx, choice=0, reward=1.0)
-        ps = LinTSProtocol.train(ps, ctx, choice=0, reward=0.5)
-        ps = LinTSProtocol.train(ps, ctx, choice=0, reward=0.0)
+        ps = LinTSPolicy.train(ps, ctx, choice=0, reward=1.0)
+        ps = LinTSPolicy.train(ps, ctx, choice=0, reward=0.5)
+        ps = LinTSPolicy.train(ps, ctx, choice=0, reward=0.0)
 
         # design matrix should accumulate
         assert not np.array_equal(ps.d[0], np.identity(2))
@@ -298,7 +298,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 2.0])
 
-        updated = LinTSProtocol.train(ps, ctx, choice=0, reward=0.5)
+        updated = LinTSPolicy.train(ps, ctx, choice=0, reward=0.5)
 
         assert updated is not None
         assert not np.array_equal(updated.d[0], ps.d[0])
@@ -308,7 +308,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=np.array([1.0, 2.0]))
 
-        updated = LinTSProtocol.train(ps, ctx, choice=0, reward=0.5)
+        updated = LinTSPolicy.train(ps, ctx, choice=0, reward=0.5)
 
         assert updated is not None
         assert not np.array_equal(updated.d[0], ps.d[0])
@@ -318,7 +318,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 1.0])
 
-        updated = LinTSProtocol.train(ps, ctx, choice=0, reward=-1.0)
+        updated = LinTSPolicy.train(ps, ctx, choice=0, reward=-1.0)
 
         assert updated.r[0][0, 0] == -1.0
         assert updated.r[0][1, 0] == -1.0
@@ -328,7 +328,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 2.0])
 
-        updated = LinTSProtocol.train(ps, ctx, choice=0, reward=np.float64(1.5))
+        updated = LinTSPolicy.train(ps, ctx, choice=0, reward=np.float64(1.5))
 
         assert updated.r[0][0, 0] == 1.5
 
@@ -338,14 +338,14 @@ class TestLinTSProtocol:
         ctx = Context(vector=[1.0, 0.5, -0.3, 0.8])
 
         # select arm
-        arm = LinTSProtocol.select(ps, ctx)
+        arm = LinTSPolicy.select(ps, ctx)
         assert 0 <= arm < 3
 
         # train on selection
-        updated_ps = LinTSProtocol.train(ps, ctx, choice=arm, reward=1.0)
+        updated_ps = LinTSPolicy.train(ps, ctx, choice=arm, reward=1.0)
 
         # select again with updated params
-        arm2 = LinTSProtocol.select(updated_ps, ctx)
+        arm2 = LinTSPolicy.select(updated_ps, ctx)
         assert 0 <= arm2 < 3
 
     def test_sample_theta_deterministic_with_seed(self):
@@ -353,10 +353,10 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=4)
 
         np.random.seed(42)
-        theta1 = LinTSProtocol._sample_theta(ps, 0)
+        theta1 = LinTSPolicy._sample_theta(ps, 0)
 
         np.random.seed(42)
-        theta2 = LinTSProtocol._sample_theta(ps, 0)
+        theta2 = LinTSPolicy._sample_theta(ps, 0)
 
         assert np.array_equal(theta1, theta2)
 
@@ -367,7 +367,7 @@ class TestLinTSProtocol:
         ps.d[0] = np.zeros((2, 2))
         ps.r[0] = np.array([[1.0], [2.0]])
 
-        theta = LinTSProtocol._sample_theta(ps, 0)
+        theta = LinTSPolicy._sample_theta(ps, 0)
 
         assert theta.shape == (2, 1)
         assert np.all(np.isfinite(theta))
@@ -378,7 +378,7 @@ class TestLinTSProtocol:
         # create a matrix that might cause issues
         ps.d[0] = np.array([[np.inf, 0.0], [0.0, np.inf]])
 
-        theta = LinTSProtocol._sample_theta(ps, 0)
+        theta = LinTSPolicy._sample_theta(ps, 0)
 
         assert theta.shape == (2, 1)
         # should return zeros as fallback
@@ -391,7 +391,7 @@ class TestLinTSProtocol:
 
         # run multiple selections to verify stochastic behavior
         np.random.seed(42)
-        selections = [LinTSProtocol.select(ps, ctx) for _ in range(100)]
+        selections = [LinTSPolicy.select(ps, ctx) for _ in range(100)]
 
         # should explore all arms due to sampling
         assert len(set(selections)) >= 2
@@ -403,14 +403,14 @@ class TestLinTSProtocol:
 
         # train arm 0 with high rewards multiple times
         for _ in range(20):
-            ps = LinTSProtocol.train(ps, ctx, choice=0, reward=1.0)
+            ps = LinTSPolicy.train(ps, ctx, choice=0, reward=1.0)
 
         # train arm 1 with low rewards
         for _ in range(20):
-            ps = LinTSProtocol.train(ps, ctx, choice=1, reward=0.0)
+            ps = LinTSPolicy.train(ps, ctx, choice=1, reward=0.0)
 
         # select multiple times
-        selections = [LinTSProtocol.select(ps, ctx) for _ in range(100)]
+        selections = [LinTSPolicy.select(ps, ctx) for _ in range(100)]
         arm_0_count = selections.count(0)
         arm_1_count = selections.count(1)
 
@@ -422,7 +422,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[2.0, 3.0])
 
-        updated = LinTSProtocol.train(ps, ctx, choice=0, reward=1.0)
+        updated = LinTSPolicy.train(ps, ctx, choice=0, reward=1.0)
 
         # d should be I + x*x.T
         x = np.array([[2.0], [3.0]])  # noqa
@@ -436,7 +436,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[2.0, 3.0])
 
-        updated = LinTSProtocol.train(ps, ctx, choice=0, reward=0.8)
+        updated = LinTSPolicy.train(ps, ctx, choice=0, reward=0.8)
 
         # r should be reward * x
         expected_r = np.array([[1.6], [2.4]])
@@ -448,7 +448,7 @@ class TestLinTSProtocol:
         ps = LinTSParamState(num_arms=3, dim=2)
         ctx = Context(vector=[1.0, 2.0])
 
-        updated = LinTSProtocol.train(ps, ctx, choice=1, reward=0.5)
+        updated = LinTSPolicy.train(ps, ctx, choice=1, reward=0.5)
 
         # arm 1 should be updated
         assert not np.array_equal(updated.d[1], ps.d[1])
@@ -468,15 +468,15 @@ class TestLinTSProtocol:
         # train both with same data
         ctx = Context(vector=[1.0, 1.0])
         for _ in range(10):
-            ps_low_v = LinTSProtocol.train(ps_low_v, ctx, choice=0, reward=1.0)
-            ps_high_v = LinTSProtocol.train(ps_high_v, ctx, choice=0, reward=1.0)
+            ps_low_v = LinTSPolicy.train(ps_low_v, ctx, choice=0, reward=1.0)
+            ps_high_v = LinTSPolicy.train(ps_high_v, ctx, choice=0, reward=1.0)
 
         # sample theta many times and check variance
         np.random.seed(42)
-        samples_low = [LinTSProtocol._sample_theta(ps_low_v, 0) for _ in range(100)]
+        samples_low = [LinTSPolicy._sample_theta(ps_low_v, 0) for _ in range(100)]
 
         np.random.seed(42)
-        samples_high = [LinTSProtocol._sample_theta(ps_high_v, 0) for _ in range(100)]
+        samples_high = [LinTSPolicy._sample_theta(ps_high_v, 0) for _ in range(100)]
 
         var_low = np.var([s[0, 0] for s in samples_low])
         var_high = np.var([s[0, 0] for s in samples_high])
@@ -490,7 +490,7 @@ class TestLinTSProtocol:
         ctx = Context(vector=[1.0, 1.0])
 
         # without seeding, selections should vary
-        selections = [LinTSProtocol.select(ps, ctx) for _ in range(10)]
+        selections = [LinTSPolicy.select(ps, ctx) for _ in range(10)]
 
         # should have some variation (not always same arm)
         # with sampling, it's very unlikely to get same arm 10 times

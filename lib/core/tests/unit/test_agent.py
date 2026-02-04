@@ -5,8 +5,8 @@ from unittest.mock import Mock
 
 from qbrixcore.agent import Agent
 from qbrixcore.param.backend import InMemoryParamBackend
-from qbrixcore.protoc.stochastic.ts import BetaTSProtocol
-from qbrixcore.protoc.stochastic.ucb import UCB1TunedProtocol
+from qbrixcore.policy.stochastic.ts import BetaTSPolicy
+from qbrixcore.policy.stochastic.ucb import UCB1TunedPolicy
 from qbrixcore.callback import BaseCallback
 
 
@@ -16,12 +16,12 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol
+            policy=BetaTSPolicy
         )
 
         assert agent.experiment_id == "exp-123"
         assert agent.pool == pool_with_three_arms
-        assert agent.protocol == BetaTSProtocol
+        assert agent.policy == BetaTSPolicy
         assert agent.init_params == {}
         assert isinstance(agent.param_backend, InMemoryParamBackend)
         assert agent.id is not None
@@ -33,19 +33,19 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=backend
         )
 
         assert agent.param_backend is backend
 
     def test_agent_creation_with_init_params(self, pool_with_three_arms):
-        """test agent creation with protocol initialization parameters."""
+        """test agent creation with policy initialization parameters."""
         init_params = {"alpha_prior": 2.0, "beta_prior": 3.0}
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             init_params=init_params
         )
 
@@ -56,12 +56,12 @@ class TestAgent:
         agent1 = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol
+            policy=BetaTSPolicy
         )
         agent2 = Agent(
             experiment_id="exp-456",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol
+            policy=BetaTSPolicy
         )
 
         assert agent1.id != agent2.id
@@ -73,7 +73,7 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol
+            policy=BetaTSPolicy
         )
 
         with pytest.raises(RuntimeError, match="param state not found"):
@@ -86,12 +86,12 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=in_memory_backend
         )
 
         # initialize params
-        params = BetaTSProtocol.init_params(num_arms=3)
+        params = BetaTSPolicy.init_params(num_arms=3)
         in_memory_backend.set("exp-123", params)
 
         choice = agent.select(context_without_vector)
@@ -106,7 +106,7 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol
+            policy=BetaTSPolicy
         )
 
         with pytest.raises(RuntimeError, match="param state not found"):
@@ -119,12 +119,12 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=in_memory_backend
         )
 
         # initialize params
-        params = BetaTSProtocol.init_params(num_arms=3)
+        params = BetaTSPolicy.init_params(num_arms=3)
         in_memory_backend.set("exp-123", params)
 
         # train
@@ -142,12 +142,12 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=in_memory_backend
         )
 
         # initialize params
-        params = BetaTSProtocol.init_params(num_arms=3)
+        params = BetaTSPolicy.init_params(num_arms=3)
         in_memory_backend.set("exp-123", params)
 
         # select
@@ -160,19 +160,19 @@ class TestAgent:
         choice2 = agent.select(context_without_vector)
         assert 0 <= choice2 < 3
 
-    def test_agent_with_different_protocol(
+    def test_agent_with_different_policy(
         self, pool_with_three_arms, context_without_vector, in_memory_backend
     ):
-        """test agent works with different protocol."""
+        """test agent works with different policy."""
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=UCB1TunedProtocol,
+            policy=UCB1TunedPolicy,
             param_backend=in_memory_backend
         )
 
         # initialize params
-        params = UCB1TunedProtocol.init_params(num_arms=3)
+        params = UCB1TunedPolicy.init_params(num_arms=3)
         in_memory_backend.set("exp-123", params)
 
         choice = agent.select(context_without_vector)
@@ -189,19 +189,19 @@ class TestAgent:
         agent1 = Agent(
             experiment_id="exp-1",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=backend
         )
         agent2 = Agent(  # noqa
             experiment_id="exp-2",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=backend
         )
 
         # initialize params for both
-        backend.set("exp-1", BetaTSProtocol.init_params(num_arms=3))
-        backend.set("exp-2", BetaTSProtocol.init_params(num_arms=3))
+        backend.set("exp-1", BetaTSPolicy.init_params(num_arms=3))
+        backend.set("exp-2", BetaTSPolicy.init_params(num_arms=3))
 
         # train agent1
         agent1.train(context_without_vector, choice=0, reward=1.0)
@@ -215,7 +215,7 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol
+            policy=BetaTSPolicy
         )
 
         mock_callback = Mock(spec=BaseCallback)
@@ -231,7 +231,7 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol
+            policy=BetaTSPolicy
         )
 
         with pytest.raises(TypeError, match="Callback must be an instance"):
@@ -242,7 +242,7 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol
+            policy=BetaTSPolicy
         )
 
         callback1 = Mock(spec=BaseCallback)
@@ -264,12 +264,12 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=in_memory_backend
         )
 
         # initialize params
-        in_memory_backend.set("exp-123", BetaTSProtocol.init_params(num_arms=3))
+        in_memory_backend.set("exp-123", BetaTSPolicy.init_params(num_arms=3))
 
         # add callback
         mock_callback = Mock(spec=BaseCallback)
@@ -290,12 +290,12 @@ class TestAgent:
         agent = Agent(
             experiment_id="exp-123",
             pool=pool_with_three_arms,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=in_memory_backend
         )
 
         # initialize params
-        in_memory_backend.set("exp-123", BetaTSProtocol.init_params(num_arms=3))
+        in_memory_backend.set("exp-123", BetaTSPolicy.init_params(num_arms=3))
 
         # add callback with tracking
         class TrackingCallback(BaseCallback):
@@ -328,10 +328,10 @@ class TestAgent:
         agent = Agent(  # noqa
             experiment_id="exp-123",
             pool=empty_pool,
-            protocol=BetaTSProtocol,
+            policy=BetaTSPolicy,
             param_backend=in_memory_backend
         )
 
         # initialize params with 0 arms would fail validation
         with pytest.raises(ValueError):
-            BetaTSProtocol.init_params(num_arms=0)
+            BetaTSPolicy.init_params(num_arms=0)

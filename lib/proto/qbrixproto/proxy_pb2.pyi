@@ -134,7 +134,7 @@ class CreateExperimentRequest(_message.Message):
     DESCRIPTOR: _descriptor.Descriptor
 
     @_typing.final
-    class ProtocolParamsEntry(_message.Message):
+    class PolicyParamsEntry(_message.Message):
         DESCRIPTOR: _descriptor.Descriptor
 
         KEY_FIELD_NUMBER: _builtins.int
@@ -152,16 +152,16 @@ class CreateExperimentRequest(_message.Message):
 
     NAME_FIELD_NUMBER: _builtins.int
     POOL_ID_FIELD_NUMBER: _builtins.int
-    PROTOCOL_FIELD_NUMBER: _builtins.int
-    PROTOCOL_PARAMS_FIELD_NUMBER: _builtins.int
+    POLICY_FIELD_NUMBER: _builtins.int
+    POLICY_PARAMS_FIELD_NUMBER: _builtins.int
     ENABLED_FIELD_NUMBER: _builtins.int
     FEATURE_GATE_FIELD_NUMBER: _builtins.int
     name: _builtins.str
     pool_id: _builtins.str
-    protocol: _builtins.str
+    policy: _builtins.str
     enabled: _builtins.bool
     @_builtins.property
-    def protocol_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
+    def policy_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
     @_builtins.property
     def feature_gate(self) -> Global___FeatureGateConfig:
         """Feature gate config"""
@@ -171,14 +171,14 @@ class CreateExperimentRequest(_message.Message):
         *,
         name: _builtins.str = ...,
         pool_id: _builtins.str = ...,
-        protocol: _builtins.str = ...,
-        protocol_params: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
+        policy: _builtins.str = ...,
+        policy_params: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
         enabled: _builtins.bool = ...,
         feature_gate: Global___FeatureGateConfig | None = ...,
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["feature_gate", b"feature_gate"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "feature_gate", b"feature_gate", "name", b"name", "pool_id", b"pool_id", "protocol", b"protocol", "protocol_params", b"protocol_params"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "feature_gate", b"feature_gate", "name", b"name", "policy", b"policy", "policy_params", b"policy_params", "pool_id", b"pool_id"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___CreateExperimentRequest: _TypeAlias = CreateExperimentRequest  # noqa: Y015
@@ -377,7 +377,7 @@ class UpdateExperimentRequest(_message.Message):
     DESCRIPTOR: _descriptor.Descriptor
 
     @_typing.final
-    class ProtocolParamsEntry(_message.Message):
+    class PolicyParamsEntry(_message.Message):
         DESCRIPTOR: _descriptor.Descriptor
 
         KEY_FIELD_NUMBER: _builtins.int
@@ -395,12 +395,12 @@ class UpdateExperimentRequest(_message.Message):
 
     EXPERIMENT_ID_FIELD_NUMBER: _builtins.int
     ENABLED_FIELD_NUMBER: _builtins.int
-    PROTOCOL_PARAMS_FIELD_NUMBER: _builtins.int
+    POLICY_PARAMS_FIELD_NUMBER: _builtins.int
     FEATURE_GATE_FIELD_NUMBER: _builtins.int
     experiment_id: _builtins.str
     enabled: _builtins.bool
     @_builtins.property
-    def protocol_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
+    def policy_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
     @_builtins.property
     def feature_gate(self) -> Global___FeatureGateConfig: ...
     def __init__(
@@ -408,12 +408,12 @@ class UpdateExperimentRequest(_message.Message):
         *,
         experiment_id: _builtins.str = ...,
         enabled: _builtins.bool | None = ...,
-        protocol_params: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
+        policy_params: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
         feature_gate: Global___FeatureGateConfig | None = ...,
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["_enabled", b"_enabled", "_feature_gate", b"_feature_gate", "enabled", b"enabled", "feature_gate", b"feature_gate"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["_enabled", b"_enabled", "_feature_gate", b"_feature_gate", "enabled", b"enabled", "experiment_id", b"experiment_id", "feature_gate", b"feature_gate", "protocol_params", b"protocol_params"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["_enabled", b"_enabled", "_feature_gate", b"_feature_gate", "enabled", b"enabled", "experiment_id", b"experiment_id", "feature_gate", b"feature_gate", "policy_params", b"policy_params"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
     _WhichOneofReturnType__enabled: _TypeAlias = _typing.Literal["enabled"]  # noqa: Y015
     _WhichOneofArgType__enabled: _TypeAlias = _typing.Literal["_enabled", b"_enabled"]  # noqa: Y015

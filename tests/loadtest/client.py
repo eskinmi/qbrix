@@ -87,13 +87,13 @@ class ProxyClient:
         self,
         name: str,
         pool_id: str,
-        protocol: str = "beta_ts",
+        policy: str = "beta_ts",
         enabled: bool = True,
     ) -> str:
         payload = {
             "name": name,
             "pool_id": pool_id,
-            "protocol": protocol,
+            "policy": policy,
             "enabled": enabled,
         }
         r = self.session.post(

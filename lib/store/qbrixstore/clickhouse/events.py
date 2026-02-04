@@ -23,7 +23,7 @@ class SelectionEvent(BaseSelectionEvent):
             self.context_vector,
             json.dumps(self.context_metadata),
             self.timestamp_ms,
-            self.protocol,
+            self.policy,
         )
 
     @classmethod
@@ -41,7 +41,7 @@ class SelectionEvent(BaseSelectionEvent):
             context_vector=event.context_vector,
             context_metadata=event.context_metadata,
             timestamp_ms=event.timestamp_ms,
-            protocol=event.protocol,
+            policy=event.policy,
         )
 
 

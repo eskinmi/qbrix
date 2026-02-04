@@ -116,7 +116,7 @@ class Experiment(_message.Message):
     DESCRIPTOR: _descriptor.Descriptor
 
     @_typing.final
-    class ProtocolParamsEntry(_message.Message):
+    class PolicyParamsEntry(_message.Message):
         DESCRIPTOR: _descriptor.Descriptor
 
         KEY_FIELD_NUMBER: _builtins.int
@@ -135,28 +135,28 @@ class Experiment(_message.Message):
     ID_FIELD_NUMBER: _builtins.int
     NAME_FIELD_NUMBER: _builtins.int
     POOL_ID_FIELD_NUMBER: _builtins.int
-    PROTOCOL_FIELD_NUMBER: _builtins.int
-    PROTOCOL_PARAMS_FIELD_NUMBER: _builtins.int
+    POLICY_FIELD_NUMBER: _builtins.int
+    POLICY_PARAMS_FIELD_NUMBER: _builtins.int
     ENABLED_FIELD_NUMBER: _builtins.int
     id: _builtins.str
     name: _builtins.str
     pool_id: _builtins.str
-    protocol: _builtins.str
+    policy: _builtins.str
     """e.g., "thompson_sampling", "ucb", "epsilon_greedy" """
     enabled: _builtins.bool
     @_builtins.property
-    def protocol_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
+    def policy_params(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]: ...
     def __init__(
         self,
         *,
         id: _builtins.str = ...,
         name: _builtins.str = ...,
         pool_id: _builtins.str = ...,
-        protocol: _builtins.str = ...,
-        protocol_params: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
+        policy: _builtins.str = ...,
+        policy_params: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
         enabled: _builtins.bool = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "id", b"id", "name", b"name", "pool_id", b"pool_id", "protocol", b"protocol", "protocol_params", b"protocol_params"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "id", b"id", "name", b"name", "policy", b"policy", "policy_params", b"policy_params", "pool_id", b"pool_id"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
 Global___Experiment: _TypeAlias = Experiment  # noqa: Y015

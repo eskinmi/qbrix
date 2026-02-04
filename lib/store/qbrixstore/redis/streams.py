@@ -62,7 +62,7 @@ class SelectionEvent:
     context_vector: list[float]
     context_metadata: dict
     timestamp_ms: int
-    protocol: str
+    policy: str
 
     def to_dict(self) -> dict:
         return {
@@ -77,7 +77,7 @@ class SelectionEvent:
             "context_vector": json.dumps(self.context_vector),
             "context_metadata": json.dumps(self.context_metadata),
             "timestamp_ms": str(self.timestamp_ms),
-            "protocol": self.protocol,
+            "policy": self.policy,
         }
 
     @classmethod
@@ -94,7 +94,7 @@ class SelectionEvent:
             context_vector=json.loads(data["context_vector"]),
             context_metadata=json.loads(data["context_metadata"]),
             timestamp_ms=int(data["timestamp_ms"]),
-            protocol=data["protocol"],
+            policy=data["policy"],
         )
 
 

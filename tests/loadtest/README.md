@@ -88,7 +88,7 @@ All settings can be configured via environment variables with `LOADTEST_` prefix
 | `LOADTEST_NUM_EXPERIMENTS` | `10` | Number of experiments (multi scenario) |
 | `LOADTEST_MAX_USERS_PER_EXPERIMENT` | `100` | Max users per experiment |
 | `LOADTEST_DEFAULT_NUM_ARMS` | `5` | Number of arms per pool |
-| `LOADTEST_DEFAULT_PROTOCOL` | `beta_ts` | Bandit protocol to use |
+| `LOADTEST_DEFAULT_PROTOCOL` | `beta_ts` | Bandit policy to use |
 
 ## Prerequisites
 

@@ -45,23 +45,23 @@ class FeatureGateRequest(BaseModel):
 class ExperimentCreateRequest(BaseModel):
     name: str
     pool_id: str
-    protocol: str
-    protocol_params: dict = {}
+    policy: str
+    policy_params: dict = {}
     enabled: bool = True
     feature_gate: Optional[FeatureGateRequest] = None
 
 
 class ExperimentUpdateRequest(BaseModel):
     enabled: Optional[bool] = None
-    protocol_params: Optional[dict] = None
+    policy_params: Optional[dict] = None
 
 
 class ExperimentResponse(BaseModel):
     id: str
     name: str
     pool_id: str
-    protocol: str
-    protocol_params: dict
+    policy: str
+    policy_params: dict
     enabled: bool
 
 
@@ -93,8 +93,8 @@ async def create_experiment(
             tenant_id=tenant_id,
             name=body.name,
             pool_id=body.pool_id,
-            protocol=body.protocol,
-            protocol_params=body.protocol_params,
+            policy=body.policy,
+            policy_params=body.policy_params,
             enabled=body.enabled,
             feature_gate_config=feature_gate_config,
         )
@@ -104,8 +104,8 @@ async def create_experiment(
             id=experiment["id"],
             name=experiment["name"],
             pool_id=experiment["pool_id"],
-            protocol=experiment["protocol"],
-            protocol_params=experiment.get("protocol_params", {}),
+            policy=experiment["policy"],
+            policy_params=experiment.get("policy_params", {}),
             enabled=experiment.get("enabled", True),
         )
     except ExperimentCreationException:
@@ -137,8 +137,8 @@ async def get_experiment(
         id=experiment["id"],
         name=experiment["name"],
         pool_id=experiment["pool_id"],
-        protocol=experiment["protocol"],
-        protocol_params=experiment.get("protocol_params", {}),
+        policy=experiment["policy"],
+        policy_params=experiment.get("policy_params", {}),
         enabled=experiment.get("enabled", True),
     )
 
@@ -162,8 +162,8 @@ async def update_experiment(
         kwargs = {}
         if body.enabled is not None:
             kwargs["enabled"] = body.enabled
-        if body.protocol_params is not None:
-            kwargs["protocol_params"] = body.protocol_params
+        if body.policy_params is not None:
+            kwargs["policy_params"] = body.policy_params
 
         experiment = await service.update_experiment(tenant_id, experiment_id, **kwargs)
 
@@ -175,8 +175,8 @@ async def update_experiment(
             id=experiment["id"],
             name=experiment["name"],
             pool_id=experiment["pool_id"],
-            protocol=experiment["protocol"],
-            protocol_params=experiment.get("protocol_params", {}),
+            policy=experiment["policy"],
+            policy_params=experiment.get("policy_params", {}),
             enabled=experiment.get("enabled", True),
         )
     except ExperimentNotFoundException:
@@ -235,8 +235,8 @@ async def list_experiments(
                 id=exp["id"],
                 name=exp["name"],
                 pool_id=exp["pool_id"],
-                protocol=exp["protocol"],
-                protocol_params=exp.get("protocol_params", {}),
+                policy=exp["policy"],
+                policy_params=exp.get("policy_params", {}),
                 enabled=exp.get("enabled", True),
             )
             for exp in experiments

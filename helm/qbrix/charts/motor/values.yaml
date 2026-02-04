@@ -112,7 +112,7 @@ config:
     ttl: 60       # seconds - balance freshness vs redis load
     maxSize: 1000
 
-  # agent cache: stores agent/protocol objects
+  # agent cache: stores agent/policy objects
   agentCache:
     ttl: 300      # seconds - agents change less frequently
     maxSize: 100

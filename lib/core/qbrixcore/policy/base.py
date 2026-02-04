@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from qbrixcore.param.state import BaseParamState
 
 
-class BaseProtocol(ABC):
+class BasePolicy(ABC):
     """
     Base class for all criteria used in bandit algorithms.
     """

@@ -6,9 +6,9 @@ import numpy as np
 from qbrixcore.pool import Pool
 from qbrixcore.pool import Arm
 from qbrixcore.agent import Agent
-from qbrixcore.protoc.stochastic.ts import BetaTSProtocol
-from qbrixcore.protoc.stochastic.ts import BetaTSParamState
-from qbrixcore.protoc.stochastic.ts import GaussianTSParamState
+from qbrixcore.policy.stochastic.ts import BetaTSPolicy
+from qbrixcore.policy.stochastic.ts import BetaTSParamState
+from qbrixcore.policy.stochastic.ts import GaussianTSParamState
 from qbrixstore.redis.client import RedisClient
 
 from motorsvc.config import MotorSettings
@@ -85,8 +85,8 @@ def experiment_data_dict(pool_data_dict):
     return {
         "id": "exp-123",
         "name": "test-experiment",
-        "protocol": "BetaTSProtocol",
-        "protocol_params": {"alpha_prior": 1.0, "beta_prior": 1.0},
+        "policy": "BetaTSPolicy",
+        "policy_params": {"alpha_prior": 1.0, "beta_prior": 1.0},
         "pool": pool_data_dict,
     }
 
@@ -115,14 +115,14 @@ def gaussian_ts_params():
 
 @pytest.fixture
 def mock_agent(pool_with_three_arms, beta_ts_params):
-    """mocked agent with beta ts protocol"""
+    """mocked agent with beta ts policy"""
     mock_backend = Mock()
     mock_backend.get.return_value = beta_ts_params
 
     agent = Agent(
         experiment_id="exp-123",
         pool=pool_with_three_arms,
-        protocol=BetaTSProtocol,
+        policy=BetaTSPolicy,
         init_params={"alpha_prior": 1.0, "beta_prior": 1.0},
         param_backend=mock_backend,
     )

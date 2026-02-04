@@ -5,12 +5,12 @@ from pydantic import Field, model_validator
 
 from qbrixcore.param.var import ArrayParam
 from qbrixcore.param.state import BaseParamState
-from qbrixcore.protoc.base import BaseProtocol
+from qbrixcore.policy.base import BasePolicy
 from qbrixcore.context import Context
 
 
 class FPLParamState(BaseParamState):
-    """Parameter state for FPL (Follow the Perturbed Leader) protocol."""
+    """Parameter state for FPL (Follow the Perturbed Leader) policy."""
 
     eta: float = Field(default=5.0, gt=0.0)
     r: ArrayParam | None = None
@@ -22,9 +22,9 @@ class FPLParamState(BaseParamState):
         return self
 
 
-class FPLProtocol(BaseProtocol):
+class FPLPolicy(BasePolicy):
     """
-    FPL (Follow the Perturbed Leader) protocol for adversarial multi-armed bandit.
+    FPL (Follow the Perturbed Leader) policy for adversarial multi-armed bandit.
 
     FPL works by:
     1. Maintaining cumulative rewards for each arm
@@ -35,7 +35,7 @@ class FPLProtocol(BaseProtocol):
     The eta parameter controls the noise scale (exploration).
     """
 
-    name: ClassVar[str] = "FPLProtocol"
+    name: ClassVar[str] = "FPLPolicy"
     param_state_cls: type[BaseParamState] = FPLParamState
 
     @staticmethod

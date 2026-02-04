@@ -26,7 +26,7 @@ class ClickHouseClient:
         "context_vector",
         "context_metadata",
         "timestamp_ms",
-        "protocol",
+        "policy",
     ]
 
     FEEDBACK_COLUMNS = [
@@ -116,7 +116,7 @@ class ClickHouseClient:
             event.context_vector,
             json.dumps(event.context_metadata),
             event.timestamp_ms,
-            event.protocol,
+            event.policy,
         )
 
     @staticmethod

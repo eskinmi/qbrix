@@ -53,8 +53,8 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             response = await self._service.create_experiment(
                 name=request.name,
                 pool_id=request.pool_id,
-                protocol=request.protocol,
-                protocol_params=dict(request.protocol_params),
+                policy=request.policy,
+                policy_params=dict(request.policy_params),
                 enabled=request.enabled,
                 feature_gate_config=feature_gate,
             )
@@ -81,8 +81,8 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             kwargs = {}
             if request.HasField("enabled"):
                 kwargs["enabled"] = request.enabled
-            if request.protocol_params:
-                kwargs["protocol_params"] = dict(request.protocol_params)
+            if request.policy_params:
+                kwargs["policy_params"] = dict(request.policy_params)
             if request.HasField("feature_gate"):
                 kwargs["feature_gate_config"] = self._proto_to_gate_config(
                     request.feature_gate
@@ -250,9 +250,9 @@ class ProxyGRPCServicer(proxy_pb2_grpc.ProxyServiceServicer):
             id=d["id"],
             name=d["name"],
             pool_id=d["pool_id"],
-            protocol=d["protocol"],
-            protocol_params={
-                k: str(v) for k, v in d.get("protocol_params", {}).items()
+            policy=d["policy"],
+            policy_params={
+                k: str(v) for k, v in d.get("policy_params", {}).items()
             },
             enabled=d.get("enabled", False),
         )

@@ -135,7 +135,7 @@ curl -X POST http://localhost:8080/api/v1/experiments \
   -d '{
     "name": "button-color-test",
     "pool_id": "<pool_id>",
-    "protocol": "beta_ts"
+    "policy": "beta_ts"
   }'
 ```
 

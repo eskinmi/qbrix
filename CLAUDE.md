@@ -84,16 +84,16 @@ Qbrix is a distributed system for multi-armed bandit (MAB) optimizations. It sep
 ### qbrixcore (lib/core)
 Core MAB algorithms. Published to envelope registry.
 
-**Protocols**:
-- Stochastic: BetaTSProtocol, GaussianTSProtocol, UCB1TunedProtocol, KLUCBProtocol, KLUCBPlusProtocol, EpsilonProtocol, MOSSProtocol, MOSSAnyTimeProtocol
-- Contextual: LinUCBProtocol, LinTSProtocol
-- Adversarial: EXP3Protocol, FPLProtocol
+**Policys**:
+- Stochastic: BetaTSPolicy, GaussianTSPolicy, UCB1TunedPolicy, KLUCBPolicy, EpsilonPolicy, MOSSPolicy, MOSSAnyTimePolicy
+- Contextual: LinUCBPolicy, LinTSPolicy
+- Adversarial: EXP3Policy, FPLPolicy
 
 **Key abstractions**:
-- `BaseProtocol`: Interface with `name`, `select()`, `train()`, `init_params()`
+- `BasePolicy`: Interface with `name`, `select()`, `train()`, `init_params()`
 - `BaseParamState`: Pydantic model for parameter state
 - `BaseParamBackend`: Abstract backend for param storage (InMemoryParamBackend, RedisParamBackend)
-- `Agent`: Orchestrates protocol execution with callbacks
+- `Agent`: Orchestrates policy execution with callbacks
 - `Pool` / `Arm`: Experiment structure
 - `Context`: Request context with id, vector, metadata
 
@@ -271,15 +271,16 @@ def select_arm():
 - Import each module on a separate line for clarity
 - Group imports: standard library, third-party, local
 - Use absolute imports for local modules
+
 ```python
 # Good
-from qbrixcore.protoc.stochastic.ts import BetaTSProtocol
-from qbrixcore.protoc.stochastic.ucb import UCB1TunedProtocol
+from qbrixcore.policy.stochastic.ts import BetaTSPolicy
+from qbrixcore.policy.stochastic.ucb import UCB1TunedPolicy
 from qbrixcore.agent import Agent
 
 # Bad
-from qbrixcore.protoc.stochastic.ts import BetaTSProtocol, GaussianTSProtocol
-from qbrixcore.protoc.stochastic.ucb import UCB1TunedProtocol, KLUCBProtocol
+from qbrixcore.policy.stochastic.ts import BetaTSPolicy, GaussianTSPolicy
+from qbrixcore.policy.stochastic.ucb import UCB1TunedPolicy, KLUCBPolicy
 ```
 
 ### Type Hints
