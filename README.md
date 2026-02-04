@@ -1,4 +1,9 @@
 <p align="center">
+  <img src="./asset/logo.png" alt="Project Logo" width="600">
+</p>
+
+
+<p align="center">
   <h1 align="center">Qbrix</h1>
   <p align="center">
     <strong>Distributed Multi-Armed Bandit Optimization Platform</strong>
