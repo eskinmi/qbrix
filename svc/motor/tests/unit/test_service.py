@@ -51,7 +51,7 @@ class TestMotorServiceLifecycle:
 class TestMotorServiceSelect:
     @pytest.mark.asyncio
     async def test_select_retrieves_experiment_from_redis(
-        self, motor_settings, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_settings, mock_redis_client, experiment_data_dict
     ):
         service = MotorService(motor_settings)
         service._redis = mock_redis_client
@@ -67,17 +67,18 @@ class TestMotorServiceSelect:
         service._agent_factory = mock_factory
 
         await service.select(
+            tenant_id=tenant_id,
             experiment_id="exp-123",
             context_id="ctx-1",
             context_vector=[0.5, 0.3],
             context_metadata={"user_id": "user-1"},
         )
 
-        mock_redis_client.get_experiment.assert_awaited_once_with("exp-123")
+        mock_redis_client.get_experiment.assert_awaited_once_with(tenant_id, "exp-123")
 
     @pytest.mark.asyncio
     async def test_select_raises_error_when_experiment_not_found(
-        self, motor_settings, mock_redis_client
+        self, tenant_id, motor_settings, mock_redis_client
     ):
         service = MotorService(motor_settings)
         service._redis = mock_redis_client
@@ -86,6 +87,7 @@ class TestMotorServiceSelect:
 
         with pytest.raises(ValueError, match="experiment not found"):
             await service.select(
+                tenant_id=tenant_id,
                 experiment_id="nonexistent-exp",
                 context_id="ctx-1",
                 context_vector=[],
@@ -94,7 +96,7 @@ class TestMotorServiceSelect:
 
     @pytest.mark.asyncio
     async def test_select_gets_or_creates_agent(
-        self, motor_settings, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_settings, mock_redis_client, experiment_data_dict
     ):
         service = MotorService(motor_settings)
         service._redis = mock_redis_client
@@ -113,17 +115,18 @@ class TestMotorServiceSelect:
         service._agent_factory = mock_factory
 
         await service.select(
+            tenant_id=tenant_id,
             experiment_id="exp-123",
             context_id="ctx-1",
             context_vector=[0.5],
             context_metadata={},
         )
 
-        mock_factory.get_or_create.assert_awaited_once_with(experiment_data_dict)
+        mock_factory.get_or_create.assert_awaited_once_with(tenant_id, experiment_data_dict)
 
     @pytest.mark.asyncio
     async def test_select_calls_agent_select_with_context(
-        self, motor_settings, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_settings, mock_redis_client, experiment_data_dict
     ):
         service = MotorService(motor_settings)
         service._redis = mock_redis_client
@@ -139,6 +142,7 @@ class TestMotorServiceSelect:
         service._agent_factory = mock_factory
 
         await service.select(
+            tenant_id=tenant_id,
             experiment_id="exp-123",
             context_id="ctx-1",
             context_vector=[0.5, 0.3],
@@ -155,7 +159,7 @@ class TestMotorServiceSelect:
 
     @pytest.mark.asyncio
     async def test_select_returns_selected_arm_info(
-        self, motor_settings, mock_redis_client, experiment_data_dict, pool_with_three_arms
+        self, tenant_id, motor_settings, mock_redis_client, experiment_data_dict, pool_with_three_arms
     ):
         service = MotorService(motor_settings)
         service._redis = mock_redis_client
@@ -171,6 +175,7 @@ class TestMotorServiceSelect:
         service._agent_factory = mock_factory
 
         result = await service.select(
+            tenant_id=tenant_id,
             experiment_id="exp-123",
             context_id="ctx-1",
             context_vector=[],
@@ -183,7 +188,7 @@ class TestMotorServiceSelect:
 
     @pytest.mark.asyncio
     async def test_select_handles_empty_context_vector(
-        self, motor_settings, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_settings, mock_redis_client, experiment_data_dict
     ):
         service = MotorService(motor_settings)
         service._redis = mock_redis_client
@@ -199,6 +204,7 @@ class TestMotorServiceSelect:
         service._agent_factory = mock_factory
 
         await service.select(
+            tenant_id=tenant_id,
             experiment_id="exp-123",
             context_id="ctx-1",
             context_vector=None,  # noqa
@@ -213,7 +219,7 @@ class TestMotorServiceSelect:
 
     @pytest.mark.asyncio
     async def test_select_handles_empty_metadata(
-        self, motor_settings, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_settings, mock_redis_client, experiment_data_dict
     ):
         service = MotorService(motor_settings)
         service._redis = mock_redis_client
@@ -229,6 +235,7 @@ class TestMotorServiceSelect:
         service._agent_factory = mock_factory
 
         await service.select(
+            tenant_id=tenant_id,
             experiment_id="exp-123",
             context_id="ctx-1",
             context_vector=[],

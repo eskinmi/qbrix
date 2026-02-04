@@ -82,15 +82,15 @@ class TestAgentFactoryBuildPool:
 class TestAgentFactoryGetOrCreate:
     @pytest.mark.asyncio
     async def test_get_or_create_returns_cached_agent(
-        self, motor_cache, mock_redis_client, mock_agent, beta_ts_params, experiment_data_dict
+        self, tenant_id, motor_cache, mock_redis_client, mock_agent, beta_ts_params, experiment_data_dict
     ):
         backend = Mock()
         backend.get.return_value = beta_ts_params
         factory = AgentFactory(motor_cache, backend)
 
-        motor_cache.set_agent("exp-123", mock_agent)
+        motor_cache.set_agent(tenant_id, "exp-123", mock_agent)
 
-        agent = await factory.get_or_create(experiment_data_dict)
+        agent = await factory.get_or_create(tenant_id, experiment_data_dict)
 
         assert agent is not None
         assert agent.experiment_id == "exp-123"
@@ -98,17 +98,18 @@ class TestAgentFactoryGetOrCreate:
 
     @pytest.mark.asyncio
     async def test_get_or_create_creates_new_agent_when_not_cached(
-        self, motor_cache, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_cache, mock_redis_client, experiment_data_dict
     ):
         backend = Mock()
         backend.get.return_value = None
         backend.update_params = AsyncMock(return_value=None)
         backend.set = Mock()
+        backend.scoped = Mock(return_value=Mock())
         factory = AgentFactory(motor_cache, backend)
 
-        agent = await factory.get_or_create(experiment_data_dict)
+        agent = await factory.get_or_create(tenant_id, experiment_data_dict)
 
-        backend.set.assert_called_once()  # todo: checkout
+        backend.set.assert_called_once()
         backend.get.assert_called_once()
         assert agent is not None
         assert agent.experiment_id == "exp-123"
@@ -117,47 +118,51 @@ class TestAgentFactoryGetOrCreate:
 
     @pytest.mark.asyncio
     async def test_get_or_create_caches_newly_created_agent(
-        self, motor_cache, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_cache, mock_redis_client, experiment_data_dict
     ):
         backend = Mock()
         backend.get.return_value = None
         backend.update_params = AsyncMock(return_value=None)
         backend.set = Mock()
+        backend.scoped = Mock(return_value=Mock())
         factory = AgentFactory(motor_cache, backend)
 
-        agent = await factory.get_or_create(experiment_data_dict)
+        agent = await factory.get_or_create(tenant_id, experiment_data_dict)
 
-        cached_agent = motor_cache.get_agent("exp-123")
+        cached_agent = motor_cache.get_agent(tenant_id, "exp-123")
         backend.set.assert_called_once()
         assert cached_agent is not None
         assert cached_agent.experiment_id == agent.experiment_id
 
     @pytest.mark.asyncio
     async def test_get_or_create_initializes_params_when_not_in_backend(
-        self, motor_cache, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_cache, mock_redis_client, experiment_data_dict
     ):
         backend = Mock()
         backend.get.return_value = None
         backend.update_params = AsyncMock(return_value=None)
         backend.set = Mock()
+        backend.scoped = Mock(return_value=Mock())
         factory = AgentFactory(motor_cache, backend)
 
-        await factory.get_or_create(experiment_data_dict)
+        await factory.get_or_create(tenant_id, experiment_data_dict)
 
         backend.set.assert_called_once()
         call_args = backend.set.call_args
-        assert call_args[0][0] == "exp-123"  # experiment_id
-        params = call_args[0][1]
+        assert call_args[0][0] == tenant_id  # tenant_id
+        assert call_args[0][1] == "exp-123"  # experiment_id
+        params = call_args[0][2]
         assert params.num_arms == 3
 
     @pytest.mark.asyncio
     async def test_get_or_create_uses_protocol_params_from_experiment(
-        self, motor_cache, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_cache, mock_redis_client, experiment_data_dict
     ):
         backend = Mock()
         backend.get.return_value = None
         backend.update_params = AsyncMock(return_value=None)
         backend.set = Mock()
+        backend.scoped = Mock(return_value=Mock())
         factory = AgentFactory(motor_cache, backend)
 
         # custom protocol params
@@ -165,7 +170,7 @@ class TestAgentFactoryGetOrCreate:
         init_beta_prior = 3.0
         experiment_data_dict["protocol_params"] = {"alpha_prior": init_alpha_prior, "beta_prior": init_beta_prior}
 
-        agent = await factory.get_or_create(experiment_data_dict)
+        agent = await factory.get_or_create(tenant_id, experiment_data_dict)
 
         assert agent.init_params == {
             "alpha_prior": init_alpha_prior,
@@ -174,7 +179,7 @@ class TestAgentFactoryGetOrCreate:
 
     @pytest.mark.asyncio
     async def test_get_or_create_raises_error_for_unknown_protocol(
-        self, motor_cache, mock_redis_client, experiment_data_dict
+        self, tenant_id, motor_cache, mock_redis_client, experiment_data_dict
     ):
         backend = Mock()
         backend.get.return_value = None
@@ -183,19 +188,20 @@ class TestAgentFactoryGetOrCreate:
         experiment_data_dict["protocol"] = "ProtocolThatMustNotExist"
 
         with pytest.raises(ValueError, match="Unknown protocol"):
-            await factory.get_or_create(experiment_data_dict)
+            await factory.get_or_create(tenant_id, experiment_data_dict)
 
     @pytest.mark.asyncio
     async def test_get_or_create_fetches_params_from_backend_when_available(
-        self, motor_cache, mock_redis_client, experiment_data_dict, beta_ts_params
+        self, tenant_id, motor_cache, mock_redis_client, experiment_data_dict, beta_ts_params
     ):
         backend = Mock()
         backend.get.return_value = None
         backend.update_params = AsyncMock(return_value=beta_ts_params)
         backend.set = Mock()
+        backend.scoped = Mock(return_value=Mock())
         factory = AgentFactory(motor_cache, backend)
 
-        agent = await factory.get_or_create(experiment_data_dict)  # noqa
+        agent = await factory.get_or_create(tenant_id, experiment_data_dict)  # noqa
 
         # when update_params returns params, they are already cached by update_params
         # so set should not be called (params are fetched, not initialized)
@@ -204,20 +210,20 @@ class TestAgentFactoryGetOrCreate:
 
     @pytest.mark.asyncio
     async def test_get_or_create_updates_params_when_agent_cached_but_params_missing(
-        self, motor_cache, mock_redis_client, mock_agent, experiment_data_dict, beta_ts_params
+        self, tenant_id, motor_cache, mock_redis_client, mock_agent, experiment_data_dict, beta_ts_params
     ):
         backend = Mock()
         backend.get.return_value = None  # params not in cache
 
-        async def mock_update_params(exp_id, protocol):  # noqa
+        async def mock_update_params(tid, exp_id, protocol):  # noqa
             return beta_ts_params
 
         backend.update_params = mock_update_params
         factory = AgentFactory(motor_cache, backend)
 
-        motor_cache.set_agent("exp-123", mock_agent)
+        motor_cache.set_agent(tenant_id, "exp-123", mock_agent)
 
-        agent = await factory.get_or_create(experiment_data_dict)
+        agent = await factory.get_or_create(tenant_id, experiment_data_dict)
 
         assert agent is not None
         # should have returned the cached agent
@@ -225,23 +231,24 @@ class TestAgentFactoryGetOrCreate:
 
     @pytest.mark.asyncio
     async def test_get_or_create_initializes_params_when_agent_cached_and_backend_empty(
-        self, motor_cache, mock_redis_client, mock_agent, experiment_data_dict
+        self, tenant_id, motor_cache, mock_redis_client, mock_agent, experiment_data_dict
     ):
         backend = Mock()
         backend.get.return_value = None
 
-        async def mock_update_params(exp_id, protocol):  # noqa
+        async def mock_update_params(tid, exp_id, protocol):  # noqa
             return None  # no params in redis
 
         backend.update_params = mock_update_params
         backend.set = Mock()
         factory = AgentFactory(motor_cache, backend)
 
-        motor_cache.set_agent("exp-123", mock_agent)
+        motor_cache.set_agent(tenant_id, "exp-123", mock_agent)
 
-        agent = await factory.get_or_create(experiment_data_dict)  # noqa
+        agent = await factory.get_or_create(tenant_id, experiment_data_dict)  # noqa
 
         # should initialize and set params
         backend.set.assert_called_once()
         call_args = backend.set.call_args
-        assert call_args[0][0] == "exp-123"
+        assert call_args[0][0] == tenant_id
+        assert call_args[0][1] == "exp-123"

@@ -41,7 +41,7 @@ class AgentFactory:
             pool.add_arm(arm)
         return pool
 
-    async def get_or_create(self, tenant_id: str, experiment_data: dict) -> Agent:
+    async def get_or_create(self, tenant_id: str, experiment_record: dict) -> Agent:
         """
         Get cached agent or create new one.
 
@@ -49,7 +49,7 @@ class AgentFactory:
         and cache set. concurrent requests may build duplicate agents. this is
         acceptable because agents are stateless and param state lives in redis.
         """
-        experiment_id = experiment_data["id"]
+        experiment_id = experiment_record["id"]
 
         agent = self._cache.get_agent(tenant_id, experiment_id)
         if agent is not None:
@@ -74,7 +74,7 @@ class AgentFactory:
         #  if it is not the first request, we already must have parameters, so we will fetch the
         #  parameters from the cache or redis.
 
-        protocol_name = experiment_data["protocol"]
+        protocol_name = experiment_record["protocol"]
         protocol_cls = PROTOCOL_MAP.get(protocol_name)
         if protocol_cls is None:
             raise ValueError(
@@ -87,21 +87,18 @@ class AgentFactory:
             )
             if params is None:
                 params = protocol_cls.init_params(
-                    num_arms=len(experiment_data["pool"]["arms"]),
-                    **experiment_data.get("protocol_params", {}),
+                    num_arms=len(experiment_record["pool"]["arms"]),
+                    **experiment_record.get("protocol_params", {}),
                 )
                 self._param_backend.set(tenant_id, experiment_id, params)
 
-        pool = self._build_pool(experiment_data["pool"])
-
-        # create a tenant-scoped param backend for the agent
+        pool = self._build_pool(experiment_record["pool"])
         scoped_param_backend = self._param_backend.scoped(tenant_id)
-
         agent = Agent(
             experiment_id=experiment_id,
             pool=pool,
             protocol=protocol_cls,
-            init_params=experiment_data.get("protocol_params", {}),
+            init_params=experiment_record.get("protocol_params", {}),
             param_backend=scoped_param_backend,
         )
 

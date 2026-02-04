@@ -6,6 +6,12 @@ from qbrixstore.redis.streams import FeedbackEvent
 
 
 @pytest.fixture
+def tenant_id():
+    """default tenant id for testing"""
+    return "tenant-001"
+
+
+@pytest.fixture
 def mock_redis_client():
     """mock redis client for param storage and experiment retrieval."""
     client = AsyncMock()
@@ -33,9 +39,10 @@ def mock_stream_consumer():
 
 
 @pytest.fixture
-def sample_feedback_event():
+def sample_feedback_event(tenant_id):
     """create a sample feedback event."""
     return FeedbackEvent(
+        tenant_id=tenant_id,
         experiment_id="exp-001",
         request_id="req-001",
         arm_index=0,

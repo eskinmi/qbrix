@@ -16,6 +16,12 @@ from motorsvc.cache import MotorCache
 
 
 @pytest.fixture
+def tenant_id():
+    """default tenant id for testing"""
+    return "tenant-001"
+
+
+@pytest.fixture
 def motor_settings():
     """default motor settings for testing"""
     return MotorSettings(

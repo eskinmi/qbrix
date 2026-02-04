@@ -9,36 +9,42 @@ from motorsvc.param_backend import RedisBackedInMemoryParamBackend
 
 class TestRedisBackedInMemoryParamBackend:
 
-    def test_get_returns_cached_params(self, mock_redis_client, motor_cache, beta_ts_params):
+    def test_get_returns_cached_params(
+        self, tenant_id, mock_redis_client, motor_cache, beta_ts_params
+    ):
         backend = RedisBackedInMemoryParamBackend(mock_redis_client, motor_cache)
         experiment_id = "exp-123"
 
-        motor_cache.set_params(experiment_id, beta_ts_params)
-        result = backend.get(experiment_id)
+        motor_cache.set_params(tenant_id, experiment_id, beta_ts_params)
+        result = backend.get(tenant_id, experiment_id)
 
         assert result is not None
         assert result.num_arms == 3
         assert np.array_equal(result.alpha, beta_ts_params.alpha)
 
-    def test_get_returns_none_when_not_cached(self, mock_redis_client, motor_cache):
+    def test_get_returns_none_when_not_cached(self, tenant_id, mock_redis_client, motor_cache):
         backend = RedisBackedInMemoryParamBackend(mock_redis_client, motor_cache)
 
-        result = backend.get("nonexistent-exp")
+        result = backend.get(tenant_id, "nonexistent-exp")
 
         assert result is None
 
-    def test_set_caches_params(self, mock_redis_client, motor_cache, beta_ts_params):
+    def test_set_caches_params(
+        self, tenant_id, mock_redis_client, motor_cache, beta_ts_params
+    ):
         backend = RedisBackedInMemoryParamBackend(mock_redis_client, motor_cache)
         experiment_id = "exp-123"
 
-        backend.set(experiment_id, beta_ts_params)
+        backend.set(tenant_id, experiment_id, beta_ts_params)
 
-        cached = motor_cache.get_params(experiment_id)
+        cached = motor_cache.get_params(tenant_id, experiment_id)
         assert cached is not None
         assert np.array_equal(cached.alpha, beta_ts_params.alpha)
 
     @pytest.mark.asyncio
-    async def test_update_params_fetches_from_redis_and_caches(self, mock_redis_client, motor_cache):
+    async def test_update_params_fetches_from_redis_and_caches(
+        self, tenant_id, mock_redis_client, motor_cache
+    ):
         backend = RedisBackedInMemoryParamBackend(mock_redis_client, motor_cache)
         experiment_id = "exp-123"
 
@@ -53,31 +59,33 @@ class TestRedisBackedInMemoryParamBackend:
         }
         mock_redis_client.get_params.return_value = params_dict
 
-        result = await backend.update_params(experiment_id, BetaTSProtocol)
+        result = await backend.update_params(tenant_id, experiment_id, BetaTSProtocol)
 
         assert result is not None
         assert result.num_arms == 3
         assert np.array_equal(result.alpha, np.array([2.0, 1.5, 1.0]))
 
         # verify it was cached
-        cached = motor_cache.get_params(experiment_id)
+        cached = motor_cache.get_params(tenant_id, experiment_id)
         assert cached is not None
         assert np.array_equal(cached.alpha, result.alpha)
 
     @pytest.mark.asyncio
-    async def test_update_params_returns_none_when_redis_has_no_params(self, mock_redis_client, motor_cache):
+    async def test_update_params_returns_none_when_redis_has_no_params(
+        self, tenant_id, mock_redis_client, motor_cache
+    ):
         backend = RedisBackedInMemoryParamBackend(mock_redis_client, motor_cache)
         experiment_id = "exp-123"
 
         mock_redis_client.get_params.return_value = None
 
-        result = await backend.update_params(experiment_id, BetaTSProtocol)
+        result = await backend.update_params(tenant_id, experiment_id, BetaTSProtocol)
 
         assert result is None
 
     @pytest.mark.asyncio
     async def test_update_params_uses_correct_protocol_param_state_class(
-        self, mock_redis_client, motor_cache
+        self, tenant_id, mock_redis_client, motor_cache
     ):
         backend = RedisBackedInMemoryParamBackend(mock_redis_client, motor_cache)
         experiment_id = "exp-123"
@@ -94,7 +102,7 @@ class TestRedisBackedInMemoryParamBackend:
         }
         mock_redis_client.get_params.return_value = params_dict
 
-        result = await backend.update_params(experiment_id, GaussianTSProtocol)
+        result = await backend.update_params(tenant_id, experiment_id, GaussianTSProtocol)
 
         assert result is not None
         assert isinstance(result, GaussianTSProtocol.param_state_cls)
@@ -102,7 +110,9 @@ class TestRedisBackedInMemoryParamBackend:
         assert np.array_equal(result.posterior_mean, np.array([0.5, 0.3, 0.7]))
 
     @pytest.mark.asyncio
-    async def test_update_params_validates_params_dict(self, mock_redis_client, motor_cache):
+    async def test_update_params_validates_params_dict(
+        self, tenant_id, mock_redis_client, motor_cache
+    ):
         backend = RedisBackedInMemoryParamBackend(mock_redis_client, motor_cache)
         experiment_id = "exp-123"
 
@@ -116,7 +126,7 @@ class TestRedisBackedInMemoryParamBackend:
         }
         mock_redis_client.get_params.return_value = params_dict
 
-        result = await backend.update_params(experiment_id, BetaTSProtocol)
+        result = await backend.update_params(tenant_id, experiment_id, BetaTSProtocol)
 
         # params should be created with defaults for missing fields
         assert result is not None

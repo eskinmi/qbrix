@@ -13,63 +13,65 @@ class TestMotorCache:
         assert cache._params is not None
         assert cache._agents is not None
 
-    def test_set_and_get_params(self, motor_cache, beta_ts_params):
+    def test_set_and_get_params(self, tenant_id, motor_cache, beta_ts_params):
         experiment_id = "exp-123"
 
-        motor_cache.set_params(experiment_id, beta_ts_params)
-        retrieved = motor_cache.get_params(experiment_id)
+        motor_cache.set_params(tenant_id, experiment_id, beta_ts_params)
+        retrieved = motor_cache.get_params(tenant_id, experiment_id)
 
         assert retrieved is not None
         assert retrieved.num_arms == 3
         assert np.array_equal(retrieved.alpha, beta_ts_params.alpha)
 
-    def test_get_params_returns_none_for_missing_experiment(self, motor_cache):
-        result = motor_cache.get_params("nonexistent-exp")
+    def test_get_params_returns_none_for_missing_experiment(self, tenant_id, motor_cache):
+        result = motor_cache.get_params(tenant_id, "nonexistent-exp")
 
         assert result is None
 
-    def test_set_and_get_agent(self, motor_cache, mock_agent):
+    def test_set_and_get_agent(self, tenant_id, motor_cache, mock_agent):
         experiment_id = "exp-123"
 
-        motor_cache.set_agent(experiment_id, mock_agent)
-        retrieved = motor_cache.get_agent(experiment_id)
+        motor_cache.set_agent(tenant_id, experiment_id, mock_agent)
+        retrieved = motor_cache.get_agent(tenant_id, experiment_id)
 
         assert retrieved is not None
         assert retrieved.experiment_id == "exp-123"
         assert len(retrieved.pool.arms) == 3
 
-    def test_get_agent_returns_none_for_missing_experiment(self, motor_cache):
-        result = motor_cache.get_agent("nonexistent-exp")
+    def test_get_agent_returns_none_for_missing_experiment(self, tenant_id, motor_cache):
+        result = motor_cache.get_agent(tenant_id, "nonexistent-exp")
 
         assert result is None
 
-    def test_invalidate_experiment_removes_params_and_agent(self, motor_cache, beta_ts_params, mock_agent):
+    def test_invalidate_experiment_removes_params_and_agent(
+        self, tenant_id, motor_cache, beta_ts_params, mock_agent
+    ):
         experiment_id = "exp-123"
 
-        motor_cache.set_params(experiment_id, beta_ts_params)
-        motor_cache.set_agent(experiment_id, mock_agent)
+        motor_cache.set_params(tenant_id, experiment_id, beta_ts_params)
+        motor_cache.set_agent(tenant_id, experiment_id, mock_agent)
 
-        motor_cache.invalidate_experiment(experiment_id)
+        motor_cache.invalidate_experiment(tenant_id, experiment_id)
 
-        assert motor_cache.get_params(experiment_id) is None
-        assert motor_cache.get_agent(experiment_id) is None
+        assert motor_cache.get_params(tenant_id, experiment_id) is None
+        assert motor_cache.get_agent(tenant_id, experiment_id) is None
 
-    def test_invalidate_experiment_handles_missing_experiment(self, motor_cache):
+    def test_invalidate_experiment_handles_missing_experiment(self, tenant_id, motor_cache):
         # should not raise exception
-        motor_cache.invalidate_experiment("nonexistent-exp")
+        motor_cache.invalidate_experiment(tenant_id, "nonexistent-exp")
 
-    def test_clear_removes_all_entries(self, motor_cache, beta_ts_params, mock_agent):
-        motor_cache.set_params("exp-1", beta_ts_params)
-        motor_cache.set_params("exp-2", beta_ts_params)
-        motor_cache.set_agent("exp-1", mock_agent)
+    def test_clear_removes_all_entries(self, tenant_id, motor_cache, beta_ts_params, mock_agent):
+        motor_cache.set_params(tenant_id, "exp-1", beta_ts_params)
+        motor_cache.set_params(tenant_id, "exp-2", beta_ts_params)
+        motor_cache.set_agent(tenant_id, "exp-1", mock_agent)
 
         motor_cache.clear()
 
-        assert motor_cache.get_params("exp-1") is None
-        assert motor_cache.get_params("exp-2") is None
-        assert motor_cache.get_agent("exp-1") is None
+        assert motor_cache.get_params(tenant_id, "exp-1") is None
+        assert motor_cache.get_params(tenant_id, "exp-2") is None
+        assert motor_cache.get_agent(tenant_id, "exp-1") is None
 
-    def test_params_cache_ttl_expiration(self, motor_settings):
+    def test_params_cache_ttl_expiration(self, tenant_id, motor_settings):
         # test with very short ttl
         settings = MotorSettings(
             param_cache_ttl=1,  # 1 second
@@ -84,13 +86,13 @@ class TestMotorCache:
             beta=np.array([1.0, 1.0]),
         )
 
-        cache.set_params("exp-1", params)
-        assert cache.get_params("exp-1") is not None
+        cache.set_params(tenant_id, "exp-1", params)
+        assert cache.get_params(tenant_id, "exp-1") is not None
 
         # note: actual ttl expiration testing would require sleep
         # which slows tests, so we just verify the cache is configured correctly
 
-    def test_cache_maxsize_limit(self, motor_settings):
+    def test_cache_maxsize_limit(self, tenant_id, motor_settings):
         # test with small maxsize
         settings = MotorSettings(
             param_cache_ttl=60,
@@ -108,7 +110,7 @@ class TestMotorCache:
                 alpha=np.array([1.0, 1.0]),
                 beta=np.array([1.0, 1.0]),
             )
-            cache.set_params(f"exp-{i}", params)
+            cache.set_params(tenant_id, f"exp-{i}", params)
 
         # at least the most recent entries should be cached
-        assert cache.get_params("exp-4") is not None
+        assert cache.get_params(tenant_id, "exp-4") is not None

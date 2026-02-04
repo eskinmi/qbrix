@@ -127,7 +127,7 @@ class TestCortexServiceStop:
             with patch("cortexsvc.service.RedisStreamConsumer", return_value=mock_stream_consumer):
                 with patch("cortexsvc.service.BatchTrainer") as mock_trainer_cls:
                     mock_trainer = AsyncMock()
-                    mock_trainer.train = AsyncMock(return_value={"exp-001": 1})
+                    mock_trainer.train = AsyncMock(return_value={("tenant-001", "exp-001"): 1})
                     mock_trainer_cls.return_value = mock_trainer
 
                     await service.start()
@@ -194,7 +194,7 @@ class TestCortexServiceRecoverPending:
             with patch("cortexsvc.service.RedisStreamConsumer", return_value=mock_stream_consumer):
                 with patch("cortexsvc.service.BatchTrainer") as mock_trainer_cls:
                     mock_trainer = AsyncMock()
-                    mock_trainer.train = AsyncMock(return_value={"exp-001": 2})
+                    mock_trainer.train = AsyncMock(return_value={("tenant-001", "exp-001"): 2})
                     mock_trainer_cls.return_value = mock_trainer
 
                     await service.start()
@@ -228,7 +228,7 @@ class TestCortexServiceProcessBatch:
             with patch("cortexsvc.service.RedisStreamConsumer", return_value=mock_stream_consumer):
                 with patch("cortexsvc.service.BatchTrainer") as mock_trainer_cls:
                     mock_trainer = AsyncMock()
-                    mock_trainer.train = AsyncMock(return_value={"exp-001": 1})
+                    mock_trainer.train = AsyncMock(return_value={("tenant-001", "exp-001"): 1})
                     mock_trainer_cls.return_value = mock_trainer
 
                     await service.start()
@@ -254,7 +254,7 @@ class TestCortexServiceProcessBatch:
             with patch("cortexsvc.service.RedisStreamConsumer", return_value=mock_stream_consumer):
                 with patch("cortexsvc.service.BatchTrainer") as mock_trainer_cls:
                     mock_trainer = AsyncMock()
-                    mock_trainer.train = AsyncMock(return_value={"exp-001": 2})
+                    mock_trainer.train = AsyncMock(return_value={("tenant-001", "exp-001"): 2})
                     mock_trainer_cls.return_value = mock_trainer
 
                     await service.start()
@@ -268,8 +268,8 @@ class TestCortexServiceProcessBatch:
                     await service._process_batch(messages)
 
                     # assert
-                    assert service._stats["exp-001"]["total"] == 2
-                    assert service._stats["exp-001"]["last_train"] > 0
+                    assert service._stats["tenant-001:exp-001"]["total"] == 2
+                    assert service._stats["tenant-001:exp-001"]["last_train"] > 0
 
 
 class TestCortexServiceRunConsumer:
@@ -319,7 +319,7 @@ class TestCortexServiceRunConsumer:
             with patch("cortexsvc.service.RedisStreamConsumer", return_value=mock_stream_consumer):
                 with patch("cortexsvc.service.BatchTrainer") as mock_trainer_cls:
                     mock_trainer = AsyncMock()
-                    mock_trainer.train = AsyncMock(return_value={"exp-001": 2})
+                    mock_trainer.train = AsyncMock(return_value={("tenant-001", "exp-001"): 2})
                     mock_trainer_cls.return_value = mock_trainer
 
                     await service.start()
@@ -359,7 +359,7 @@ class TestCortexServiceRunConsumer:
             with patch("cortexsvc.service.RedisStreamConsumer", return_value=mock_stream_consumer):
                 with patch("cortexsvc.service.BatchTrainer") as mock_trainer_cls:
                     mock_trainer = AsyncMock()
-                    mock_trainer.train = AsyncMock(return_value={"exp-001": 1})
+                    mock_trainer.train = AsyncMock(return_value={("tenant-001", "exp-001"): 1})
                     mock_trainer_cls.return_value = mock_trainer
 
                     await service.start()
@@ -463,7 +463,7 @@ class TestCortexServiceFlushBatch:
             with patch("cortexsvc.service.RedisStreamConsumer", return_value=mock_stream_consumer):
                 with patch("cortexsvc.service.BatchTrainer") as mock_trainer_cls:
                     mock_trainer = AsyncMock()
-                    mock_trainer.train = AsyncMock(return_value={"exp-001": 2})
+                    mock_trainer.train = AsyncMock(return_value={("tenant-001", "exp-001"): 2})
                     mock_trainer_cls.return_value = mock_trainer
 
                     await service.start()
@@ -493,12 +493,13 @@ class TestCortexServiceFlushBatch:
             with patch("cortexsvc.service.RedisStreamConsumer", return_value=mock_stream_consumer):
                 with patch("cortexsvc.service.BatchTrainer") as mock_trainer_cls:
                     mock_trainer = AsyncMock()
-                    mock_trainer.train = AsyncMock(return_value={"exp-001": 1})
+                    mock_trainer.train = AsyncMock(return_value={("tenant-001", "exp-001"): 1})
                     mock_trainer_cls.return_value = mock_trainer
 
                     await service.start()
 
                     event1 = FeedbackEvent(
+                        tenant_id="tenant-001",
                         experiment_id="exp-001",
                         request_id="req-001",
                         arm_index=0,
@@ -509,6 +510,7 @@ class TestCortexServiceFlushBatch:
                         timestamp_ms=1234567890,
                     )
                     event2 = FeedbackEvent(
+                        tenant_id="tenant-001",
                         experiment_id="exp-002",
                         request_id="req-002",
                         arm_index=1,
@@ -536,12 +538,12 @@ class TestCortexServiceFlushBatch:
 class TestCortexServiceGetStats:
     """test stats retrieval."""
 
-    def test_get_stats_without_experiment_id_returns_all(self):
+    def test_get_stats_without_experiment_id_returns_all(self, tenant_id):
         # arrange
         settings = CortexSettings()
         service = CortexService(settings)
-        service._stats["exp-001"] = {"total": 10, "pending": 0, "last_train": 123}
-        service._stats["exp-002"] = {"total": 5, "pending": 2, "last_train": 456}
+        service._stats[f"{tenant_id}:exp-001"] = {"total": 10, "pending": 0, "last_train": 123}
+        service._stats[f"{tenant_id}:exp-002"] = {"total": 5, "pending": 2, "last_train": 456}
 
         # act
         stats = service.get_stats()
@@ -552,27 +554,27 @@ class TestCortexServiceGetStats:
         assert "exp-001" in exp_ids
         assert "exp-002" in exp_ids
 
-    def test_get_stats_with_experiment_id_returns_single(self):
+    def test_get_stats_with_experiment_id_returns_single(self, tenant_id):
         # arrange
         settings = CortexSettings()
         service = CortexService(settings)
-        service._stats["exp-001"] = {"total": 10, "pending": 0, "last_train": 123}
+        service._stats[f"{tenant_id}:exp-001"] = {"total": 10, "pending": 0, "last_train": 123}
 
         # act
-        stats = service.get_stats(experiment_id="exp-001")
+        stats = service.get_stats(tenant_id=tenant_id, experiment_id="exp-001")
 
         # assert
         assert len(stats) == 1
         assert stats[0]["experiment_id"] == "exp-001"
         assert stats[0]["total"] == 10
 
-    def test_get_stats_with_missing_experiment_id_returns_empty(self):
+    def test_get_stats_with_missing_experiment_id_returns_empty(self, tenant_id):
         # arrange
         settings = CortexSettings()
         service = CortexService(settings)
 
         # act
-        stats = service.get_stats(experiment_id="exp-999")
+        stats = service.get_stats(tenant_id=tenant_id, experiment_id="exp-999")
 
         # assert
         assert stats == []
